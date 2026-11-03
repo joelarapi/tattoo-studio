@@ -1,59 +1,69 @@
-import { headers as getHeaders } from 'next/headers.js'
-import Image from 'next/image'
-import { getPayload } from 'payload'
-import React from 'react'
-import { fileURLToPath } from 'url'
+import { Button } from '@/components/ui/Button'
+import { Container } from '@/components/ui/Container'
+import { Eyebrow } from '@/components/ui/Eyebrow'
 
-import config from '@/payload.config'
-import './styles.css'
-
-export default async function HomePage() {
-  const headers = await getHeaders()
-  const payloadConfig = await config
-  const payload = await getPayload({ config: payloadConfig })
-  const { user } = await payload.auth({ headers })
-
-  const fileURL = `vscode://file/${fileURLToPath(import.meta.url)}`
-
+/*
+ * Phase 1 placeholder: shows the tokens and UI primitives so the scaffold can be checked.
+ * Replaced by the CMS-driven homepage in Phase 4.
+ */
+export default function HomePage() {
   return (
-    <div className="home">
-      <div className="content">
-        <picture>
-          <source srcSet="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg" />
-          <Image
-            alt="Payload Logo"
-            height={65}
-            src="https://raw.githubusercontent.com/payloadcms/payload/3.x/packages/ui/src/assets/payload-favicon.svg"
-            width={65}
-          />
-        </picture>
-        {!user && <h1>Welcome to your new project.</h1>}
-        {user && <h1>Welcome back, {user.email}</h1>}
-        <div className="links">
-          <a
-            className="admin"
-            href={payloadConfig.routes.admin}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Go to admin panel
-          </a>
-          <a
-            className="docs"
-            href="https://payloadcms.com/docs"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Documentation
-          </a>
+    <main>
+      <Container as="section" aria-labelledby="hero-title" className="py-section-lg">
+        <Eyebrow pill>Design system check · Phase 1</Eyebrow>
+        <h1 id="hero-title" className="mt-8 max-w-[14ch] text-display">
+          Your story, permanently drawn
+        </h1>
+        <p className="mt-6 max-w-[52ch] text-large">
+          Scaffold preview: Roboto headings, Roboto Mono labels, the black and grey palette, and a
+          single orange accent. Hover the buttons to see the label scramble.
+        </p>
+        <div className="mt-10 flex flex-wrap items-center gap-3">
+          <Button href="/admin">Book a consult</Button>
+          <Button variant="secondary" href="/admin">
+            Our studio
+          </Button>
+          <Button size="sm" href="/admin">
+            Learn more
+          </Button>
+          <Button size="sm" variant="secondary" arrow={false}>
+            Secondary small
+          </Button>
+          <Button asChild variant="secondary">
+            <a href="https://payloadcms.com/docs" rel="noopener noreferrer" target="_blank">
+              External (asChild)
+            </a>
+          </Button>
         </div>
-      </div>
-      <div className="footer">
-        <p>Update this page by editing</p>
-        <a className="codeLink" href={fileURL}>
-          <code>app/(frontend)/page.tsx</code>
-        </a>
-      </div>
-    </div>
+      </Container>
+
+      <Container as="section" aria-labelledby="tokens-title" className="pb-section">
+        <Eyebrow>Tokens</Eyebrow>
+        <h2 id="tokens-title" className="mt-4 text-h2">
+          Type scale <span className="text-text-muted">and colour.</span>
+        </h2>
+        <ul className="mt-10 grid grid-cols-2 gap-gutter sm:grid-cols-5">
+          {[
+            ['bg-surface', 'Surface'],
+            ['bg-surface-2', 'Surface 2'],
+            ['bg-line', 'Line'],
+            ['bg-muted', 'Muted'],
+            ['bg-accent', 'Accent'],
+          ].map(([swatch, label]) => (
+            <li key={label} className="rounded-md bg-surface p-4">
+              <span className={`block h-16 rounded-sm ${swatch}`} />
+              <span className="mt-3 block mono-label-sm text-text-muted">{label}</span>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-12 space-y-4">
+          <p className="text-h3 text-text">Heading three</p>
+          <p className="text-h5 text-text">Heading five</p>
+          <p className="text-main">Body copy in mid grey for long-form reading.</p>
+          <p className="mono-label text-text-muted">001 · Mono label</p>
+          <p className="mono-label-sm text-text-faint">Caption · faint (non-essential only)</p>
+        </div>
+      </Container>
+    </main>
   )
 }

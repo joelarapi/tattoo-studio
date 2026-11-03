@@ -1,0 +1,151 @@
+@import 'tailwindcss';
+@import 'lenis/dist/lenis.css';
+
+/*
+ * Design tokens.
+ * `@theme static` emits every token as a CSS custom property on :root (even if no utility
+ * uses it), so components, inline SVG and canvas code can read them with var(--…).
+ */
+@theme static {
+  /* Colour: drop Tailwind's default palette so only on-system colours exist. */
+  --color-*: initial;
+  --color-bg: #000000;
+  --color-surface: #111111; /* cards */
+  --color-surface-2: #212121; /* secondary buttons, borders */
+  --color-line: #343434; /* line-art strokes, grid */
+  --color-muted: #4e4e4e;
+  --color-text-muted: #a8a8a8; /* body copy: 8.8:1 on black */
+  --color-text-faint: #717171; /* non-essential captions only: 4.3:1 on black, fails AA for body text */
+  --color-text: #ffffff;
+  --color-accent: #ff4800; /* SINGLE accent: change it here and everything follows */
+  --color-accent-hover: color-mix(in srgb, var(--color-accent), black 20%);
+  /*
+   * Text drawn ON the accent. White on #FF4800 is only 3.4:1 (fails WCAG AA for 12–14px labels);
+   * black is 6.2:1. To use white, darken the accent to about #D93D00 or deeper (4.5:1).
+   */
+  --color-on-accent: #000000;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --ease-studio: cubic-bezier(0.625, 0.05, 0, 1);
+
+  /* Fluid type: clamp between a 320px and 1920px viewport */
+  --text-display: clamp(3rem, 1.6rem + 4.6vw, 7.64rem);
+  --text-display--line-height: 1.2;
+  --text-h1: clamp(2.25rem, 1.45rem + 3.2vw, 5.46rem);
+  --text-h1--line-height: 1.2;
+  --text-h2: clamp(2rem, 1.3rem + 2.9vw, 4.86rem);
+  --text-h2--line-height: 1.2;
+  --text-h3: clamp(1.75rem, 1.15rem + 2.5vw, 4.25rem);
+  --text-h3--line-height: 1.2;
+  --text-h5: clamp(1.25rem, 1.05rem + 1.1vw, 2.32rem);
+  --text-h5--line-height: 1.2;
+  --text-large: clamp(1.125rem, 1.09rem + 0.18vw, 1.3rem);
+  --text-large--line-height: 1.4;
+  --text-main: clamp(0.9375rem, 0.92rem + 0.09vw, 1.03rem);
+  --text-main--line-height: 1.4;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.2;
+  --text-label-sm: 0.75rem;
+  --text-label-sm--line-height: 1.2;
+}
+
+/* Layout tokens (not a Tailwind namespace, so plain custom properties). */
+:root {
+  --site-margin: clamp(1.5rem, 0.5rem + 5vw, 9.36rem); /* side gutter */
+  --site-max: 120rem;
+  --gutter: 0.5rem;
+  --section-space: clamp(4rem, 3.2rem + 3vw, 7rem);
+  --section-space-lg: clamp(5.5rem, 4.6rem + 4.5vw, 10rem);
+  --nav-height: 4rem;
+}
+
+/* Utilities that point at runtime variables (fonts come from next/font on <html>). */
+@theme inline {
+  --font-sans: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
+
+  /* Spacing and container names must not collide: max-w-* checks --spacing-* first. */
+  --spacing-site-margin: var(--site-margin); /* px-site-margin */
+  --spacing-gutter: var(--gutter); /* gap-gutter */
+  --spacing-section: var(--section-space); /* py-section */
+  --spacing-section-lg: var(--section-space-lg); /* py-section-lg */
+  --spacing-nav: var(--nav-height); /* h-nav, pt-nav */
+  --container-site: var(--site-max); /* max-w-site */
+}
+
+@layer base {
+  html {
+    background-color: var(--color-bg);
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    min-height: 100svh;
+    font-family: var(--font-sans);
+    font-size: var(--text-main);
+    line-height: 1.4;
+    color: var(--color-text-muted);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--color-text);
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  dd,
+  blockquote {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-accent) 60%, transparent);
+    color: var(--color-text);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+  }
+}
+
+/* Small UPPERCASE Roboto Mono labels: nav links, eyebrows, buttons, index numbers. */
+@utility mono-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-label);
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@utility mono-label-sm {
+  font-family: var(--font-mono);
+  font-size: var(--text-label-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/*
+ * Pre-animation states. `js-ready` is added to <html> by an inline script, so without JS
+ * nothing is ever hidden. Reduced-motion users never get hidden states either.
+ * Mark elements with data-reveal; motion components animate them in and set data-revealed.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .js-ready [data-reveal]:not([data-revealed]) {
+    opacity: 0;
+  }
+}
