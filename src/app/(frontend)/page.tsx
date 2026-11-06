@@ -1,69 +1,56 @@
-import { Button } from '@/components/ui/Button'
-import { Container } from '@/components/ui/Container'
-import { Eyebrow } from '@/components/ui/Eyebrow'
+import { draftMode } from 'next/headers'
 
-/*
- * Phase 1 placeholder: shows the tokens and UI primitives so the scaffold can be checked.
- * Replaced by the CMS-driven homepage in Phase 4.
- */
-export default function HomePage() {
+import { ArtistsSection } from '@/components/home/ArtistsSection'
+import { Booking } from '@/components/home/Booking'
+import { Faq } from '@/components/home/Faq'
+import { FeaturedWork } from '@/components/home/FeaturedWork'
+import { Hero } from '@/components/home/Hero'
+import { Journal } from '@/components/home/Journal'
+import { ProcessSection } from '@/components/home/ProcessSection'
+import { Standards } from '@/components/home/Standards'
+import { Statement } from '@/components/home/Statement'
+import { StudioNumbers } from '@/components/home/StudioNumbers'
+import { StylesGrid } from '@/components/home/StylesGrid'
+import { LivePreviewListener } from '@/components/LivePreviewListener'
+import {
+  getArtists,
+  getFeaturedStyles,
+  getFeaturedWork,
+  getHomepage,
+  getHomepageFaqs,
+  getLatestPosts,
+  getStyles,
+} from '@/lib/data'
+
+/** The homepage: every text from Homepage in the CMS, every list from its collection. */
+export default async function HomePage() {
+  const [home, work, featuredStyles, allStyles, artists, posts, faqs, draft] = await Promise.all([
+    getHomepage(),
+    getFeaturedWork(),
+    getFeaturedStyles(),
+    getStyles(),
+    getArtists(),
+    getLatestPosts(3),
+    getHomepageFaqs(),
+    draftMode(),
+  ])
+  const poster = typeof home.hero.poster === 'object' ? home.hero.poster?.url : null
+  const featuredArtists = artists.filter((artist) => artist.featured).slice(0, 4)
+
   return (
-    <main>
-      <Container as="section" aria-labelledby="hero-title" className="py-section-lg">
-        <Eyebrow pill>Design system check · Phase 1</Eyebrow>
-        <h1 id="hero-title" className="mt-8 max-w-[14ch] text-display">
-          Your story, permanently drawn
-        </h1>
-        <p className="mt-6 max-w-[52ch] text-large">
-          Scaffold preview: Roboto headings, Roboto Mono labels, the black and grey palette, and a
-          single orange accent. Hover the buttons to see the label scramble.
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <Button href="/admin">Book a consult</Button>
-          <Button variant="secondary" href="/admin">
-            Our studio
-          </Button>
-          <Button size="sm" href="/admin">
-            Learn more
-          </Button>
-          <Button size="sm" variant="secondary" arrow={false}>
-            Secondary small
-          </Button>
-          <Button asChild variant="secondary">
-            <a href="https://payloadcms.com/docs" rel="noopener noreferrer" target="_blank">
-              External (asChild)
-            </a>
-          </Button>
-        </div>
-      </Container>
-
-      <Container as="section" aria-labelledby="tokens-title" className="pb-section">
-        <Eyebrow>Tokens</Eyebrow>
-        <h2 id="tokens-title" className="mt-4 text-h2">
-          Type scale <span className="text-text-muted">and colour.</span>
-        </h2>
-        <ul className="mt-10 grid grid-cols-2 gap-gutter sm:grid-cols-5">
-          {[
-            ['bg-surface', 'Surface'],
-            ['bg-surface-2', 'Surface 2'],
-            ['bg-line', 'Line'],
-            ['bg-muted', 'Muted'],
-            ['bg-accent', 'Accent'],
-          ].map(([swatch, label]) => (
-            <li key={label} className="rounded-md bg-surface p-4">
-              <span className={`block h-16 rounded-sm ${swatch}`} />
-              <span className="mt-3 block mono-label-sm text-text-muted">{label}</span>
-            </li>
-          ))}
-        </ul>
-        <div className="mt-12 space-y-4">
-          <p className="text-h3 text-text">Heading three</p>
-          <p className="text-h5 text-text">Heading five</p>
-          <p className="text-main">Body copy in mid grey for long-form reading.</p>
-          <p className="mono-label text-text-muted">001 · Mono label</p>
-          <p className="mono-label-sm text-text-faint">Caption · faint (non-essential only)</p>
-        </div>
-      </Container>
+    <main id="main">
+      {draft.isEnabled && <LivePreviewListener />}
+      <Hero hero={home.hero} />
+      <ProcessSection process={home.process} posterSrc={poster} />
+      <FeaturedWork copy={home.featuredWork} items={work} />
+      <StylesGrid copy={home.styles} styles={featuredStyles} />
+      <StudioNumbers copy={home.numbers} />
+      <Statement copy={home.statement} />
+      <ArtistsSection copy={home.artists} artists={featuredArtists} />
+      <Standards copy={home.standards} />
+      <Journal copy={home.journal} posts={posts} />
+      <Faq copy={home.faq} faqs={faqs} />
+      <Booking copy={home.booking} styles={allStyles} artists={artists} />
     </main>
   )
 }

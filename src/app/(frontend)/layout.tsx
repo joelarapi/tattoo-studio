@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 
+import { Footer } from '@/components/layout/Footer'
+import { Nav } from '@/components/layout/Nav'
+import { FadeReveals } from '@/components/motion/FadeReveals'
 import { MotionProvider } from '@/components/motion/MotionProvider'
+import { getNavigation, getSiteSettings, getStyles } from '@/lib/data'
 import { defaultLocale } from '@/lib/i18n'
 
 import { roboto, robotoMono } from './fonts'
@@ -25,7 +29,14 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
 }
 
-export default function FrontendLayout({ children }: { children: ReactNode }) {
+export default async function FrontendLayout({ children }: { children: ReactNode }) {
+  const [navigation, settings, styles] = await Promise.all([
+    getNavigation(),
+    getSiteSettings(),
+    getStyles(),
+  ])
+  const menuStyles = styles.map(({ id, name, slug }) => ({ id, name, slug }))
+
   return (
     <html
       lang={defaultLocale}
@@ -37,7 +48,18 @@ export default function FrontendLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: jsReadyScript }} />
       </head>
       <body>
-        <MotionProvider>{children}</MotionProvider>
+        <a
+          href="#main"
+          className="sr-only z-[60] rounded-sm bg-accent px-4 py-3 mono-label text-on-accent focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        >
+          Skip to content
+        </a>
+        <MotionProvider>
+          <Nav navigation={navigation} settings={settings} styles={menuStyles} />
+          {children}
+          <Footer navigation={navigation} settings={settings} styles={menuStyles} />
+          <FadeReveals />
+        </MotionProvider>
       </body>
     </html>
   )

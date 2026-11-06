@@ -67,35 +67,69 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
+    posts: Post;
+    categories: Category;
     media: Media;
+    artists: Artist;
+    styles: Style;
+    'portfolio-items': PortfolioItem;
+    faqs: Faq;
+    leads: Lead;
+    'lead-attachments': LeadAttachment;
+    'legal-pages': LegalPage;
+    users: User;
     'payload-kv': PayloadKv;
+    'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    artists: ArtistsSelect<false> | ArtistsSelect<true>;
+    styles: StylesSelect<false> | StylesSelect<true>;
+    'portfolio-items': PortfolioItemsSelect<false> | PortfolioItemsSelect<true>;
+    faqs: FaqsSelect<false> | FaqsSelect<true>;
+    leads: LeadsSelect<false> | LeadsSelect<true>;
+    'lead-attachments': LeadAttachmentsSelect<false> | LeadAttachmentsSelect<true>;
+    'legal-pages': LegalPagesSelect<false> | LegalPagesSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    homepage: Homepage;
+    'site-settings': SiteSetting;
+    navigation: Navigation;
+  };
+  globalsSelect: {
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+    navigation: NavigationSelect<false> | NavigationSelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
   };
   user: User;
   jobs: {
-    tasks: unknown;
+    tasks: {
+      schedulePublish: TaskSchedulePublish;
+      inline: {
+        input: unknown;
+        output: unknown;
+      };
+    };
     workflows: unknown;
   };
 }
@@ -118,11 +152,478 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * The blog ("Journal"). Save as draft while writing; publish now, or schedule a date with the arrow next to Publish.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  /**
+   * The headline. Aim for under 60 characters so Google shows all of it.
+   */
+  title: string;
+  /**
+   * One or two sentences shown in post lists, and used by Google if the SEO description is empty. Max 160 characters.
+   */
+  excerpt: string;
+  cover: number | Media;
+  /**
+   * Use headings (H2) to split the article; they become the table of contents. Add a "Call to action" or "Artist card" with the + button.
+   */
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Filled in automatically on first publish. Shown on the article.
+   */
+  publishedAt?: string | null;
+  /**
+   * Credit the post to an artist. Leave empty to credit the studio.
+   */
+  author?: (number | null) | Artist;
+  categories?: (number | Category)[] | null;
+  /**
+   * Optional keywords, e.g. "first tattoo". Press Enter after each one.
+   */
+  tags?: string[] | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * Every image and video on the site. Upload large originals; the site makes smaller copies automatically.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Describe what the image shows, for blind visitors and for Google. e.g. "Fine-line rose tattoo on a forearm".
+   */
+  alt: string;
+  /**
+   * Optional. Shown under the image where the design has room for it.
+   */
+  caption?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Resident artists. Drag rows to change the order they appear on the site.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artists".
+ */
+export interface Artist {
+  id: number;
+  _order?: string | null;
+  name: string;
+  /**
+   * Portrait photo, at least 1200px tall. Shown in a 3:4 frame.
+   */
+  portrait: number | Media;
+  /**
+   * 3–5 sentences, written in the third person.
+   */
+  bio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The styles this artist is known for.
+   */
+  specialities?: (number | Style)[] | null;
+  instagram?: string | null;
+  yearsOfExperience?: number | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * The homepage shows up to 4 artists.
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * The styles the studio offers. They appear in the menu, the homepage grid and the booking form. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styles".
+ */
+export interface Style {
+  id: number;
+  _order?: string | null;
+  /**
+   * e.g. Fine line
+   */
+  name: string;
+  /**
+   * One or two sentences for the homepage grid. Max 160.
+   */
+  shortDescription: string;
+  /**
+   * The style's own page: how the studio approaches it.
+   */
+  longDescription?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * The small line drawing shown next to the title.
+   */
+  icon:
+    | 'fine-line'
+    | 'blackwork'
+    | 'realism'
+    | 'traditional'
+    | 'lettering'
+    | 'cover-up'
+    | 'geometric'
+    | 'dotwork'
+    | 'needle'
+    | 'ink'
+    | 'certificate'
+    | 'aftercare'
+    | 'shield'
+    | 'compass';
+  /**
+   * Large image at the top of the style page.
+   */
+  heroImage?: (number | null) | Media;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * The "What we tattoo" grid shows 4 styles. Tick exactly 4.
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Topics for journal posts, e.g. Aftercare or Styles. Each gets its own page.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  /**
+   * Shown on the category page and used for Google. Max 160 characters.
+   */
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Finished tattoos. Tick "Featured" to show a piece in the homepage slider. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-items".
+ */
+export interface PortfolioItem {
+  id: number;
+  _order?: string | null;
+  /**
+   * Short and descriptive, e.g. "Peony half-sleeve".
+   */
+  title: string;
+  artist: number | Artist;
+  style: number | Style;
+  /**
+   * The first image is the one shown on cards. Drag to reorder.
+   */
+  images: (number | Media)[];
+  /**
+   * A silent loop of a few seconds, MP4 or WebM, max 8 MB. Plays instead of the image on the homepage.
+   */
+  video?: (number | null) | Media;
+  /**
+   * Where on the body, e.g. "Forearm" or "Upper back".
+   */
+  placement?: string | null;
+  clientConsent: boolean;
+  /**
+   * Show in the homepage slider.
+   */
+  featured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Questions and answers. Google can show these directly in search results. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  _order?: string | null;
+  /**
+   * Phrase it the way a client would ask it.
+   */
+  question: string;
+  /**
+   * Two to four sentences. Answer the question in the first one.
+   */
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * The homepage shows 5–8 questions.
+   */
+  showOnHomepage?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Every consultation request from the website, newest first. Filter by status, style or ad campaign.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads".
+ */
+export interface Lead {
+  id: number;
+  /**
+   * Track follow-up. Only admins can change this.
+   */
+  status: 'new' | 'contacted' | 'booked' | 'closed';
+  name: string;
+  phone: string;
+  email?: string | null;
+  style?: (number | null) | Style;
+  preferredArtist?: (number | null) | Artist;
+  size?: ('small' | 'medium' | 'large' | 'xl' | 'unsure') | null;
+  placement?: string | null;
+  description?: string | null;
+  referenceImage?: (number | null) | LeadAttachment;
+  marketingConsent?: boolean | null;
+  /**
+   * Where the visit came from, captured automatically from ad links (Google Ads, Meta).
+   */
+  attribution?: {
+    utmSource?: string | null;
+    utmMedium?: string | null;
+    utmCampaign?: string | null;
+    utmTerm?: string | null;
+    utmContent?: string | null;
+    gclid?: string | null;
+    fbclid?: string | null;
+    /**
+     * First page they visited.
+     */
+    landingPage?: string | null;
+    referrer?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Images clients attached to booking requests. Private: never shown on the site.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-attachments".
+ */
+export interface LeadAttachment {
+  id: number;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * Privacy and cookie policies. Paste the text from your lawyer; the "last updated" date is set automatically.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages".
+ */
+export interface LegalPage {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * People who can log in to this CMS. Admins manage users and settings; editors manage content.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  name: string;
+  /**
+   * Editors can manage all content. Only admins can manage users and settings.
+   */
+  roles: ('admin' | 'editor')[];
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -145,29 +646,10 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  alt: string;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -181,23 +663,151 @@ export interface PayloadKv {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs".
+ */
+export interface PayloadJob {
+  id: number;
+  /**
+   * Input data provided to the job
+   */
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taskStatus?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  totalTried?: number | null;
+  /**
+   * If hasError is true this job will not be retried
+   */
+  hasError?: boolean | null;
+  /**
+   * If hasError is true, this is the error that caused it
+   */
+  error?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Task execution log
+   */
+  log?:
+    | {
+        executedAt: string;
+        completedAt: string;
+        taskSlug: 'inline' | 'schedulePublish';
+        taskID: string;
+        input?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        output?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        state: 'failed' | 'succeeded';
+        error?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  taskSlug?: ('inline' | 'schedulePublish') | null;
+  queue?: string | null;
+  waitUntil?: string | null;
+  processing?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: string | User;
+        relationTo: 'posts';
+        value: number | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: number | Category;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'artists';
+        value: number | Artist;
+      } | null)
+    | ({
+        relationTo: 'styles';
+        value: number | Style;
+      } | null)
+    | ({
+        relationTo: 'portfolio-items';
+        value: number | PortfolioItem;
+      } | null)
+    | ({
+        relationTo: 'faqs';
+        value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'leads';
+        value: number | Lead;
+      } | null)
+    | ({
+        relationTo: 'lead-attachments';
+        value: number | LeadAttachment;
+      } | null)
+    | ({
+        relationTo: 'legal-pages';
+        value: number | LegalPage;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -207,10 +817,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -230,7 +840,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -238,9 +848,265 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  excerpt?: T;
+  cover?: T;
+  content?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  publishedAt?: T;
+  author?: T;
+  categories?: T;
+  tags?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media_select".
+ */
+export interface MediaSelect<T extends boolean = true> {
+  alt?: T;
+  caption?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        card?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        hero?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        og?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "artists_select".
+ */
+export interface ArtistsSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  portrait?: T;
+  bio?: T;
+  specialities?: T;
+  instagram?: T;
+  yearsOfExperience?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styles_select".
+ */
+export interface StylesSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  shortDescription?: T;
+  longDescription?: T;
+  icon?: T;
+  heroImage?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-items_select".
+ */
+export interface PortfolioItemsSelect<T extends boolean = true> {
+  _order?: T;
+  title?: T;
+  artist?: T;
+  style?: T;
+  images?: T;
+  video?: T;
+  placement?: T;
+  clientConsent?: T;
+  featured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs_select".
+ */
+export interface FaqsSelect<T extends boolean = true> {
+  _order?: T;
+  question?: T;
+  answer?: T;
+  showOnHomepage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "leads_select".
+ */
+export interface LeadsSelect<T extends boolean = true> {
+  status?: T;
+  name?: T;
+  phone?: T;
+  email?: T;
+  style?: T;
+  preferredArtist?: T;
+  size?: T;
+  placement?: T;
+  description?: T;
+  referenceImage?: T;
+  marketingConsent?: T;
+  attribution?:
+    | T
+    | {
+        utmSource?: T;
+        utmMedium?: T;
+        utmCampaign?: T;
+        utmTerm?: T;
+        utmContent?: T;
+        gclid?: T;
+        fbclid?: T;
+        landingPage?: T;
+        referrer?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-attachments_select".
+ */
+export interface LeadAttachmentsSelect<T extends boolean = true> {
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+  sizes?:
+    | T
+    | {
+        thumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-pages_select".
+ */
+export interface LegalPagesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  name?: T;
+  roles?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -261,29 +1127,42 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media_select".
- */
-export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
   key?: T;
   data?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-jobs_select".
+ */
+export interface PayloadJobsSelect<T extends boolean = true> {
+  input?: T;
+  taskStatus?: T;
+  completedAt?: T;
+  totalTried?: T;
+  hasError?: T;
+  error?: T;
+  log?:
+    | T
+    | {
+        executedAt?: T;
+        completedAt?: T;
+        taskSlug?: T;
+        taskID?: T;
+        input?: T;
+        output?: T;
+        state?: T;
+        error?: T;
+        id?: T;
+      };
+  taskSlug?: T;
+  queue?: T;
+  waitUntil?: T;
+  processing?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -318,6 +1197,732 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * All homepage text, section by section. Changes autosave as a draft; press Publish to put them live.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: number;
+  hero: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    eyebrowLink: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+    /**
+     * The main headline (the page’s H1). Short and memorable; Google reads it first.
+     */
+    heading: string;
+    /**
+     * One or two sentences under the headline.
+     */
+    intro: string;
+    cta: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+    /**
+     * The small hint at the bottom of the hero.
+     */
+    scrollLabel?: string | null;
+    /**
+     * Replaces the first frame of the process animation, shown while it loads. Black background, 16:9.
+     */
+    poster?: (number | null) | Media;
+  };
+  /**
+   * Four steps that scroll past while the animation plays.
+   */
+  process: {
+    /**
+     * Section heading, e.g. "From idea to healed".
+     */
+    heading: string;
+    /**
+     * Technical: the animation’s folder name. Set by the developer when new footage arrives.
+     */
+    sequence?: string | null;
+    /**
+     * Exactly four steps; they’re numbered 01–04 automatically.
+     */
+    steps: {
+      /**
+       * Optional small label, e.g. "Week 1".
+       */
+      label?: string | null;
+      heading: string;
+      text: string;
+      id?: string | null;
+    }[];
+  };
+  /**
+   * Shows portfolio pieces marked "Featured".
+   */
+  featuredWork: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+    intro?: string | null;
+  };
+  /**
+   * Shows the 4 styles marked "Show on homepage".
+   */
+  styles: {
+    /**
+     * e.g. "What we tattoo"
+     */
+    heading: string;
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+  };
+  numbers: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+    /**
+     * Real figures only. The seeded numbers are placeholders: replace them before launch.
+     */
+    stats?:
+      | {
+          /**
+           * e.g. 4.9
+           */
+          value: number;
+          /**
+           * Optional, e.g. "+" or "★".
+           */
+          unit?: string | null;
+          /**
+           * The rest of the sentence, e.g. "average Google rating".
+           */
+          text: string;
+          image?: (number | null) | Media;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  statement: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    headingLine1: string;
+    headingLine2?: string | null;
+    text?: string | null;
+    secondaryButton: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+    primaryButton: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+  };
+  /**
+   * Shows artists marked "Show on homepage".
+   */
+  artists: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+    /**
+     * A second sentence, shown in grey after the heading.
+     */
+    headingMuted?: string | null;
+  };
+  standards: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+    /**
+     * Four promises. Only publish what is true for the studio.
+     */
+    items?:
+      | {
+          /**
+           * The small line drawing shown next to the title.
+           */
+          icon:
+            | 'fine-line'
+            | 'blackwork'
+            | 'realism'
+            | 'traditional'
+            | 'lettering'
+            | 'cover-up'
+            | 'geometric'
+            | 'dotwork'
+            | 'needle'
+            | 'ink'
+            | 'certificate'
+            | 'aftercare'
+            | 'shield'
+            | 'compass';
+          title: string;
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Shows the three newest published posts.
+   */
+  journal: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+  };
+  /**
+   * Shows FAQs marked "Show on homepage".
+   */
+  faq: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    heading: string;
+  };
+  booking: {
+    /**
+     * Small uppercase label above the heading. Keep it to a few words.
+     */
+    eyebrow?: string | null;
+    /**
+     * e.g. "Ready when you are"
+     */
+    heading: string;
+    intro?: string | null;
+    submitLabel: string;
+    /**
+     * Short note under the form. Link to the privacy policy.
+     */
+    privacyNote?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    successHeading: string;
+    successMessage?: string | null;
+    /**
+     * Turn on if your ad campaigns count conversions by page visit.
+     */
+    redirectToThankYou?: boolean | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Name, address, opening hours and contact details. These must match your Google Business Profile exactly.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  studioName: string;
+  /**
+   * Optional. Leave empty to use the built-in wordmark (recommended).
+   */
+  logo?: (number | null) | Media;
+  /**
+   * Short paragraph next to the logo in the footer.
+   */
+  brandParagraph?: string | null;
+  /**
+   * For Google, e.g. "€€" or "From €80".
+   */
+  priceRange?: string | null;
+  address: {
+    street: string;
+    city: string;
+    postcode?: string | null;
+    country: string;
+  };
+  /**
+   * In Google Maps, right-click the studio and click the numbers at the top to copy them.
+   */
+  geo?: {
+    lat?: number | null;
+    lng?: number | null;
+  };
+  phone: string;
+  /**
+   * International format, e.g. +355 69 …
+   */
+  whatsapp?: string | null;
+  email: string;
+  googleMapsUrl?: string | null;
+  /**
+   * One row per set of days with the same hours. Days not listed show as closed.
+   */
+  openingHours?:
+    | {
+        days: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[];
+        opens: string;
+        closes: string;
+        id?: string | null;
+      }[]
+    | null;
+  socialLinks?:
+    | {
+        platform: 'instagram' | 'facebook' | 'tiktok' | 'youtube' | 'pinterest' | 'x' | 'google';
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  seo: {
+    /**
+     * How page titles look in Google. %s is replaced by the page title, e.g. "%s | Studio Name".
+     */
+    titleTemplate: string;
+    /**
+     * Used when a page has no description of its own. Max 160.
+     */
+    description: string;
+    /**
+     * Shown when a page without its own image is shared.
+     */
+    ogImage?: (number | null) | Media;
+  };
+  tracking?: {
+    gtmId?: string | null;
+    metaPixelId?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The links in the top menu and the footer.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation".
+ */
+export interface Navigation {
+  id: number;
+  header: {
+    /**
+     * Shown left to right. Keep labels to one word where possible.
+     */
+    links?:
+      | {
+          type?: ('link' | 'styles') | null;
+          label: string;
+          href?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * The orange button.
+     */
+    cta: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /journal, a section like #book, or a full web address.
+       */
+      href: string;
+    };
+  };
+  footer: {
+    /**
+     * Link columns. The newsletter and contact columns are added automatically.
+     */
+    columns?:
+      | {
+          title: string;
+          type: 'links' | 'styles';
+          links?:
+            | {
+                label: string;
+                href: string;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    newsletter: {
+      title: string;
+      text?: string | null;
+      buttonLabel: string;
+      /**
+       * Text next to the consent checkbox.
+       */
+      consentLabel: string;
+    };
+    contactTitle: string;
+    /**
+     * e.g. "© {year} Studio Name". {year} becomes the current year.
+     */
+    legalLine?: string | null;
+    /**
+     * Small links at the very bottom, e.g. Privacy and Cookies.
+     */
+    legalLinks?:
+      | {
+          label: string;
+          href: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        eyebrow?: T;
+        eyebrowLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        heading?: T;
+        intro?: T;
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        scrollLabel?: T;
+        poster?: T;
+      };
+  process?:
+    | T
+    | {
+        heading?: T;
+        sequence?: T;
+        steps?:
+          | T
+          | {
+              label?: T;
+              heading?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  featuredWork?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+      };
+  styles?:
+    | T
+    | {
+        heading?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  numbers?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        stats?:
+          | T
+          | {
+              value?: T;
+              unit?: T;
+              text?: T;
+              image?: T;
+              id?: T;
+            };
+      };
+  statement?:
+    | T
+    | {
+        eyebrow?: T;
+        headingLine1?: T;
+        headingLine2?: T;
+        text?: T;
+        secondaryButton?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        primaryButton?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  artists?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        headingMuted?: T;
+      };
+  standards?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        items?:
+          | T
+          | {
+              icon?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  journal?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  faq?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+      };
+  booking?:
+    | T
+    | {
+        eyebrow?: T;
+        heading?: T;
+        intro?: T;
+        submitLabel?: T;
+        privacyNote?: T;
+        successHeading?: T;
+        successMessage?: T;
+        redirectToThankYou?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  studioName?: T;
+  logo?: T;
+  brandParagraph?: T;
+  priceRange?: T;
+  address?:
+    | T
+    | {
+        street?: T;
+        city?: T;
+        postcode?: T;
+        country?: T;
+      };
+  geo?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+      };
+  phone?: T;
+  whatsapp?: T;
+  email?: T;
+  googleMapsUrl?: T;
+  openingHours?:
+    | T
+    | {
+        days?: T;
+        opens?: T;
+        closes?: T;
+        id?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        titleTemplate?: T;
+        description?: T;
+        ogImage?: T;
+      };
+  tracking?:
+    | T
+    | {
+        gtmId?: T;
+        metaPixelId?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "navigation_select".
+ */
+export interface NavigationSelect<T extends boolean = true> {
+  header?:
+    | T
+    | {
+        links?:
+          | T
+          | {
+              type?: T;
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+        cta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  footer?:
+    | T
+    | {
+        columns?:
+          | T
+          | {
+              title?: T;
+              type?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        newsletter?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+              buttonLabel?: T;
+              consentLabel?: T;
+            };
+        contactTitle?: T;
+        legalLine?: T;
+        legalLinks?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+              id?: T;
+            };
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
@@ -326,6 +1931,63 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSchedulePublish".
+ */
+export interface TaskSchedulePublish {
+  input: {
+    type?: ('publish' | 'unpublish') | null;
+    locale?: string | null;
+    doc?: {
+      relationTo: 'posts';
+      value: number | Post;
+    } | null;
+    global?: string | null;
+    user?: {
+      relationTo: 'users';
+      value: number | User;
+    } | null;
+  };
+  output?: unknown;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CallToActionBlock".
+ */
+export interface CallToActionBlock {
+  /**
+   * e.g. "Thinking about your first piece?"
+   */
+  heading: string;
+  /**
+   * One or two sentences.
+   */
+  text?: string | null;
+  button: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label: string;
+    /**
+     * A page on this site like /journal, a section like #book, or a full web address.
+     */
+    href: string;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArtistCardBlock".
+ */
+export interface ArtistCardBlock {
+  artist: number | Artist;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'artistCard';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

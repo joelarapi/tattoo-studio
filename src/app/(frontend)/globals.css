@@ -149,3 +149,54 @@
     opacity: 0;
   }
 }
+
+/* Dashed beams travelling along line art (<DashedBeam>; pathLength is 100). */
+@keyframes beam-travel {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.beam {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  animation: beam-travel 8s linear infinite;
+}
+
+/*
+ * The nav fades in on load. CSS only, so it also ends visible without JS. Opacity only: a
+ * transform on the header would trap the fixed mobile menu inside it.
+ */
+@keyframes nav-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* "Scroll to begin": a dot running down a short line. */
+@keyframes scroll-hint {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(250%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* <details> disclosures (FAQ, menus): hide the default marker in every browser. */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}

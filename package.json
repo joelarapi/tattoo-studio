@@ -15,6 +15,9 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts",
+    "sequence:placeholder": "tsx scripts/make-placeholder-sequence.ts",
+    "sequence:extract": "bash scripts/extract-frames.sh",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts"
@@ -22,8 +25,12 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@payloadcms/db-postgres": "3.92.1",
+    "@payloadcms/email-resend": "3.92.1",
+    "@payloadcms/live-preview-react": "3.92.1",
     "@payloadcms/next": "3.92.1",
+    "@payloadcms/plugin-seo": "3.92.1",
     "@payloadcms/richtext-lexical": "3.92.1",
+    "@payloadcms/storage-s3": "3.92.1",
     "@payloadcms/ui": "3.92.1",
     "@tailwindcss/postcss": "^4.3.4",
     "cross-env": "^7.0.3",

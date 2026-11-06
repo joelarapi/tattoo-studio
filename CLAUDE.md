@@ -21,9 +21,42 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **GSAP:** only core plugins (ScrollTrigger, CustomEase "studio") are registered globally in `src/lib/motion/gsap.ts`. Other plugins are registered inside the components that use them.
 - **Slider:** GSAP Draggable + InertiaPlugin, not Embla.
 - **Placeholder frames:** the placeholder frame sequence is generated with sharp, not node-canvas. ffmpeg is installed only when real footage arrives (`winget install Gyan.FFmpeg`).
-- **Privacy page:** add a CMS-editable `/privacy` stub, which the spec lacks.
+- **Privacy page:** CMS-editable through the `legal-pages` collection (seeded with `privacy` and `cookies`). The `/privacy` and `/cookies` routes come in Phase 5.
+- **Email:** Resend (`@payloadcms/email-resend`), used only when `RESEND_API_KEY` is set. No SMTP.
+- **Post authors:** `posts.author` links to `artists` (for E-E-A-T). If it's empty, the studio gets the credit. CMS users are logins only.
+- **Leads export:** none for now (the user's choice). If it's wanted later, `@payloadcms/plugin-import-export` is the option, and it needs approval.
+- **Lead reference images:** a separate `lead-attachments` upload collection (only admins and editors can read it), stored in a private R2 bucket (`S3_PRIVATE_BUCKET`) rather than in `media`, because R2 public access is per bucket.
+- **Landing pages:** the `landing-pages` collection is built in Phase 6, together with `/lp/[slug]`.
+- **SEO fields:** collections place them by hand with `seoTab()` (`src/fields/seo.ts`). The homepage gets them from the plugin (`globals: ['homepage']`), because the plugin's generate endpoints need that. `meta.title` holds the full title, so render it with `title.absolute`.
+- **Caching:** tags are `collection:<slug>` and `global:<slug>` (`src/lib/cache-tags.ts`). Each fetcher tags every collection it reads, including populated relations and `media`. Hooks call `revalidateTag(tag, { expire: 0 })` (Next 16 requires the second argument). Outside a request they fall back to `POST /api/revalidate`.
+- **Scheduled publishing:** runs as Payload jobs. `autoRun` checks every minute, except on Vercel, where a cron in `vercel.json` calls the job runner with `CRON_SECRET`.
+- **Orderable lists:** artists, styles, portfolio and FAQs use `orderable: true` (sorted by `_order`) instead of a number field.
+- **Placeholder studio name:** "Linja Tattoo Studio", set in `site-settings` only.
+- **Sequence frames:** ffmpeg only decodes (24 fps, at most 180 frames, near-black crushed to black); sharp resizes and encodes (`scripts/sequence/encode.ts`). Mobile frames are a 960×1200 (4:5) centre crop rather than 16:9, so portrait phones stay sharp at DPR 1. The manifest has per-set counts and sizes, plus `fallbackExt` and `poster`.
+- **Sequence layout:** the steps are real HTML in rows sized to each step's quarter of the scroll. On desktop they scroll past on the left. On mobile they dock at the bottom (`position: sticky`), and with JS only the active step shows. No JS still works, because all the layout is CSS. Reduced motion is handled by CSS too (`motion-reduce:` gives a stacked list), so there's no layout shift.
+- **next/image in Next 16:** `priority` is deprecated. Use `loading="eager"` + `fetchPriority="high"` (or `preload`). `/sequences/**` is in `images.localPatterns`.
+- **Favicon:** none yet (the 404 in the console). It comes with the logo in Phase 7.
+- **Data caching:** `unstable_cache` with tags (`src/lib/data.ts`), not `'use cache'`, because that needs Cache Components, which would change every route including Payload's admin. In draft mode the cache is skipped and drafts are read. Verified: a published edit appears on the static homepage within a second, and a draft save doesn't change it.
+- **LCP:** the hero H1 is painted immediately (`SplitReveal hideUntilPlayed={false}`) and flickers once JS loads. The process poster on the homepage isn't high priority, because it's below the fold.
+- **Nav:** the scrolled backdrop is its own layer, and the entrance animation is opacity only. A filter or transform on the header would trap the fixed mobile menu inside it.
+- **Tailwind:** custom `@utility` classes (`mono-label*`) come before single-property utilities in the CSS, so `text-label-sm` and `normal-case` override them. Grids that hold form rows need `grid-cols-1` on mobile, or an input's built-in width forces overflow (Lenis `overflow: clip` hides it from scrollWidth checks).
 
 ## Status
 
 - **Phase 1 (scaffold): done.** Tokens, fonts, MotionProvider (GSAP + Lenis), and the Button / Eyebrow / Container primitives. `/` is a temporary design-system preview.
-- **Phase 2 (CMS model + seed): next.** Blocked until the user fills `DATABASE_URI` and `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD` in `.env`. Pending user choice: the email adapter (`@payloadcms/email-resend` or `@payloadcms/email-nodemailer`) and approval of `@payloadcms/live-preview-react`.
+- **Phase 2 (CMS model + seed): done.** 11 collections and 3 globals, roles, the SEO plugin, drafts, autosave and scheduling, live preview (`/api/preview`), revalidation hooks, an idempotent `pnpm seed` and access tests (`pnpm test:int`). Neon is seeded. The frontend pages aren't wired to the CMS yet (Phases 4 and 5).
+- **Phase 3 (ScrollSequence): done.** Frame scripts, placeholder sequence (`public/sequences/placeholder`, 7 MB, committed), `<ScrollSequence>`, `<SplitReveal>`, and the test route `/dev/sequence` (**remove before launch**). Real footage can arrive at any time; swapping it needs no code changes (README → Process animation).
+- **Phase 4 (homepage sections 1–13): done.** All sections are wired to the CMS through `src/lib/data.ts`, with nav, footer, line art and motion. The booking and newsletter forms show a notice until Phase 6 (and a decision on the newsletter). `/dev/design` (the Phase 1 preview) and `/dev/sequence` are test pages to **remove before launch**.
+- **Phase 5 (journal, artist and style pages): next.** Wait for the user's go-ahead. Until then, links to those pages and to /privacy and /cookies 404, and Next's prefetches log console errors.
+- **Open for later:** the spec gives the footer newsletter no backend; decide in Phase 4 or 6. `.env` uses `sslmode=require`. `verify-full` behaves the same and silences pg's warning.
+- **Secrets:** they go in `.env` only. The user once pasted the DB string into `.env.example` (which is committed); it was caught before any push. Before every commit, check that `.env.example` contains only placeholders.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
