@@ -22,11 +22,22 @@ Next.js 16 (App Router) + Payload CMS 3 + Postgres (Neon). The full brief is in 
 | `pnpm generate:types`                  | Regenerate `src/payload-types.ts`                    |
 | `pnpm generate:importmap`              | Regenerate the admin import map                      |
 | `pnpm seed`                            | Add placeholder content (safe to rerun)              |
+| `pnpm media:to-r2`                     | Copy locally stored uploads into R2 (safe to rerun)  |
 | `pnpm test:int`                        | Access-control integration tests                     |
 | `pnpm sequence:placeholder`            | Regenerate the placeholder process animation         |
 | `pnpm sequence:extract <video> <name>` | Turn a video into a process animation (needs ffmpeg) |
 
 Always use `pnpm exec` / `pnpm dlx` rather than plain `npx`, so commands run on the pinned Node.
+
+## Deploying to Vercel
+
+1. **Media must be in R2 first.** Vercel has no persistent disk and `/media` isn't in git. Create the two R2 buckets, put the `S3_*` variables in your local `.env` as well, then run `pnpm media:to-r2`. Running it also adds any missing storage columns to the database (dev schema push), which production can't do by itself.
+2. Import the GitHub repo in Vercel. The framework (Next.js) and pnpm are detected automatically. Under Settings → Build and Deployment, check that the Node.js version is 24.x.
+3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Set `NOINDEX=true` for a demo.
+4. Functions run in `fra1` (Frankfurt, `vercel.json`), next to the Neon database in `eu-central-1`.
+5. Add the production URL to the R2 bucket's CORS rule (`PUT`, `GET`), next to `http://localhost:3000`.
+
+Local and deployed sites share the same database until launch. Schema changes reach it through `pnpm dev`, so redeploy after changing collections.
 
 ## Design system
 
@@ -100,10 +111,10 @@ The "process" section plays a short clip frame by frame as you scroll (`src/comp
 
 - Config: `src/payload.config.ts`. Collections are in `src/collections/`, globals in `src/globals/`, access rules in `src/access/` and shared fields in `src/fields/`.
 - **Roles:** `admin` can do everything. `editor` can manage all content and read booking requests, but can't change or delete them, manage users or change tracking IDs. The first account created at `/admin` becomes an admin.
-- **Drafts and scheduling:** journal posts and the homepage have drafts and autosave, and posts can also be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET` (per-minute crons need Vercel Pro).
+- **Drafts and scheduling:** journal posts and the homepage have drafts and autosave, and posts can also be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET`. It runs once a day (06:00 UTC) because Vercel Hobby rejects anything more frequent. On Pro, change the schedule to `* * * * *`.
 - **Live preview:** `/api/preview` needs `PREVIEW_SECRET` and a logged-in CMS session, then turns on Next.js draft mode. `/api/exit-preview` turns it off. While in draft mode, pages mount `src/components/LivePreviewListener.tsx`.
 - **Revalidation:** every collection and global calls `src/hooks/revalidate.ts` after published changes. Data fetchers must tag their caches with the tag of **every** collection they read (`src/lib/cache-tags.ts`). Code running outside a request (the job runner) revalidates through `POST /api/revalidate` with `REVALIDATE_SECRET`.
-- **Media storage:** local disk in development: `/media`, plus `/media-private` for booking reference images. In production, set the `S3_*` variables for Cloudflare R2. `S3_BUCKET` is public: set `S3_PUBLIC_URL` to its r2.dev or custom-domain URL. `S3_PRIVATE_BUCKET` must **not** be public. Uploads go straight from the browser to R2, so the public bucket needs a CORS rule that allows `PUT` from the site's origin.
+- **Media storage:** local disk in development: `/media`, plus `/media-private` for booking reference images. In production, set the `S3_*` variables for Cloudflare R2. `S3_BUCKET` is public: set `S3_PUBLIC_URL` to its r2.dev or custom-domain URL. `S3_PRIVATE_BUCKET` must **not** be public. Uploads go straight from the browser to R2, so the public bucket needs a CORS rule that allows `PUT` from the site's origin. The storage plugin's columns (`prefix`, `_objectKey`) exist whether or not R2 is on (`alwaysInsertFields`), so the schema doesn't change between environments. `pnpm media:to-r2` copies files already uploaded to local disk into R2.
 - **Email:** Resend, when `RESEND_API_KEY` is set. `EMAIL_FROM_ADDRESS` must be on a domain verified in Resend. Without a key, emails are printed to the console.
 - **Schema changes:** development uses Payload's automatic schema push. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`) on a separate Neon branch.
 

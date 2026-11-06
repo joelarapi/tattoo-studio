@@ -16,6 +16,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts",
+    "media:to-r2": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/media-to-r2.ts",
     "sequence:placeholder": "tsx scripts/make-placeholder-sequence.ts",
     "sequence:extract": "bash scripts/extract-frames.sh",
     "test": "pnpm run test:int && pnpm run test:e2e",

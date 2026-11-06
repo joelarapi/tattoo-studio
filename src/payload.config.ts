@@ -105,6 +105,9 @@ export default buildConfig({
     seo,
     s3Storage({
       enabled: Boolean(process.env.S3_BUCKET),
+      // Adds the plugin's columns (prefix, _objectKey) even when disabled, so the database schema
+      // is the same with or without R2. Production never pushes schema changes by itself.
+      alwaysInsertFields: true,
       bucket: process.env.S3_BUCKET || '',
       config: s3ClientConfig,
       // Browser uploads straight to R2, so large files skip Vercel's 4.5 MB request limit.
@@ -125,6 +128,7 @@ export default buildConfig({
     // Private bucket: client reference images, only readable through Payload's access control.
     s3Storage({
       enabled: Boolean(process.env.S3_PRIVATE_BUCKET),
+      alwaysInsertFields: true,
       bucket: process.env.S3_PRIVATE_BUCKET || '',
       config: s3ClientConfig,
       collections: { 'lead-attachments': { prefix: 'leads' } },

@@ -232,6 +232,8 @@ export interface Media {
    * Optional. Shown under the image where the design has room for it.
    */
   caption?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -557,6 +559,8 @@ export interface Lead {
  */
 export interface LeadAttachment {
   id: number;
+  prefix?: string | null;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -891,6 +895,8 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1062,6 +1068,8 @@ export interface LeadsSelect<T extends boolean = true> {
  * via the `definition` "lead-attachments_select".
  */
 export interface LeadAttachmentsSelect<T extends boolean = true> {
+  prefix?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

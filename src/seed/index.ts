@@ -58,7 +58,14 @@ async function seedAdmin() {
 async function image(kind: PlaceholderKind, seed: number, alt: string): Promise<number> {
   const file = await placeholderImage(kind, seed)
   const doc = await ensure('media', { filename: { equals: file.name } }, () =>
-    payload.create({ collection: 'media', data: { alt: `Placeholder: ${alt}` }, file, context }),
+    // A fresh context per upload: the storage plugin leaves flags on it that would make R2 skip
+    // every later file if the object were shared.
+    payload.create({
+      collection: 'media',
+      data: { alt: `Placeholder: ${alt}` },
+      file,
+      context: { ...context },
+    }),
   )
   return doc.id
 }

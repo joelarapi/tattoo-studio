@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
+  // NOINDEX=true on demo / staging deploys keeps search engines away from placeholder content.
+  headers: async () =>
+    process.env.NOINDEX === 'true'
+      ? [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }]
+      : [],
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
