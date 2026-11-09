@@ -27,25 +27,25 @@ We're building the new website for London InkTattoo in Fier. Until the real cont
 
 ## 4. Portfolio
 
-- [ ] At least 8 strong pieces: high-resolution photos (fresh and/or healed)
-- [ ] For each: a short title, the category, the body placement and two or three sentences about the piece
-- [ ] Which pieces to feature on the homepage
-- [ ] **Confirmation that each client has agreed to their tattoo being published**
+Received: 30 pieces with 32 photos and 11 films, now on the site with their titles, categories, placements and short descriptions.
+
+- [ ] **Confirmation that each client has agreed to their tattoo being published.** The site currently marks all 30 as agreed, on the studio's behalf.
+- [ ] Check the titles, placements and descriptions of the 30 pieces
+- [ ] More photos where you have them: healed results, close-ups of details, a second angle
+- [ ] Any new pieces, as they're finished
 
 ## 5. Portfolio categories
 
-- [ ] The categories to filter by (the site starts with Graphic, Botanical, Symbolic and The process)
+- [ ] Confirm the categories to filter by: Portrait, Black & Grey, Colour and Geometric
 
-## 6. Films for the video portfolio
+## 6. Films
 
-- [ ] Up to 8 short clips (MP4, under 8 MB each): the process, placement, the reveal, close-ups, the studio
-- [ ] A still image for each, used as its cover
+- [ ] More short clips (MP4, under 8 MB each) whenever you have them: the process, placement, the reveal, close-ups, the studio. A still image for each is used as its cover.
 
 ## 7. Photos
 
-- [ ] Two strong photos for the top of the homepage
-- [ ] Studio interior photos
-- [ ] Black and white or colour? The design shows every photo in black and white; one switch in the CMS turns colour back on.
+- [ ] Studio interior photos, and a few of Tisi at work (for the About page and the journal)
+- [ ] Black and white or colour? The design shows photos in black and white, with each one in colour when opened; one switch in the CMS shows them all in colour.
 
 ## 8. Travel help (Visiting Albania page)
 

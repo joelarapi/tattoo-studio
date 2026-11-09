@@ -34,9 +34,9 @@ export default async function JournalPage() {
 
   return (
     <main id="main">
-      <PageHero hero={page.hero} className="md:min-h-[500px]" />
+      <PageHero hero={page.hero} short />
 
-      <section className="pb-section px-site">
+      <section className="px-site py-section">
         {featured && (
           <>
             <Tag className="mb-10">{page.featured.tag}</Tag>

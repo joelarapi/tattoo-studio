@@ -6,6 +6,9 @@ import { defineConfig, devices } from '@playwright/test'
  */
 import 'dotenv/config'
 
+/** The site under test. Set E2E_BASE_URL to test a server on another port. */
+const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -36,6 +39,6 @@ export default defineConfig({
   webServer: {
     command: 'pnpm dev',
     reuseExistingServer: true,
-    url: 'http://localhost:3000',
+    url: baseURL,
   },
 })

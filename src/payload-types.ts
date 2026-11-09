@@ -383,7 +383,7 @@ export interface Style {
   createdAt: string;
 }
 /**
- * Finished tattoos. Each piece gets its own page. Tick "Featured" to show it on the homepage. Drag rows to reorder.
+ * Finished tattoos. Each piece gets its own page. Drag rows to reorder. The homepage shows the pieces chosen in Pages → Homepage → Portfolio.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolio-items".
@@ -408,25 +408,32 @@ export interface PortfolioItem {
    */
   placement?: string | null;
   /**
-   * The first image is the one shown on cards. Drag to reorder.
+   * The first photo is the one shown on cards. Drag to reorder.
    */
-  images: (number | Media)[];
+  images?: (number | Media)[] | null;
   /**
    * MP4 or WebM, max 8 MB. Shown on the piece’s page.
    */
   video?: (number | null) | Media;
   /**
+   * A still from the video, portrait format. Shown before it plays and on the homepage film cards.
+   */
+  videoPoster?: (number | null) | Media;
+  /**
    * Optional while the studio has one artist.
    */
   artist?: (number | null) | Artist;
   /**
-   * e.g. "A statement across the back."
+   * Replaces the shared heading ("Look closer.") for this piece.
    */
   detailsHeading?: string | null;
+  /**
+   * Extra paragraphs after the summary, each with an optional title.
+   */
   story?:
     | {
         /**
-         * e.g. "Look closer."
+         * e.g. "The placement."
          */
         title?: string | null;
         text: string;
@@ -447,10 +454,6 @@ export interface PortfolioItem {
   generateSlug?: boolean | null;
   slug: string;
   clientConsent: boolean;
-  /**
-   * Show in the homepage gallery.
-   */
-  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -996,6 +999,7 @@ export interface PortfolioItemsSelect<T extends boolean = true> {
   placement?: T;
   images?: T;
   video?: T;
+  videoPoster?: T;
   artist?: T;
   detailsHeading?: T;
   story?:
@@ -1015,7 +1019,6 @@ export interface PortfolioItemsSelect<T extends boolean = true> {
   generateSlug?: T;
   slug?: T;
   clientConsent?: T;
-  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1305,9 +1308,6 @@ export interface Homepage {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Shows the portfolio pieces marked "Featured" (or all of them if none are).
-   */
   work: {
     /**
      * Small orange label above the heading. A few words.
@@ -1336,23 +1336,38 @@ export interface Homepage {
       href?: string | null;
     };
     /**
-     * Small label above the gallery, e.g. "Photos · scroll at your own pace".
+     * Tiny line above the photos and under the films, e.g. "Original work by Tisi".
+     */
+    creditLine?: string | null;
+    /**
+     * Small label above the photos, e.g. "Photos · scroll at your own pace".
      */
     trackLabel?: string | null;
     /**
-     * Line under the gallery. Optional.
+     * The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.
      */
-    closingText?: string | null;
-    closingLink?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
+    pieces?: (number | PortfolioItem)[] | null;
+  };
+  /**
+   * A second gallery under the photos.
+   */
+  films?: {
+    /**
+     * Small label above the films.
+     */
+    trackLabel?: string | null;
+    /**
+     * Top of each card, e.g. "Tisi / film".
+     */
+    itemLabel?: string | null;
+    /**
+     * Link at the bottom of each card.
+     */
+    watchLabel?: string | null;
+    /**
+     * Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to hide the films.
+     */
+    pieces?: (number | PortfolioItem)[] | null;
   };
   meetArtist: {
     /**
@@ -1376,6 +1391,10 @@ export interface Homepage {
      */
     image?: (number | null) | Media;
     /**
+     * Small note on the image, e.g. "Original work by Tisi". Optional.
+     */
+    imageNote?: string | null;
+    /**
      * A short introduction. Leave an empty line between paragraphs.
      */
     text?: string | null;
@@ -1390,74 +1409,9 @@ export interface Homepage {
       href?: string | null;
     };
     /**
-     * Small text next to the asterisk. Enter for a line break.
+     * Small text next to the asterisk. Optional.
      */
     signoff?: string | null;
-  };
-  /**
-   * Leave "Films" empty to hide this section.
-   */
-  reels: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    /**
-     * Small label above the films.
-     */
-    trackLabel?: string | null;
-    /**
-     * After the number on each card: "01 / Film".
-     */
-    itemLabel?: string | null;
-    /**
-     * Card link when there is a video.
-     */
-    watchLabel?: string | null;
-    /**
-     * Card link when there is no video yet.
-     */
-    comingSoonLabel?: string | null;
-    items?:
-      | {
-          title: string;
-          /**
-           * Portrait format (3:4).
-           */
-          poster: number | Media;
-          /**
-           * MP4 or WebM, max 8 MB. Without a video, the card opens the text below.
-           */
-          video?: (number | null) | Media;
-          /**
-           * Shown in the pop-up while there is no video.
-           */
-          text?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-    dialogLink?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
   };
   visit: {
     /**
@@ -1706,6 +1660,10 @@ export interface AboutPage {
      * Tiny line at the bottom, e.g. "01 / About us".
      */
     indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
   };
   /**
    * The text comes from the artist’s bio.
@@ -1892,6 +1850,10 @@ export interface PortfolioPage {
      * Tiny line at the bottom, e.g. "01 / About us".
      */
     indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
   };
   intro: {
     /**
@@ -1937,13 +1899,32 @@ export interface PortfolioPage {
   };
   detail: {
     /**
-     * Small label above the title, before the number, e.g. "Portfolio study".
+     * Small label above the title, e.g. "Tisi / London InkTattoo".
      */
-    studyLabel?: string | null;
+    label?: string | null;
     /**
-     * Small label above the story, e.g. "The details".
+     * Under each photo; it opens the photo in colour.
      */
-    storyLabel?: string | null;
+    photoLabel?: string | null;
+    /**
+     * Under the video, after the piece’s title.
+     */
+    videoCaption?: string | null;
+    /**
+     * Heading next to the photos, e.g. "Look closer." A piece can replace it.
+     */
+    storyHeading?: string | null;
+    /**
+     * After the piece’s summary. Optional.
+     */
+    storyNote?: string | null;
+    direction?: {
+      title?: string | null;
+      /**
+       * Leave an empty line between paragraphs.
+       */
+      text?: string | null;
+    };
     /**
      * The orange button to the enquiry form.
      */
@@ -2077,6 +2058,10 @@ export interface VisitingPage {
        */
       footnote?: string | null;
     };
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
   };
   plan: {
     /**
@@ -2382,6 +2367,10 @@ export interface JournalPage {
      * Tiny line at the bottom, e.g. "01 / About us".
      */
     indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
   };
   featured: {
     /**
@@ -2858,14 +2847,17 @@ export interface HomepageSelect<T extends boolean = true> {
               label?: T;
               href?: T;
             };
+        creditLine?: T;
         trackLabel?: T;
-        closingText?: T;
-        closingLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
+        pieces?: T;
+      };
+  films?:
+    | T
+    | {
+        trackLabel?: T;
+        itemLabel?: T;
+        watchLabel?: T;
+        pieces?: T;
       };
   meetArtist?:
     | T
@@ -2880,6 +2872,7 @@ export interface HomepageSelect<T extends boolean = true> {
             };
         artist?: T;
         image?: T;
+        imageNote?: T;
         text?: T;
         button?:
           | T
@@ -2888,38 +2881,6 @@ export interface HomepageSelect<T extends boolean = true> {
               href?: T;
             };
         signoff?: T;
-      };
-  reels?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        trackLabel?: T;
-        itemLabel?: T;
-        watchLabel?: T;
-        comingSoonLabel?: T;
-        items?:
-          | T
-          | {
-              title?: T;
-              poster?: T;
-              video?: T;
-              text?: T;
-              id?: T;
-            };
-        dialogLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
       };
   visit?:
     | T
@@ -3092,6 +3053,7 @@ export interface AboutPageSelect<T extends boolean = true> {
         intro?: T;
         scrollLabel?: T;
         indexLabel?: T;
+        background?: T;
       };
   meetArtist?:
     | T
@@ -3211,6 +3173,7 @@ export interface PortfolioPageSelect<T extends boolean = true> {
             };
         intro?: T;
         indexLabel?: T;
+        background?: T;
       };
   intro?:
     | T
@@ -3234,8 +3197,17 @@ export interface PortfolioPageSelect<T extends boolean = true> {
   detail?:
     | T
     | {
-        studyLabel?: T;
-        storyLabel?: T;
+        label?: T;
+        photoLabel?: T;
+        videoCaption?: T;
+        storyHeading?: T;
+        storyNote?: T;
+        direction?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+            };
         ctaLabel?: T;
         travel?:
           | T
@@ -3327,6 +3299,7 @@ export interface VisitingPageSelect<T extends boolean = true> {
                   };
               footnote?: T;
             };
+        background?: T;
       };
   plan?:
     | T
@@ -3514,6 +3487,7 @@ export interface JournalPageSelect<T extends boolean = true> {
             };
         intro?: T;
         indexLabel?: T;
+        background?: T;
       };
   featured?:
     | T

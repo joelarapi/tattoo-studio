@@ -43,11 +43,34 @@ export const PortfolioPage = pageGlobal({
       description: 'Shown on every portfolio piece’s own page.',
       fields: [
         section('detail', 'Piece pages', [
+          text('label', 'Small label above the title, e.g. "Tisi / London InkTattoo".'),
+          {
+            type: 'row',
+            fields: [
+              {
+                name: 'photoLabel',
+                type: 'text',
+                admin: {
+                  width: '50%',
+                  description: 'Under each photo; it opens the photo in colour.',
+                },
+              },
+              {
+                name: 'videoCaption',
+                type: 'text',
+                admin: {
+                  width: '50%',
+                  description: 'Under the video, after the piece’s title.',
+                },
+              },
+            ],
+          },
           text(
-            'studyLabel',
-            'Small label above the title, before the number, e.g. "Portfolio study".',
+            'storyHeading',
+            'Heading next to the photos, e.g. "Look closer." A piece can replace it.',
           ),
-          text('storyLabel', 'Small label above the story, e.g. "The details".'),
+          paragraphs('storyNote', 'After the piece’s summary. Optional.'),
+          section('direction', 'Under the story', [text('title'), paragraphs()]),
           text('ctaLabel', 'The orange button to the enquiry form.', true),
           section('travel', 'Travel band', [
             tagField(),

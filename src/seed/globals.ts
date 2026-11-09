@@ -16,7 +16,11 @@ import { doc, link, p } from './lexical'
 export type GlobalRefs = {
   og: number
   heroImages: [number, number]
-  reelPosters: number[]
+  /** The image in the homepage's artist section, until Tisi's portrait arrives. */
+  artistImage: number
+  backgrounds: { about: number; portfolio: number; visiting: number; journal: number }
+  homepagePieces: number[]
+  homepageFilms: number[]
   artist: number
   featuredPost: number
 }
@@ -38,7 +42,7 @@ export const homepage = (refs: GlobalRefs): Seed<Homepage> => ({
     secondaryLink: { label: 'Explore the work', href: '#work' },
     factValue: '18',
     factLabel: 'Years of tattoo experience',
-    secondFact: 'Meet Tisi.\nYour artist in Fier, Albania.',
+    secondFact: 'Meet Tisi.\nThe best tattoo artist in Albania',
     primaryImage: refs.heroImages[0],
     primaryCaption: 'The details make the difference.',
     secondaryImage: refs.heroImages[1],
@@ -56,36 +60,24 @@ export const homepage = (refs: GlobalRefs): Seed<Homepage> => ({
     intro:
       'Look closer at the lines, the contrast, the details.\nFind the direction that feels like you.',
     button: { label: 'View the full portfolio', href: '/portfolio' },
+    creditLine: `Original work by Tisi / ${STUDIO_NAME}, Albania`,
     trackLabel: 'Photos · scroll at your own pace',
-    closingText:
-      'Your next tattoo might start with a detail.\nA flower. A symbol. A story only you can tell.',
-    closingLink: { label: 'Bring your idea', href: enquiry },
+    pieces: refs.homepagePieces,
+  },
+  films: {
+    trackLabel: 'Films · scroll at your own pace',
+    itemLabel: 'Tisi / film',
+    watchLabel: 'Watch the tattoo video',
+    pieces: refs.homepageFilms,
   },
   meetArtist: {
-    tag: 'Meet the artist',
-    heading: { text: 'Tisi.', soft: '18 years.\nOne dedication.' },
+    tag: 'Meet your artist',
+    heading: { text: 'Tisi.', soft: 'The artist behind\nyour story.' },
     artist: refs.artist,
-    text: `With 18 years of tattoo experience, Tisi is the artist behind ${STUDIO_NAME} in Fier, Albania.\n\nA tattoo is personal. So is choosing the person who creates it. Explore the work, share the details that matter to you and get to know the artist before your next piece.`,
-    button: { label: 'Get to know Tisi', href: '/about' },
-    signoff: 'Your idea.\nA personal conversation.',
-  },
-  reels: {
-    tag: 'Video portfolio',
-    heading: { text: 'More than', soft: 'a still image.' },
-    intro:
-      'From the first line to the final reveal.\nA closer view of the process, the placement\nand the finished piece.',
-    trackLabel: 'Films · scroll at your own pace',
-    itemLabel: 'Film',
-    watchLabel: 'Watch the film',
-    comingSoonLabel: 'Footage to come',
-    items: ['The process', 'The placement', 'The reveal', 'The close-up', 'Inside the studio'].map(
-      (title, index) => ({
-        title,
-        poster: refs.reelPosters[index % refs.reelPosters.length],
-        text: 'This film is on its way. In the meantime, explore the work in the portfolio.',
-      }),
-    ),
-    dialogLink: { label: 'Explore the portfolio', href: '/portfolio' },
+    image: refs.artistImage,
+    imageNote: 'Original work by Tisi',
+    text: `With 18 years of tattoo experience and an extensive body of work, Tisi creates personal tattoos at ${STUDIO_NAME} in Fier, Albania. His work spans large custom pieces, detailed portrait tattoos and full sleeves, with careful attention to composition, expression and the way a design follows the body.\n\nWe take time to discuss your idea. Bring your references, a starting point or simply a feeling you want to capture. If you are unsure where to begin, we can design something for you and work through the direction, placement and details together.`,
+    button: { label: 'More about Tisi', href: '/about' },
   },
   visit: {
     tag: 'Make Albania part of your story',
@@ -164,7 +156,7 @@ export const homepage = (refs: GlobalRefs): Seed<Homepage> => ({
   mobileCta: { label: 'Your next tattoo', href: enquiry },
   meta: {
     title: `Tattoos in Albania – Tisi, 18 Years of Experience | ${STUDIO_NAME}`,
-    description: `Your story, our artistry. Discover ${STUDIO_NAME} in Fier, Albania, and Tisi’s 18 years of tattoo experience. Explore the portfolio and send your tattoo idea.`,
+    description: `Your story, our artistry. Discover ${STUDIO_NAME} in Fier, Albania, and Tisi’s 18 years of tattoo experience. Explore the portfolio and plan your tattoo enquiry.`,
     image: refs.og,
   },
   _status: 'published',
@@ -177,6 +169,7 @@ export const aboutPage = (refs: GlobalRefs): Seed<AboutPage> => ({
     intro: 'Meet the person behind the work.\nAnd find the connection behind your next tattoo.',
     scrollLabel: 'Get to know Tisi',
     indexLabel: '01 / About us',
+    background: refs.backgrounds.about,
   },
   meetArtist: {
     tag: 'Meet your artist',
@@ -234,32 +227,42 @@ export const aboutPage = (refs: GlobalRefs): Seed<AboutPage> => ({
   _status: 'published',
 })
 
-export const portfolioPage = (): Seed<PortfolioPage> => ({
+export const portfolioPage = (refs: GlobalRefs): Seed<PortfolioPage> => ({
   hero: {
     tag: 'Art. Identity. Expression.',
     heading: { text: 'The work.', soft: 'Look closer.' },
     intro: 'Find the styles, details and placements that speak to you.',
     indexLabel: '02 / Portfolio',
+    background: refs.backgrounds.portfolio,
   },
   intro: {
-    tag: 'Tattoo portfolio / Albania',
-    heading: { text: 'Find the direction for your next tattoo.' },
+    tag: 'Tisi / Tattoo portfolio / Albania',
+    heading: { text: 'Real work. Individual stories.' },
     text: doc(
       p(
-        `Explore tattoo styles, subjects and placements as you plan your next piece with ${STUDIO_NAME} in Fier, Albania. From bold back compositions to botanical arm tattoos, look for the details that connect with your idea: contrast, linework, scale and the way a design follows the body.`,
+        `Explore tattoos by Tisi at ${STUDIO_NAME} in Fier, Albania. Discover realistic portraits, large sleeves, full back pieces, traditional colour tattoos and geometric designs. Each project brings together photographs, videos where available, and a closer look at its subjects and details.`,
       ),
       p(
-        'Use these pieces to start a conversation with Tisi, the artist behind the studio with 18 years of tattoo experience. Share the subject and placement you have in mind through our ',
-        link('tattoo enquiry form', contactEnquiry),
-        '. If you’re visiting Albania, include your travel dates so availability can be discussed before you make plans.',
+        'Planning your own piece? Share your idea and placement through our ',
+        link('contact page', '/contact'),
+        '. If you are travelling from abroad, explore our ',
+        link('Albania visitor guide', '/visiting-albania'),
+        ' and discuss availability before arranging your trip.',
       ),
     ),
   },
-  filter: { allLabel: 'All work', countLabel: 'pieces' },
+  filter: { allLabel: 'All work', countLabel: 'Projects' },
   detail: {
-    studyLabel: 'Portfolio study',
-    storyLabel: 'The details',
-    ctaLabel: 'Discuss a tattoo idea',
+    label: `Tisi / ${STUDIO_NAME} / Fier, Albania`,
+    photoLabel: 'View original colours',
+    videoCaption: 'A closer view of the details and placement.',
+    storyHeading: 'Look closer.',
+    storyNote: `Part of Tisi’s tattoo portfolio at ${STUDIO_NAME} in Fier, Albania. Open a photograph to see its original colours and details.`,
+    direction: {
+      title: 'Your own direction.',
+      text: 'We take time to discuss your idea. Bring references, a story or a rough starting point. If you do not have one yet, we can explore the direction together and design something for you.',
+    },
+    ctaLabel: 'Discuss your tattoo',
     travel: {
       tag: 'Thinking of travelling for your piece?',
       heading: { text: 'Your tattoo.', soft: 'Your visit to Albania.' },
@@ -271,20 +274,19 @@ export const portfolioPage = (): Seed<PortfolioPage> => ({
     },
     suggestions: {
       tag: 'Keep exploring',
-      heading: { text: 'More inspiration.', soft: 'Your next direction.' },
-      button: { label: 'View the full portfolio', href: '/portfolio' },
+      heading: { text: 'More work by Tisi.' },
+      button: { label: 'All portfolio', href: '/portfolio' },
       cardLink: 'View this piece',
     },
   },
   meta: {
-    title: `Tattoo Portfolio | ${STUDIO_NAME}, Fier`,
-    description:
-      'Explore tattoo styles, subjects and placements, from bold back pieces to botanical arm tattoos, and find the direction for your next tattoo.',
+    title: `Tisi Tattoo Portfolio in Fier, Albania | ${STUDIO_NAME}`,
+    description: `Explore Tisi’s tattoo portfolio in Fier, Albania: realistic portraits, full sleeves, back pieces, colour tattoos and geometric designs at ${STUDIO_NAME}.`,
   },
   _status: 'published',
 })
 
-export const visitingPage = (): Seed<VisitingPage> => ({
+export const visitingPage = (refs: GlobalRefs): Seed<VisitingPage> => ({
   hero: {
     tag: 'Your tattoo. Your trip. Your Albania.',
     heading: { text: 'Come for the ink.', soft: 'Stay for the', accent: 'experience.' },
@@ -304,6 +306,7 @@ export const visitingPage = (): Seed<VisitingPage> => ({
       ],
       footnote: 'An outline, not to scale',
     },
+    background: refs.backgrounds.visiting,
   },
   plan: {
     navLabel: 'Plan your visit',
@@ -453,6 +456,7 @@ export const journalPage = (refs: GlobalRefs): Seed<JournalPage> => ({
     heading: { text: 'Before the ink.', soft: 'A little inspiration.' },
     intro: 'Ideas to explore. Questions to ask.\nA place to begin your next piece.',
     indexLabel: '03 / The journal',
+    background: refs.backgrounds.journal,
   },
   featured: {
     tag: 'The first conversation',

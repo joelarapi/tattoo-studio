@@ -21,3 +21,17 @@ const reelDialog=document.querySelector("#reel-dialog");if(reelDialog){document.
  };
  addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll,{passive:true});preference.addEventListener('change',start);start();
 })();
+
+// Reveal one photograph at a time without interrupting manual browsing.
+(()=>{
+ const track=document.querySelector('#home-photo-track');if(!track)return;
+ const cards=[...track.querySelectorAll('.project')];if(!cards.length)return;
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)');let index=0,visible=false,resumeAt=0;
+ const show=(next,move=false)=>{index=next;cards.forEach((card,i)=>card.classList.toggle('is-colour-active',i===index));if(move){const card=cards[index],left=card.offsetLeft-track.firstElementChild.offsetLeft;if(left<track.scrollLeft||left+card.offsetWidth>track.scrollLeft+track.clientWidth)track.scrollTo({left,behavior:'smooth'})}};
+ const pause=()=>{resumeAt=Date.now()+6500};
+ ['pointerdown','wheel','keydown','touchstart'].forEach(event=>track.addEventListener(event,pause,{passive:true}));
+ document.querySelectorAll('[data-scroll-target="home-photo-track"]').forEach(button=>button.addEventListener('click',pause));
+ new IntersectionObserver(entries=>{visible=entries[0].isIntersecting},{threshold:.15}).observe(track);
+ show(0);
+ setInterval(()=>{if(reduced.matches||!visible||document.hidden||Date.now()<resumeAt||track.matches(':hover')&&matchMedia('(hover:hover)').matches||track.contains(document.activeElement))return;show((index+1)%cards.length,true)},3500);
+})();

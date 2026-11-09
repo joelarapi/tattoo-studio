@@ -1,8 +1,9 @@
 import Link from 'next/link'
 
 import { Asterisk } from '@/components/art/Glyphs'
-import { ArtistStencil, FlashIcon } from '@/components/art/Stencils'
+import { FlashIcon } from '@/components/art/Stencils'
 import { PortfolioCard } from '@/components/cards/PortfolioCard'
+import { FilmCard } from '@/components/home/FilmCard'
 import { Action } from '@/components/ui/Action'
 import { NumberedCards, SectionHead } from '@/components/ui/Blocks'
 import { CmsImage } from '@/components/ui/CmsImage'
@@ -10,24 +11,43 @@ import { ScrollTrack } from '@/components/ui/ScrollTrack'
 import { StyledHeading } from '@/components/ui/StyledHeading'
 import { Tag } from '@/components/ui/Tag'
 import { Lines, Paragraphs } from '@/components/ui/Text'
+import { cn } from '@/lib/cn'
 import { pathForDoc } from '@/lib/routes'
 import type { Artist, Homepage, PortfolioItem, Post } from '@/payload-types'
 
 /* The homepage sections between the hero and the enquiry form, in page order. */
 
+/** The tiny credit line above the photos and under the films. */
+function CreditLine({ text, className }: { text?: string | null; className?: string }) {
+  if (!text) return null
+  return (
+    <p
+      className={cn(
+        'max-w-[900px] font-label text-[8px] leading-[1.9] text-faint uppercase md:text-[9px] md:leading-[1.8]',
+        className,
+      )}
+    >
+      {text}
+    </p>
+  )
+}
+
+/** The portfolio on the homepage: a photo track, then a film track. */
 export function WorkSection({
   copy,
-  items,
-  positions,
+  pieces,
+  filmCopy,
+  films,
   number,
 }: {
   copy: Homepage['work']
-  items: PortfolioItem[]
-  /** Each piece's position in the whole portfolio, for its "001" number. */
-  positions: Map<number, number>
+  pieces: PortfolioItem[]
+  filmCopy: Homepage['films']
+  /** Pieces with a video and a video cover. */
+  films: PortfolioItem[]
   number: number
 }) {
-  if (!items.length) return null
+  if (!pieces.length && !films.length) return null
   return (
     <section id="work" className="scroll-mt-5 px-site py-section">
       <SectionHead
@@ -37,26 +57,32 @@ export function WorkSection({
         intro={copy.intro}
         action={<Action link={copy.button} variant="outline" />}
       />
-      <ScrollTrack label={copy.trackLabel} ariaLabel="Portfolio pieces">
-        {items.map((item) => (
-          <PortfolioCard
-            key={item.id}
-            item={item}
-            position={positions.get(item.id) ?? 0}
-            imageClassName="h-[390px] md:h-[310px] lg:h-[400px] 2xl:h-[400px]"
-          />
-        ))}
-      </ScrollTrack>
-      {(copy.closingText || copy.closingLink?.href) && (
-        <div className="mt-[30px] flex flex-col items-start gap-[25px] border-t border-line-strong pt-[25px] md:mt-10 md:flex-row md:items-center md:justify-between">
-          {copy.closingText && (
-            <p className="text-[12px] md:text-[13px]">
-              <Lines text={copy.closingText} />
-            </p>
-          )}
-          <Action link={copy.closingLink} variant="plain" />
-        </div>
+      <CreditLine text={copy.creditLine} className="mb-[25px]" />
+      {pieces.length > 0 && (
+        <ScrollTrack label={copy.trackLabel} ariaLabel="Tattoo photography" colourCycle>
+          {pieces.map((item, index) => (
+            <PortfolioCard
+              key={item.id}
+              item={item}
+              position={index + 1}
+              imageClassName="h-[390px] md:h-[310px] lg:h-[400px] 2xl:h-[400px]"
+            />
+          ))}
+        </ScrollTrack>
       )}
+      {films.length > 0 && (
+        <ScrollTrack label={filmCopy?.trackLabel} ariaLabel="Tattoo films">
+          {films.map((item) => (
+            <FilmCard
+              key={item.id}
+              item={item}
+              label={filmCopy?.itemLabel}
+              watchLabel={filmCopy?.watchLabel}
+            />
+          ))}
+        </ScrollTrack>
+      )}
+      <CreditLine text={copy.creditLine} />
     </section>
   )
 }
@@ -65,8 +91,10 @@ export function ArtistSection({ copy, number }: { copy: Homepage['meetArtist']; 
   const artist = typeof copy.artist === 'object' ? (copy.artist as Artist) : null
   const image = copy.image ?? artist?.portrait
   return (
-    <section className="relative isolate grid grid-cols-1 items-center gap-[35px] overflow-hidden px-site py-section md:grid-cols-2 md:gap-[6%] lg:gap-[10%]">
-      <ArtistStencil className="absolute right-[-35px] bottom-[50px] -z-0 h-[250px] w-[200px] -rotate-20 opacity-[0.12] md:h-[300px] md:w-[240px] lg:right-[-25px] lg:bottom-[55px] lg:h-[350px] lg:w-[280px] lg:opacity-[0.14]" />
+    <section
+      id="meet-the-artist"
+      className="grid grid-cols-1 items-center gap-[35px] overflow-hidden px-site py-section md:grid-cols-2 md:gap-[6%] lg:gap-[10%]"
+    >
       <div data-reveal className="framed h-[440px] md:h-[540px] lg:h-[600px]">
         <div className="relative size-full">
           <CmsImage
@@ -76,6 +104,11 @@ export function ArtistSection({ copy, number }: { copy: Homepage['meetArtist']; 
             className="object-cover object-[45%]"
           />
         </div>
+        {copy.imageNote && (
+          <span className="absolute bottom-[23px] left-[23px] bg-[#000b] px-2.5 py-[7px] label-xs text-[#ccc]">
+            {copy.imageNote}
+          </span>
+        )}
       </div>
       <div data-reveal className="relative z-[1]">
         <Tag number={number}>{copy.tag}</Tag>
@@ -183,7 +216,7 @@ export function JournalSection({
 }) {
   if (!posts.length) return null
   return (
-    <section className="pb-section px-site pt-[15px] md:pt-5">
+    <section className="px-site pt-[15px] pb-section md:pt-5">
       <SectionHead
         tag={copy.tag}
         number={number}

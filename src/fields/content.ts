@@ -69,6 +69,15 @@ export const image = (
   admin: { description },
 })
 
+/** A photo behind the top of a page, darkened so the heading stays readable. */
+export const heroBackground = (): UploadField =>
+  image(
+    'background',
+    'Background photo',
+    'Optional. Shown in colour, darkened, behind the heading.',
+    false,
+  )
+
 /** The top of an inner page: a boxed label, the H1, a short intro and a small index line. */
 export const pageHero = (extra: Field[] = []): GroupField =>
   section('hero', 'Top of the page', [
@@ -77,6 +86,7 @@ export const pageHero = (extra: Field[] = []): GroupField =>
     paragraphs('intro', 'Under the title. Enter for a line break.'),
     ...extra,
     text('indexLabel', 'Tiny line at the bottom, e.g. "01 / About us".'),
+    heroBackground(),
   ])
 
 /** A plain list of links (label + where it goes). */

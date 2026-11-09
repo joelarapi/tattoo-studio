@@ -3,8 +3,10 @@ import type { ReactNode } from 'react'
 import { Asterisk } from '@/components/art/Glyphs'
 import { cn } from '@/lib/cn'
 import type { HeadingValue } from '@/lib/heading'
+import type { Media } from '@/payload-types'
 
 import { Action } from './Action'
+import { CmsImage } from './CmsImage'
 import { StyledHeading } from './StyledHeading'
 import { Tag } from './Tag'
 import { Lines, Paragraphs } from './Text'
@@ -93,9 +95,33 @@ export function SectionHead({
   )
 }
 
+/**
+ * A photo behind the top of a page, in colour under a dark wash and the grid. Goes inside a
+ * `grid-bg` section, which keeps its circle and vignette on top.
+ */
+export function HeroPhoto({ media }: { media: Media | number | null | undefined }) {
+  if (!media || typeof media !== 'object') return null
+  return (
+    <div aria-hidden="true" className="absolute inset-0 -z-2">
+      <CmsImage
+        media={media}
+        alt=""
+        fill
+        sizes="100vw"
+        photo={false}
+        loading="eager"
+        fetchPriority="high"
+        className="object-cover"
+      />
+      <div className="absolute inset-0 hero-photo" />
+    </div>
+  )
+}
+
 /** The top of an inner page: grid background, boxed label, title, intro and a small index line. */
 export function PageHero({
   hero,
+  short = false,
   children,
   className,
 }: {
@@ -104,17 +130,22 @@ export function PageHero({
     heading: HeadingValue
     intro?: string | null
     indexLabel?: string | null
+    background?: Media | number | null
   }
+  /** A lower minimum height on tablet and desktop (Portfolio, Journal). */
+  short?: boolean
   children?: ReactNode
   className?: string
 }) {
   return (
     <section
       className={cn(
-        'grid-bg flex min-h-[530px] flex-col items-center justify-center overflow-hidden px-[6%] pt-[65px] pb-[45px] text-center md:min-h-[570px] md:pt-[85px] md:pb-[65px]',
+        'grid-bg flex min-h-[530px] flex-col items-center justify-center overflow-hidden px-[6%] pt-[65px] pb-[45px] text-center md:pt-[85px] md:pb-[65px]',
+        short ? 'md:min-h-[500px]' : 'md:min-h-[570px]',
         className,
       )}
     >
+      <HeroPhoto media={hero.background} />
       {hero.tag && (
         <span className="mb-6 rounded-[5px] border border-line bg-panel-2 px-3 py-2 label-xs text-accent md:px-4 md:py-2.5 md:text-[10px]">
           {hero.tag}

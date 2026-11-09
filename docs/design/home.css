@@ -8,3 +8,13 @@
 .home-hero-copy>p{max-width:520px}.home-hero-copy>p.hero-supporting-copy{font-size:13px;color:#999;margin-top:16px;line-height:1.85}@media(max-width:680px){.home-hero-copy>p.hero-supporting-copy{font-size:12px}}
 /* Scroll motion is progressively enhanced; content stays visible without JS. */
 .scroll-reveal{opacity:0;transform:translate3d(0,20px,0);transition:opacity .75s ease var(--reveal-delay,0ms),transform .85s cubic-bezier(.2,.65,.3,1) var(--reveal-delay,0ms)}.scroll-reveal.is-revealed{opacity:1;transform:translate3d(0,0,0)}.scroll-reveal:focus-within{opacity:1;transform:none}.hero-primary{transform:translate3d(0,var(--hero-primary-shift,0px),0) rotate(-4deg)}.hero-secondary{transform:translate3d(0,var(--hero-secondary-shift,0px),0) rotate(5deg)}.scroll-stencil .stencil-line{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.9s ease var(--stroke-delay,0ms)}.scroll-stencil.stencil-drawn .stencil-line{stroke-dashoffset:0}@media(max-width:680px){.scroll-reveal{transform:translate3d(0,12px,0);transition-duration:.6s,.7s}}@media(prefers-reduced-motion:reduce){.scroll-reveal,.scroll-reveal.is-revealed{opacity:1;transform:none;transition:none}.hero-primary{transform:rotate(-4deg)}.hero-secondary{transform:rotate(5deg)}.scroll-stencil .stencil-line{stroke-dashoffset:0;transition:none}}
+
+.home-hero img:not(.stencil-accent),.reel-card>img,.home .project-image img{filter:grayscale(1) brightness(.85)}.reel-card{display:block;text-decoration:none}.reel-card .reel-bottom b{font-size:22px}
+
+
+/* Let the work reveal its original colour. */
+.home #home-photo-track .project-image img{transition:filter .9s ease,transform .4s ease}
+.home #home-photo-track .is-colour-active .project-image img,
+.home #home-photo-track .project:focus-visible .project-image img{filter:none!important}
+@media(hover:hover){.home #home-photo-track .project:hover .project-image img{filter:none!important}}
+@media(prefers-reduced-motion:reduce){.home #home-photo-track .project-image img{transition:none}}

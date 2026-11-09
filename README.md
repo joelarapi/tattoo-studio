@@ -13,7 +13,7 @@ Next.js 16 (App Router) + Payload CMS 3 + Postgres (Neon), for London InkTattoo 
 3. `pnpm seed` creates the tables (in development Payload pushes the schema automatically), the admin user and the starting content.
 4. `pnpm dev`, then open http://localhost:3000 (site) and http://localhost:3000/admin (CMS).
 
-**One database per git branch.** `main`/`redesign` and `design-v1` have different CMS schemas, so each uses its own Neon branch. When you switch git branches, switch `DATABASE_URI` in `.env` too: `pnpm dev` and `pnpm seed` push the current code's schema and would drop the other branch's columns. Both databases share the R2 media bucket, so don't delete images in the CMS while both are in use.
+**One database per CMS schema.** `redesign` (soon `main`) and the old `design-v1` have different CMS schemas. The production Neon database now holds the redesign's. To run `design-v1`, give it its own Neon branch with an empty schema and run `pnpm seed` there. When you switch git branches, switch `DATABASE_URI` in `.env` too: `pnpm dev` and `pnpm seed` push the current code's schema and would drop the other schema's columns.
 
 | Script                     | What it does                                        |
 | -------------------------- | --------------------------------------------------- |
@@ -37,7 +37,7 @@ Always use `pnpm exec` / `pnpm dlx` rather than plain `npx`, so commands run on 
 3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Set `NOINDEX=true` for a demo.
 4. Functions run in `fra1` (Frankfurt, `vercel.json`), next to the Neon database in `eu-central-1`.
 5. Add the production URL to the R2 bucket's CORS rule (`PUT`, `GET`), next to `http://localhost:3000`.
-6. Preview deployments of other branches use the Preview variables. A branch with its own database (like `redesign`) needs its own `DATABASE_URI` and `NEXT_PUBLIC_SITE_URL`, scoped to that branch.
+6. Preview deployments of other branches use the Preview variables. A branch with its own database (like `design-v1`) needs its own `DATABASE_URI` and `NEXT_PUBLIC_SITE_URL`, scoped to that branch.
 
 Schema changes reach a database through `pnpm dev` or `pnpm seed`, so run one against it before deploying code that changes collections.
 
@@ -103,12 +103,14 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
 Log in at `/admin`. The menu on the left has five groups:
 
 - **Content:** journal posts, journal categories, and images and videos.
-- **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. Each FAQ chooses the pages it appears on (Homepage, Contact, Visiting Albania).
+- **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. Each FAQ chooses the pages it appears on (Homepage, Contact, Visiting Albania). A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
 - **Leads:** tattoo enquiries from the website form (once it's connected), and the photos and videos clients attach.
 - **Settings:** legal pages (privacy and cookies), CMS users, studio details and menus. Studio details covers the name, address, opening hours, social links, the black-and-white photo switch, the closing call to action shared by several pages, and the "page not found" text.
 - **Pages:** the text of every page, section by section: Homepage, About, Portfolio, Visiting Albania, Journal and Contact.
 
 Headings have three boxes, **White**, **Grey** and **Orange**, shown in that order, each on a new line. Section numbers like "01 /" are added automatically.
+
+The homepage galleries show the pieces chosen in **Pages → Homepage → Portfolio**: **Photos** and **Films**, each in the order you drag them into. The pages About, Portfolio, Visiting Albania and Journal can each have a **Background photo** at the top (Hero tab); it's shown darkened behind the heading.
 
 Pages and journal posts save a draft automatically while you type. Nothing changes on the website until you press **Publish**. To publish a post on a later date, use the arrow next to Publish. The eye icon at the top opens a live preview next to the form, and you can switch between Mobile and Desktop above the preview.
 

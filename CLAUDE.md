@@ -14,13 +14,13 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 ## Branches and databases
 
 - `main` is production (Vercel deploys it). Other branches get preview deployments.
-- `design-v1` keeps the previous design (scroll-sequence animation, GSAP slider, text effects). It uses the **original** Neon database branch.
-- `redesign` is the new design. It uses the Neon branch **`redesign`**, which starts with an empty schema and is filled by `pnpm seed`.
-- **`.env` `DATABASE_URI` must match the checked-out git branch.** `pnpm dev`/`pnpm seed` push the schema, so running one branch's code against the other's database drops that database's columns.
+- `redesign` is the new design. It uses the **original (production) Neon database**. On 9 Nov 2026 that database was emptied (`DROP SCHEMA public CASCADE`) and refilled by `pnpm seed` with the redesign's schema and content. The user approved this: the separate Neon branch `redesign` had been auto-deleted, and the live demo isn't on the real domain yet.
+- **Until `redesign` is merged into `main`, the live demo is broken:** `main` still runs the old design's code against the new schema. At switch-over: merge into `main`, redeploy, re-create the client's CMS user.
+- `design-v1` keeps the previous design (scroll-sequence animation, GSAP slider, text effects). **It has no database any more.** To run it, create a new Neon branch, empty its schema, point `.env` at it and run `pnpm seed` on `design-v1`.
+- **`.env` `DATABASE_URI` must match the checked-out git branch.** `pnpm dev`/`pnpm seed` push the schema, so running one branch's code against another branch's database drops that database's columns.
 - Before running anything that touches the database after switching, compare the host in `DATABASE_URI` (print a hash, never the string).
-- Both databases' media documents point at the same R2 objects. **Never delete media documents** while both are in use: the storage plugin deletes the file from R2.
-- Schema-push prompts (renames, data loss) need an interactive terminal, so the agent's shell can't answer them. Ask the user to run `pnpm dev` and answer, or, on a disposable branch, empty the schema and reseed.
-- At switch-over: point Vercel Production `DATABASE_URI` at the `redesign` Neon branch, merge into `main`, redeploy, re-create the client's CMS user.
+- If two databases ever share the R2 bucket again, **never delete media documents** while both are in use: the storage plugin deletes the file from R2.
+- Schema-push prompts (renames, data loss) need an interactive terminal, so the agent's shell can't answer them. Ask the user to run `pnpm dev` and answer, or, on a disposable database, empty the schema and reseed.
 
 ## Decisions so far
 
@@ -34,7 +34,8 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **Shared copy:** the closing call to action (About, Portfolio, Journal, articles) and the 404 copy are in Studio details → Shared sections. The enquiry form's button and notes are in Pages → Contact → Form, also used on the homepage.
 - **Collections after the redesign:**
   - `styles` are portfolio categories (the filter).
-  - `portfolio-items` have slugs, a summary, a story and an SEO tab. Each gets its own page, and the card number is its position in CMS order.
+  - `portfolio-items` have slugs, a summary, photos, an optional video with a cover (`videoPoster`), optional extra story and an SEO tab. A piece needs a photo or a video; without a photo, cards use the video cover. Each gets its own page; the text shared by those pages is in Pages → Portfolio → Piece pages.
+  - The homepage picks its pieces in Pages → Homepage → Portfolio: `work.pieces` (photo track; empty = the first 9) and `films.pieces` (film track; pieces with a video). Card numbers are positions in each list.
   - FAQs pick their pages with `pages` (home / contact / visiting).
   - `artists` has no pages of its own; Homepage and About pick an artist.
 - **Tailwind v4 tokens:** in `src/app/(frontend)/globals.css`, taken from the design.
@@ -47,7 +48,8 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **Fonts:** Inter (next/font) for labels, buttons and nav. Headings and body use the system Arial/Helvetica, as in the design.
 - **Accent:** `#FF5100`. Text on it is black (`--color-on-accent`), the user's choice for WCAG AA; the design uses white (3.3:1). Small grey labels use `--color-faint` #8F8F8F, not the design's #666.
 - **Glyphs:** `✳` and `▶` are SVGs (`components/art/Glyphs.tsx`), because iOS draws them as emoji. Text arrows get VS15 (`↗︎`).
-- **Photos:** black and white through the `photo` utility, unless Studio details → "Show photos in black and white" is off (`data-mono-photos` on `<html>`). `CmsImage` adds it by default (`photo={false}` for logos).
+- **Photos:** black and white and slightly darkened (`grayscale(1) brightness(.85)`) through the `photo` utility, unless Studio details → "Show photos in black and white" is off (`data-mono-photos` on `<html>`). `CmsImage` adds it by default. `photo={false}` is for logos, the piece lightbox and page-top backgrounds, which the design shows in colour. Videos are never filtered.
+- **Page-top photos:** `pageHero()` (and the Visiting hero) has an optional `background`. `HeroPhoto` (`ui/Blocks.tsx`) puts it behind the grid under a dark wash (`hero-photo` utility).
 - **Motion:** no GSAP or Lenis (they stay on `design-v1`). `PageMotion` (in the layout) handles all of it with IntersectionObservers:
   - `data-reveal` fades content up once.
   - `data-reveal-group` staggers siblings by (index % 3) × 65 ms.
@@ -55,7 +57,10 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
   - It sets `motion-ready` for the layout's `jsReadyScript`, and rescans on navigation and DOM changes (live preview).
   - Never put `data-reveal` on hero/LCP content.
   - Also: `HeroParallax` and `MobileCta` on the homepage only; native smooth scrolling with `data-scroll-behavior="smooth"`.
-- **Horizontal galleries:** `ScrollTrack`, a native scroll-snap row with prev/next buttons. No autoplay, by design.
+- **Horizontal galleries:** `ScrollTrack`, a native scroll-snap row with prev/next buttons. Only the homepage photo track moves by itself:
+  - `colourCycle` shows one photo at a time in colour every 3.5 s and scrolls to it.
+  - It waits while the track is hovered, focused or off screen, and never runs with reduced motion.
+  - It stops for good on the first interaction. The design resumes after 6.5 s; stopping is the WCAG 2.2.2-safe choice.
 - **Enquiry form:** `EnquiryForm` is UI only until the lead-capture phase; submitting shows `pendingNotice`.
   - Travel fields show with CSS `:has(#travelling:checked)`, so they work without JS.
   - `?travel=1` and `?project=<slug>` are read with `useSyncExternalStore`, not `useSearchParams`, which would need a Suspense boundary on prerendered pages.
@@ -80,6 +85,9 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 
 - **Phases 1–4** (scaffold, CMS, scroll sequence, homepage) are done and preserved on `design-v1`.
 - **Redesign: in progress on `redesign`.** Covers all pages from `docs/design/`, the reworked CMS model (page globals, portfolio pages, FAQ pages, lead fields), seed content for London InkTattoo, and the removal of GSAP, Lenis and the scroll sequence. It replaces the old Phase 5 (journal, artist and style pages).
+- **Studio portfolio** (design revision "real work"): 30 real pieces, with 32 photos and 11 films.
+  - `pnpm seed` downloads them from the design review (`src/seed/studio-media.ts`) straight into the media library (R2), so the clients' tattoos are never in git. If a download fails, it falls back to a placeholder.
+  - The seed ticks `clientConsent` on the studio's behalf. Written consent for each piece is still to be confirmed (`docs/RESOURCES_NEEDED.md`).
 - **Next:** Phase 6 (lead capture: sending the enquiry form, Turnstile, Resend, UTM, consent), then 7 (SEO: sitemap, robots, LocalBusiness JSON-LD, favicon) and 8 (QA).
 - **Open for later:** the footer has no newsletter in the new design (dropped). `.env` uses `sslmode=require`; `verify-full` behaves the same and silences pg's warning.
 - **Secrets:** they go in `.env` only. The user once pasted the DB string into `.env.example` (which is committed); it was caught before any push. Before every commit, check that `.env.example` contains only placeholders.

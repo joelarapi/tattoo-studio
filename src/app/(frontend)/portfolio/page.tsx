@@ -41,7 +41,7 @@ export default async function PortfolioPage() {
 
   return (
     <main id="main">
-      <PageHero hero={page.hero} className="md:min-h-[500px]" />
+      <PageHero hero={page.hero} short />
 
       <section className="pb-section px-site pt-10">
         <div className="my-10 grid grid-cols-1 gap-[25px] md:my-[60px] md:grid-cols-[1fr_1.2fr] md:gap-[9%]">

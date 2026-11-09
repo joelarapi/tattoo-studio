@@ -123,6 +123,12 @@
 @utility py-section {
   padding-block: var(--section-y);
 }
+@utility pt-section {
+  padding-top: var(--section-y);
+}
+@utility pb-section {
+  padding-bottom: var(--section-y);
+}
 
 /* ---------- Type ---------- */
 
@@ -382,7 +388,48 @@
 /* Photos follow the "black and white" switch in Studio details. */
 @utility photo {
   html[data-mono-photos] & {
-    filter: grayscale(1);
+    filter: grayscale(1) brightness(0.85);
+  }
+}
+
+/*
+ * The homepage photo track lets one photo at a time show its colours (ScrollTrack's colourCycle),
+ * plus the one under the pointer or keyboard focus.
+ */
+html[data-mono-photos] [data-colour-cycle] > * .photo {
+  transition:
+    filter 0.9s ease,
+    transform 0.4s ease;
+}
+html[data-mono-photos] [data-colour-cycle] > :is([data-colour-active], :focus-visible) .photo {
+  filter: none;
+}
+@media (hover: hover) {
+  html[data-mono-photos] [data-colour-cycle] > :hover .photo {
+    filter: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-mono-photos] [data-colour-cycle] > * .photo {
+    transition: none;
+  }
+}
+
+/* A photo behind the top of a page: grid lines over a dark wash, so the heading stays readable. */
+@utility hero-photo {
+  background-image:
+    linear-gradient(#ffffff07 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff07 1px, transparent 1px),
+    linear-gradient(90deg, #050505de, #050505b8 50%, #050505de);
+  background-size:
+    45px 45px,
+    45px 45px,
+    cover;
+  @media (width >= 681px) {
+    background-size:
+      70px 70px,
+      70px 70px,
+      cover;
   }
 }
 

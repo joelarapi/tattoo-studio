@@ -18,12 +18,13 @@ export function PortfolioCard({
   className,
 }: {
   item: PortfolioItem
-  /** 1-based position in the portfolio, shown as "001". */
+  /** 1-based position in its list, shown as "001". */
   position: number
   imageClassName?: string
   className?: string
 }) {
-  const cover = item.images?.[0]
+  // A piece with only a video uses the video cover.
+  const cover = item.images?.[0] ?? item.videoPoster
   return (
     <Link
       href={pathForDoc('portfolio-items', item.slug)}
@@ -32,8 +33,8 @@ export function PortfolioCard({
     >
       <div
         className={cn(
-          'relative h-[440px] overflow-hidden rounded-md bg-panel-2 md:h-[280px] lg:h-[360px] 2xl:h-[430px]',
-          imageClassName,
+          'relative overflow-hidden rounded-md bg-panel-2',
+          imageClassName ?? 'h-[440px] md:h-[280px] lg:h-[360px] 2xl:h-[430px]',
         )}
       >
         <CmsImage
@@ -60,7 +61,7 @@ export function PortfolioCard({
       </div>
       <p className="mt-3 flex justify-between gap-2.5 border-t border-line-strong pt-3 label-sm text-[#999] md:flex-col md:gap-1 lg:flex-row">
         {categoryName(item)}
-        {item.placement && <span>Placement / {item.placement}</span>}
+        {item.placement && <span>{item.placement}</span>}
       </p>
       {item.summary && (
         <p className="mt-4 text-[13px] leading-[1.85] md:text-[12px]">{item.summary}</p>

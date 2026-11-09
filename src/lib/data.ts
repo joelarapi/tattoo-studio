@@ -54,7 +54,7 @@ function pageGlobal<S extends PageGlobalSlug>(slug: S, collections: CollectionSl
   )
 }
 
-export const getHomepage = pageGlobal('homepage', ['artists'], 2)
+export const getHomepage = pageGlobal('homepage', ['artists', 'portfolio-items', 'styles'], 2)
 export const getAboutPage = pageGlobal('about-page', ['artists'], 2)
 export const getPortfolioPage = pageGlobal('portfolio-page', linkable)
 export const getVisitingPage = pageGlobal('visiting-page', linkable)

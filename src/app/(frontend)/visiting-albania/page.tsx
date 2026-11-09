@@ -4,7 +4,7 @@ import { DestinationMotif, SupportSymbol } from '@/components/art/Glyphs'
 import { FaqList } from '@/components/faq/FaqList'
 import { RichText } from '@/components/RichText'
 import { Action } from '@/components/ui/Action'
-import { EndCta, Notice, NumberedCards } from '@/components/ui/Blocks'
+import { EndCta, HeroPhoto, Notice, NumberedCards } from '@/components/ui/Blocks'
 import { StyledHeading } from '@/components/ui/StyledHeading'
 import { Tag } from '@/components/ui/Tag'
 import { Lines, Paragraphs } from '@/components/ui/Text'
@@ -65,6 +65,7 @@ export default async function VisitingAlbaniaPage() {
   return (
     <main id="main">
       <section className="grid-bg grid grid-cols-1 items-center gap-10 overflow-hidden px-[6%] py-[60px] md:grid-cols-[1.2fr_1fr] md:gap-[5%] md:px-[5%] lg:gap-[9%] lg:px-site lg:py-20">
+        <HeroPhoto media={hero.background} />
         <div>
           <Tag>{hero.tag}</Tag>
           <StyledHeading
@@ -123,7 +124,11 @@ export default async function VisitingAlbaniaPage() {
           className="flex flex-wrap justify-between gap-x-5 gap-y-3 border-y border-line bg-[#101010] px-site py-[23px]"
         >
           {sections.map((section) => (
-            <a key={section.id} href={`#${section.id}`} className="label-sm hover:text-accent">
+            <a
+              key={section.id}
+              href={`#${section.id}`}
+              className="font-label text-[8px] text-text uppercase hover:text-accent md:text-[9px]"
+            >
               {section.label} ↓&#xFE0E;
             </a>
           ))}

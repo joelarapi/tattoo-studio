@@ -10,3 +10,17 @@ nav a.orange-button[aria-current="page"]{color:#fff}
 .footer-socials{grid-column:1/-1;display:flex;gap:12px;align-items:center;margin-top:2px}.social-placeholder{display:grid;place-items:center;width:42px;height:42px;border:1px solid #3b3b3b;border-radius:5px;color:#deddd8;background:#111}.social-placeholder svg{display:block;width:21px;height:21px}.social-placeholder:hover{color:var(--orange);border-color:var(--orange)}
 /* Supporting-page scroll motion, enabled only when JavaScript is available. */
 .page-scroll-reveal{opacity:0;transform:translate3d(0,18px,0);transition:opacity .7s ease var(--page-reveal-delay,0ms),transform .8s cubic-bezier(.2,.65,.3,1) var(--page-reveal-delay,0ms)}.page-scroll-reveal.page-is-revealed{opacity:1;transform:translate3d(0,0,0)}.page-scroll-reveal:focus-within{opacity:1;transform:none}@media(max-width:680px){.page-scroll-reveal{transform:translate3d(0,12px,0);transition-duration:.6s,.7s}}@media(prefers-reduced-motion:reduce){.page-scroll-reveal,.page-scroll-reveal.page-is-revealed{opacity:1;transform:none;transition:none}}
+
+.project-image img,.suggested-project img{filter:grayscale(1) brightness(.85)!important}.project-grid{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:680px){.project-grid{grid-template-columns:1fr}}
+
+
+/* About hero: retain the existing grid, circle and content over the studio work. */
+.about-hero{background-image:linear-gradient(#ffffff07 1px,transparent 1px),linear-gradient(90deg,#ffffff07 1px,transparent 1px),linear-gradient(90deg,rgba(5,5,5,.85),rgba(5,5,5,.72) 50%,rgba(5,5,5,.85)),url("assets/work/archangel-mary-full-sleeve-tattoo-01.jpg");background-size:70px 70px,70px 70px,cover,cover;background-position:center,center,center,center 38%;background-repeat:repeat,repeat,no-repeat,no-repeat}
+@media(max-width:680px){.about-hero{background-size:45px 45px,45px 45px,cover,cover;background-position:center,center,center,center 32%}}
+
+/* Temporary hero photography; replace the per-page image variables as needed. */
+.photo-banner{background-image:linear-gradient(#ffffff07 1px,transparent 1px),linear-gradient(90deg,#ffffff07 1px,transparent 1px),linear-gradient(90deg,#050505de,#050505b8 50%,#050505de),var(--hero-photo);background-size:70px 70px,70px 70px,cover,cover;background-position:center,center,center,var(--hero-position,center);background-repeat:repeat,repeat,no-repeat,no-repeat}
+.portfolio-banner{--hero-photo:url("assets/work/lion-cub-family-sleeve-tattoo-01.jpg");--hero-position:center 40%}
+.visit-banner{--hero-photo:url("assets/work/compass-map-quill-tattoo-01.jpg");--hero-position:center 40%}
+.blog-banner{--hero-photo:url("assets/detail.jpg");--hero-position:center 40%}
+@media(max-width:680px){.photo-banner{background-size:45px 45px,45px 45px,cover,cover}}

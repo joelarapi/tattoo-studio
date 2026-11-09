@@ -3,7 +3,6 @@ import type { Metadata } from 'next'
 import { FaqSection } from '@/components/faq/FaqSection'
 import { ContactDetail, EnquirySection } from '@/components/forms/EnquirySection'
 import { HomeHero } from '@/components/home/HomeHero'
-import { ReelsTrack } from '@/components/home/ReelsTrack'
 import {
   ArtistSection,
   JournalSection,
@@ -13,8 +12,7 @@ import {
 } from '@/components/home/Sections'
 import { MobileCta } from '@/components/motion/MobileCta'
 import { Action } from '@/components/ui/Action'
-import { EndCta, NeedleDivider, SectionHead } from '@/components/ui/Blocks'
-import { CmsImage } from '@/components/ui/CmsImage'
+import { EndCta, NeedleDivider } from '@/components/ui/Blocks'
 import { Paragraphs } from '@/components/ui/Text'
 import {
   getContactPage,
@@ -25,6 +23,11 @@ import {
   getSiteSettings,
 } from '@/lib/data'
 import { pageMetadata } from '@/lib/metadata'
+import type { PortfolioItem } from '@/payload-types'
+
+/** The populated pieces of a relationship field (IDs mean the piece is unpublished or deleted). */
+const populated = (value: (number | PortfolioItem)[] | null | undefined) =>
+  (value ?? []).filter((item): item is PortfolioItem => typeof item === 'object')
 
 export async function generateMetadata(): Promise<Metadata> {
   const [home, settings] = await Promise.all([getHomepage(), getSiteSettings()])
@@ -42,35 +45,15 @@ export default async function HomePage() {
     getLatestPosts(3),
   ])
 
-  const featured = portfolio.filter((item) => item.featured)
-  const work = featured.length ? featured : portfolio
-  const positions = new Map(portfolio.map((item, index) => [item.id, index + 1]))
-  const reels = (home.reels.items ?? []).map((reel) => {
-    const poster = typeof reel.poster === 'object' ? reel.poster : null
-    const video = typeof reel.video === 'object' && reel.video?.url ? reel.video : null
-    return {
-      id: reel.id ?? reel.title,
-      title: reel.title,
-      text: reel.text,
-      video: video ? { url: video.url!, mimeType: video.mimeType } : null,
-      posterURL: poster?.sizes?.hero?.url ?? poster?.url,
-      poster: (
-        <CmsImage
-          media={poster}
-          alt=""
-          fill
-          sizes="(min-width: 681px) 33vw, 86vw"
-          className="object-cover"
-        />
-      ),
-    }
-  })
+  // The pieces chosen in Pages → Homepage → Portfolio, or the start of the portfolio.
+  const chosen = populated(home.work.pieces)
+  const pieces = chosen.length ? chosen : portfolio.slice(0, 9)
+  const films = populated(home.films?.pieces).filter((item) => item.video && item.videoPoster)
 
   // Sections are numbered in the order they appear; empty ones drop out of the count.
   const shown = {
-    work: work.length > 0,
+    work: pieces.length > 0 || films.length > 0,
     artist: true,
-    reels: reels.length > 0,
     visit: true,
     plan: true,
     enquiry: true,
@@ -87,28 +70,14 @@ export default async function HomePage() {
   return (
     <main id="main">
       <HomeHero hero={home.hero} strip={home.strip} />
-      <WorkSection copy={home.work} items={work} positions={positions} number={numbers.work} />
-      <NeedleDivider />
+      <WorkSection
+        copy={home.work}
+        pieces={pieces}
+        filmCopy={home.films}
+        films={films}
+        number={numbers.work}
+      />
       <ArtistSection copy={home.meetArtist} number={numbers.artist} />
-
-      {reels.length > 0 && (
-        <section className="border-y border-[#252525] bg-band px-site py-section">
-          <SectionHead
-            tag={home.reels.tag}
-            number={numbers.reels}
-            heading={home.reels.heading}
-            intro={home.reels.intro}
-          />
-          <ReelsTrack
-            reels={reels}
-            trackLabel={home.reels.trackLabel}
-            itemLabel={home.reels.itemLabel}
-            watchLabel={home.reels.watchLabel}
-            comingSoonLabel={home.reels.comingSoonLabel}
-            dialogLink={home.reels.dialogLink}
-          />
-        </section>
-      )}
 
       <VisitSection copy={home.visit} number={numbers.visit} />
       <NeedleDivider />

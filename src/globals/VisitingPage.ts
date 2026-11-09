@@ -1,6 +1,14 @@
 import type { ArrayField, Field } from 'payload'
 
-import { cardList, optionalLink, paragraphs, section, tagField, text } from '@/fields/content'
+import {
+  cardList,
+  heroBackground,
+  optionalLink,
+  paragraphs,
+  section,
+  tagField,
+  text,
+} from '@/fields/content'
 import { styledHeading } from '@/fields/heading'
 import { linkGroup } from '@/fields/link'
 import { basicEditor } from '@/fields/richText'
@@ -55,6 +63,7 @@ export const VisitingPage = pageGlobal({
             ),
             text('footnote', 'Small label at the bottom of the box.'),
           ]),
+          heroBackground(),
         ]),
       ],
     },

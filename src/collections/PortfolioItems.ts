@@ -21,9 +21,9 @@ export const PortfolioItems: CollectionConfig = {
   admin: {
     group: 'Studio',
     useAsTitle: 'title',
-    defaultColumns: ['title', 'style', 'placement', 'featured'],
+    defaultColumns: ['title', 'style', 'placement', 'updatedAt'],
     description:
-      'Finished tattoos. Each piece gets its own page. Tick "Featured" to show it on the homepage. Drag rows to reorder.',
+      'Finished tattoos. Each piece gets its own page. Drag rows to reorder. The homepage shows the pieces chosen in Pages → Homepage → Portfolio.',
     livePreview: { url: ({ data }) => piecePath(data) },
     preview: (data) => piecePath(data),
   },
@@ -79,21 +79,48 @@ export const PortfolioItems: CollectionConfig = {
             },
             {
               name: 'images',
+              label: 'Photos',
               type: 'upload',
               relationTo: 'media',
               hasMany: true,
-              required: true,
-              minRows: 1,
               filterOptions: { mimeType: { contains: 'image' } },
-              admin: { description: 'The first image is the one shown on cards. Drag to reorder.' },
+              // A piece needs something to show: a photo, or at least a video.
+              validate: (value, { siblingData }) =>
+                (Array.isArray(value) && value.length > 0) ||
+                Boolean((siblingData as { video?: unknown })?.video) ||
+                'Add at least one photo or a video.',
+              admin: {
+                description: 'The first photo is the one shown on cards. Drag to reorder.',
+              },
             },
             {
-              name: 'video',
-              label: 'Short video (optional)',
-              type: 'upload',
-              relationTo: 'media',
-              filterOptions: { mimeType: { contains: 'video' } },
-              admin: { description: 'MP4 or WebM, max 8 MB. Shown on the piece’s page.' },
+              type: 'row',
+              fields: [
+                {
+                  name: 'video',
+                  label: 'Short video (optional)',
+                  type: 'upload',
+                  relationTo: 'media',
+                  filterOptions: { mimeType: { contains: 'video' } },
+                  admin: {
+                    width: '50%',
+                    description: 'MP4 or WebM, max 8 MB. Shown on the piece’s page.',
+                  },
+                },
+                {
+                  name: 'videoPoster',
+                  label: 'Video cover',
+                  type: 'upload',
+                  relationTo: 'media',
+                  filterOptions: { mimeType: { contains: 'image' } },
+                  admin: {
+                    width: '50%',
+                    condition: (_, siblingData) => Boolean(siblingData?.video),
+                    description:
+                      'A still from the video, portrait format. Shown before it plays and on the homepage film cards.',
+                  },
+                },
+              ],
             },
             {
               name: 'artist',
@@ -105,22 +132,28 @@ export const PortfolioItems: CollectionConfig = {
         },
         {
           label: 'Story',
-          description: 'The text next to the photo on the piece’s own page.',
+          description:
+            'Optional. The text next to the photos is shared by every piece (Pages → Portfolio → Piece pages); add to it here.',
           fields: [
             {
               name: 'detailsHeading',
               label: 'Heading',
               type: 'text',
-              admin: { description: 'e.g. "A statement across the back."' },
+              admin: {
+                description: 'Replaces the shared heading ("Look closer.") for this piece.',
+              },
             },
             {
               name: 'story',
               type: 'array',
               labels: { singular: 'Paragraph', plural: 'Paragraphs' },
               maxRows: 6,
-              admin: { components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' } },
+              admin: {
+                description: 'Extra paragraphs after the summary, each with an optional title.',
+                components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' },
+              },
               fields: [
-                { name: 'title', type: 'text', admin: { description: 'e.g. "Look closer."' } },
+                { name: 'title', type: 'text', admin: { description: 'e.g. "The placement."' } },
                 { name: 'text', type: 'textarea', required: true },
               ],
             },
@@ -139,12 +172,6 @@ export const PortfolioItems: CollectionConfig = {
       validate: (value: boolean | null | undefined) =>
         value === true || 'Only publish work the client has agreed to share.',
       admin: { position: 'sidebar' },
-    },
-    {
-      name: 'featured',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { position: 'sidebar', description: 'Show in the homepage gallery.' },
     },
   ],
 }

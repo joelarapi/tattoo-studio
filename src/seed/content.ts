@@ -10,10 +10,10 @@ export const STUDIO_NAME = 'London InkTattoo'
 
 /** Portfolio categories (the `styles` collection). */
 export const styles = [
-  { name: 'Graphic', slug: 'graphic' },
-  { name: 'Botanical', slug: 'botanical' },
-  { name: 'Symbolic', slug: 'symbolic' },
-  { name: 'The process', slug: 'process' },
+  { name: 'Portrait', slug: 'portrait' },
+  { name: 'Black & Grey', slug: 'black-grey' },
+  { name: 'Colour', slug: 'colour' },
+  { name: 'Geometric', slug: 'geometric' },
 ]
 
 export const artists = [
@@ -41,102 +41,330 @@ export const artists = [
 type PortfolioSeed = {
   title: string
   slug: string
+  /** A portfolio category slug. */
   style: string
   placement: string
   summary: string
-  detailsHeading: string
-  story: { title: string; text: string }[]
+  /** How many photos the studio supplied: `<slug>-01.jpg`, `<slug>-02.jpg` … */
+  photos: number
+  /** Whether there's a film: `<slug>-video-01.mp4`, with `<slug>-video-01-poster.jpg`. */
+  video?: boolean
 }
 
-const makeItPersonal = (text: string) => ({ title: 'Make it personal.', text })
-const lookCloser = (text: string) => ({ title: 'Look closer.', text })
-
+/**
+ * The studio's portfolio, as supplied for the design review (November 2026), in portfolio order.
+ * The files themselves are fetched by the seed (studio-media.ts).
+ */
 export const portfolio: PortfolioSeed[] = [
   {
-    title: 'Graphic Back Tattoo',
-    slug: 'graphic-back-tattoo',
-    style: 'graphic',
+    title: 'Joker & Playing Cards Sleeve',
+    slug: 'joker-playing-cards-sleeve',
+    style: 'portrait',
+    placement: 'Arm',
+    photos: 1,
+    video: true,
+    summary:
+      'A Joker portrait, playing cards and a clock come together in a black and grey sleeve, with strong shadows and crisp highlights.',
+  },
+  {
+    title: 'Traditional Rose & Moth Tattoo',
+    slug: 'traditional-rose-moth-tattoo',
+    style: 'colour',
+    placement: 'Arm',
+    photos: 1,
+    summary:
+      'A red rose and moth combine bold black outlines with green leaves and warm orange details in this traditional colour tattoo.',
+  },
+  {
+    title: 'Woman Portrait Forearm Tattoo',
+    slug: 'woman-portrait-forearm-tattoo',
+    style: 'portrait',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A realistic woman’s portrait on the forearm, with carefully shaded eyes, hair and lips rendered in black and grey.',
+  },
+  {
+    title: 'Lighthouse, Anchor & Compass Tattoo',
+    slug: 'lighthouse-anchor-compass-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A nautical forearm composition brings together a lighthouse, sailing boats, waves, an anchor and compass in black and grey.',
+  },
+  {
+    title: 'Aztec-Inspired Chest & Shoulder Tattoo',
+    slug: 'aztec-inspired-chest-shoulder-tattoo',
+    style: 'black-grey',
+    placement: 'Chest and shoulder',
+    photos: 1,
+    summary:
+      'An expansive chest and shoulder tattoo combines a calendar-like circular motif, a fierce carved face and geometric ornament in shaded black ink.',
+  },
+  {
+    title: 'Dragon Lower Leg Tattoo',
+    slug: 'dragon-lower-leg-tattoo',
+    style: 'black-grey',
+    placement: 'Lower leg',
+    photos: 1,
+    summary:
+      'A detailed dragon follows the lower leg, combining scales, flowing whiskers and layered black and grey shading.',
+  },
+  {
+    title: 'Mandala & Mask Leg Tattoo',
+    slug: 'mandala-mask-leg-tattoo',
+    style: 'geometric',
+    placement: 'Lower leg',
+    photos: 2,
+    summary:
+      'Layered mandalas wrap around the leg alongside a bold mask motif. Solid black shapes, open skin and dot shading give the ornamental design its contrast.',
+  },
+  {
+    title: 'Skull & Clock Forearm Tattoo',
+    slug: 'skull-clock-forearm-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    video: true,
+    summary:
+      'A large skull and clock face anchor this forearm tattoo, with smooth grey shading and dark lettering extending the composition.',
+  },
+  {
+    title: 'Angel & Money Forearm Tattoo',
+    slug: 'angel-money-colour-forearm-tattoo',
+    style: 'colour',
+    placement: 'Forearm',
+    photos: 2,
+    summary:
+      'A winged angel, banknotes and a globe form a forearm composition with black and grey figures against red and orange accents.',
+  },
+  {
+    title: 'Clown Faces Forearm Tattoo',
+    slug: 'clown-faces-forearm-tattoo',
+    style: 'portrait',
+    placement: 'Forearm',
+    photos: 2,
+    video: true,
+    summary:
+      'Expressive clown faces, dark eye makeup and small red accents create a dramatic forearm tattoo with contrasting light and shadow.',
+  },
+  {
+    title: 'Eagle & Spartan Shoulder Tattoo',
+    slug: 'eagle-spartan-chest-shoulder-tattoo',
+    style: 'black-grey',
+    placement: 'Chest and shoulder',
+    photos: 1,
+    summary:
+      'An eagle spreads its wings across the chest beside a shaded Spartan helmet on the shoulder, connected by a soft cloud-like background.',
+  },
+  {
+    title: 'Japanese-Inspired Landscape Leg Tattoo',
+    slug: 'japanese-landscape-leg-tattoo',
+    style: 'geometric',
+    placement: 'Lower leg',
+    photos: 1,
+    summary:
+      'A Japanese-inspired landscape combines a mountain, flying birds, a pine tree, a torii gate and a small boat, framed by geometric lines and red sun accents.',
+  },
+  {
+    title: 'Family Beach Sunset Tattoo',
+    slug: 'family-beach-sunset-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A family walks hand in hand towards the sea beneath palm trees and birds. Soft shading builds the sunset scene around the silhouettes.',
+  },
+  {
+    title: 'Archangel & Mary Full Sleeve Tattoo',
+    slug: 'archangel-mary-full-sleeve-tattoo',
+    style: 'portrait',
+    placement: 'Arm',
+    photos: 1,
+    video: true,
+    summary:
+      'A large religious sleeve pairs an armoured winged figure with a praying woman’s portrait, flowing fabric and architectural details in black and grey.',
+  },
+  {
+    title: 'Black & Grey Rose Forearm Tattoo',
+    slug: 'black-grey-rose-forearm-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A large rose fills the forearm with layered petals, deep black backgrounds and fine highlights that separate the flower’s shapes.',
+  },
+  {
+    title: 'Mary, Cherub & Lettering Tattoo',
+    slug: 'mary-cherub-lettering-tattoo',
+    style: 'portrait',
+    placement: 'Lower leg',
+    photos: 1,
+    summary:
+      'A veiled praying figure sits above bold numerals and a cherub in this black and grey lower-leg tattoo. Radiating lines frame the portrait.',
+  },
+  {
+    title: 'Compass, Map & Quill Tattoo',
+    slug: 'compass-map-quill-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    video: true,
+    summary:
+      'A compass, map, key, ink bottle and quill bring a travel and writing theme together across the forearm in black and grey.',
+  },
+  {
+    title: 'Lion & Cub Family Sleeve Tattoo',
+    slug: 'lion-cub-family-sleeve-tattoo',
+    style: 'portrait',
+    placement: 'Arm',
+    photos: 1,
+    video: true,
+    summary:
+      'A realistic lion and cub lead this family-themed sleeve, with detailed fur, soft backgrounds and personal lettering continuing down the arm.',
+  },
+  {
+    title: 'Colosseum & Sword Forearm Tattoo',
+    slug: 'colosseum-sword-forearm-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'The Colosseum, a sword and cloud shading form a black and grey forearm composition, with lettering and coordinates above the architectural scene.',
+  },
+  {
+    title: 'Grim Reaper Full Back Tattoo',
+    slug: 'grim-reaper-full-back-tattoo',
+    style: 'colour',
     placement: 'Back',
+    photos: 1,
     summary:
-      'Strong contrast, layered detail and a composition that uses the back as a single canvas. A starting point for discussing a larger tattoo and the elements you want it to bring together.',
-    detailsHeading: 'A statement across the back.',
-    story: [
-      lookCloser(
-        'The broad placement creates room for a central motif and supporting patterns. Look at how areas of dark ink sit beside open skin, and how the smaller details fit within the overall shape.',
-      ),
-      makeItPersonal(
-        'For your own back piece, bring the subject, references and meaning you have in mind. Discuss the composition and placement with Tisi, along with the session plan, estimated cost and time the work may need.',
-      ),
-    ],
+      'A hooded skeleton, raven and lantern fill a large back composition. Vivid orange and red backgrounds frame the detailed black and grey figures.',
   },
   {
-    title: 'Botanical Arm Tattoo',
-    slug: 'botanical-arm-tattoo',
-    style: 'botanical',
+    title: 'Shark Forearm Tattoo',
+    slug: 'shark-forearm-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A shark rises through a shaded underwater scene on the forearm, with attention to the open mouth, teeth and the shape of the body.',
+  },
+  {
+    title: 'Lion & Compass Forearm Tattoo',
+    slug: 'lion-compass-forearm-tattoo',
+    style: 'portrait',
+    placement: 'Forearm',
+    photos: 1,
+    summary:
+      'A realistic lion in profile is paired with a large compass rose, using flowing mane details and bold directional points across the forearm.',
+  },
+  {
+    title: 'Clock, Compass & Map Tattoo',
+    slug: 'clock-compass-map-tattoo',
+    style: 'black-grey',
+    placement: 'Forearm',
+    photos: 1,
+    video: true,
+    summary:
+      'A Roman-numeral clock, compass rose and map details create a connected forearm tattoo, with precise linework beside smooth black and grey shading.',
+  },
+  {
+    title: 'Angel & Ornamental Arm Tattoo',
+    slug: 'angel-ornamental-arm-tattoo',
+    style: 'black-grey',
     placement: 'Arm',
+    photos: 1,
     summary:
-      'A botanical subject gives this arm tattoo its direction. The flower forms and flowing lines show how a natural motif can become a personal piece.',
-    detailsHeading: 'Nature, carried with you.',
-    story: [
-      lookCloser(
-        'Notice the relationship between the flower, its surrounding lines and the space around the design. The placement is part of the composition, rather than a separate decision made at the end.',
-      ),
-      makeItPersonal(
-        'Tell Tisi whether a particular flower or plant has meaning for you, or bring references for a visual direction you like. You can also begin without a reference and discuss a design together.',
-      ),
-    ],
+      'A winged figure sits within an ornamental arm composition, with feather detail, flowing shapes and broad areas of soft grey shading.',
   },
   {
-    title: 'Symbolic Shoulder Tattoos',
-    slug: 'symbolic-shoulder-tattoos',
-    style: 'symbolic',
-    placement: 'Shoulder',
-    summary:
-      'Separate symbolic motifs create a collection of details around the shoulder and upper chest: small tattoos that relate to one another while keeping their own identity.',
-    detailsHeading: 'Small marks. Personal meaning.',
-    story: [
-      lookCloser(
-        'Open space matters here. Consider the size and position of each motif, the distance between the pieces and how the arrangement sits alongside existing tattoos.',
-      ),
-      makeItPersonal(
-        'Bring the symbols or memories you want to express, whether you are starting with one small piece or thinking about several. Discuss the overall arrangement with Tisi before settling on the individual designs.',
-      ),
-    ],
-  },
-  {
-    title: 'Tattoo Process: A Close-Up',
-    slug: 'tattoo-process-close-up',
-    style: 'process',
+    title: 'Family Memory Full Sleeve Tattoo',
+    slug: 'family-memory-full-sleeve-tattoo',
+    style: 'black-grey',
     placement: 'Arm',
+    photos: 1,
+    video: true,
     summary:
-      'Tattooing in progress, up close. A process study rather than a finished piece, with space to look at the detail involved in creating a tattoo.',
-    detailsHeading: 'A closer look at the craft.',
-    story: [
-      lookCloser(
-        'A process photograph tells a different story from a finished or healed image. Use it to begin asking questions about how a session is organised and how a design develops on the skin.',
-      ),
-      makeItPersonal(
-        'Before your appointment, discuss the design review, expected session time, preparation and aftercare with Tisi. Ask to see relevant finished and healed work when choosing the direction for your own tattoo.',
-      ),
-    ],
+      'A family scene leads into a larger sleeve with personal dates and a warrior helmet. Black and grey shading connects the narrative elements along the arm.',
   },
   {
-    title: 'Inside a Tattoo Session',
-    slug: 'inside-a-tattoo-session',
-    style: 'process',
-    placement: 'Arm',
+    title: 'Medusa & Snake Forearm Tattoo',
+    slug: 'medusa-snake-forearm-tattoo',
+    style: 'portrait',
+    placement: 'Forearm',
+    photos: 1,
     summary:
-      'A wider view of tattooing in progress puts the working process in context, and opens the conversation about what your own appointment could involve.',
-    detailsHeading: 'From a conversation to a piece.',
-    story: [
-      lookCloser(
-        'The artist, the arm and the working space in one frame: a reminder that a tattoo is made over time, in a calm and focused session.',
-      ),
-      makeItPersonal(
-        'Share your idea and placement first. Then discuss the design approach, timing and cost, along with anything you want to understand before confirming your appointment. If you are travelling, include your dates in Albania.',
-      ),
-    ],
+      'A woman’s face is framed by snakes in this Medusa-inspired forearm tattoo, combining detailed scales with shaded portrait features.',
   },
+  {
+    title: 'Jesus Portrait & Cross Tattoo',
+    slug: 'jesus-portrait-cross-tattoo',
+    style: 'portrait',
+    placement: 'Forearm',
+    photos: 1,
+    video: true,
+    summary:
+      'A realistic portrait of Jesus with a crown of thorns is paired with a crucifix, using fine facial details and deep black and grey contrast.',
+  },
+  {
+    title: 'Winged Warrior Arm Tattoo',
+    slug: 'winged-warrior-arm-tattoo',
+    style: 'black-grey',
+    placement: 'Arm',
+    photos: 1,
+    summary:
+      'An armoured winged warrior forms the centre of this arm tattoo, with layered feathers, fabric and decorative armour rendered in black and grey.',
+  },
+  {
+    title: 'Archangel Chest Tattoo',
+    slug: 'archangel-chest-tattoo',
+    style: 'black-grey',
+    placement: 'Chest',
+    photos: 1,
+    video: true,
+    summary:
+      'A winged armoured figure spans the chest, with shaded feathers, flowing fabric and detailed armour shaping a large black and grey tattoo.',
+  },
+  {
+    title: 'Peaky Blinders Upper Arm Tattoo',
+    slug: 'peaky-blinders-upper-arm-tattoo',
+    style: 'portrait',
+    placement: 'Upper arm',
+    photos: 0,
+    video: true,
+    summary:
+      'A flat-capped figure and street scene form a Peaky Blinders-inspired upper-arm tattoo, framed by script and black and grey shading.',
+  },
+]
+
+/** The homepage photo track, in order. */
+export const homepagePieces = [
+  'jesus-portrait-cross-tattoo',
+  'family-memory-full-sleeve-tattoo',
+  'aztec-inspired-chest-shoulder-tattoo',
+  'japanese-landscape-leg-tattoo',
+  'archangel-mary-full-sleeve-tattoo',
+  'woman-portrait-forearm-tattoo',
+  'lion-cub-family-sleeve-tattoo',
+  'joker-playing-cards-sleeve',
+  'compass-map-quill-tattoo',
+]
+
+/** The homepage film track, in order (pieces with a video). */
+export const homepageFilms = [
+  'joker-playing-cards-sleeve',
+  'skull-clock-forearm-tattoo',
+  'clown-faces-forearm-tattoo',
+  'archangel-mary-full-sleeve-tattoo',
+  'compass-map-quill-tattoo',
+  'lion-cub-family-sleeve-tattoo',
+  'clock-compass-map-tattoo',
+  'family-memory-full-sleeve-tattoo',
+  'jesus-portrait-cross-tattoo',
+  'archangel-chest-tattoo',
+  'peaky-blinders-upper-arm-tattoo',
 ]
 
 /** Journal categories. */

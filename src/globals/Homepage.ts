@@ -95,22 +95,68 @@ export const Homepage = pageGlobal({
     {
       label: 'Portfolio',
       fields: [
+        section('work', 'Portfolio', [
+          tagField(),
+          styledHeading(),
+          paragraphs('intro', 'Next to the heading. Enter for a line break.'),
+          optionalLink('button', 'Button'),
+          text(
+            'creditLine',
+            'Tiny line above the photos and under the films, e.g. "Original work by Tisi".',
+          ),
+          text(
+            'trackLabel',
+            'Small label above the photos, e.g. "Photos · scroll at your own pace".',
+          ),
+          {
+            name: 'pieces',
+            label: 'Photos',
+            type: 'relationship',
+            relationTo: 'portfolio-items',
+            hasMany: true,
+            maxRows: 12,
+            admin: {
+              description:
+                'The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.',
+            },
+          },
+        ]),
         section(
-          'work',
-          'Portfolio',
+          'films',
+          'Films',
           [
-            tagField(),
-            styledHeading(),
-            paragraphs('intro', 'Next to the heading. Enter for a line break.'),
-            optionalLink('button', 'Button'),
-            text(
-              'trackLabel',
-              'Small label above the gallery, e.g. "Photos · scroll at your own pace".',
-            ),
-            paragraphs('closingText', 'Line under the gallery. Optional.'),
-            optionalLink('closingLink', 'Link under the gallery'),
+            text('trackLabel', 'Small label above the films.'),
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'itemLabel',
+                  type: 'text',
+                  admin: { width: '50%', description: 'Top of each card, e.g. "Tisi / film".' },
+                },
+                {
+                  name: 'watchLabel',
+                  type: 'text',
+                  defaultValue: 'Watch the tattoo video',
+                  admin: { width: '50%', description: 'Link at the bottom of each card.' },
+                },
+              ],
+            },
+            {
+              name: 'pieces',
+              label: 'Films',
+              type: 'relationship',
+              relationTo: 'portfolio-items',
+              hasMany: true,
+              maxRows: 12,
+              filterOptions: { video: { exists: true } },
+              admin: {
+                description:
+                  'Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to hide the films.',
+              },
+            },
           ],
-          'Shows the portfolio pieces marked "Featured" (or all of them if none are).',
+          'A second gallery under the photos.',
         ),
       ],
     },
@@ -128,76 +174,11 @@ export const Homepage = pageGlobal({
             admin: { description: 'The artist whose portrait is shown.' },
           },
           image('image', 'Image', 'Optional. Replaces the artist portrait here.', false),
+          text('imageNote', 'Small note on the image, e.g. "Original work by Tisi". Optional.'),
           paragraphs('text', 'A short introduction. Leave an empty line between paragraphs.'),
           optionalLink('button', 'Button'),
-          paragraphs('signoff', 'Small text next to the asterisk. Enter for a line break.'),
+          paragraphs('signoff', 'Small text next to the asterisk. Optional.'),
         ]),
-      ],
-    },
-    {
-      label: 'Films',
-      fields: [
-        section(
-          'reels',
-          'Video portfolio',
-          [
-            tagField(),
-            styledHeading(),
-            paragraphs('intro', 'Next to the heading. Enter for a line break.'),
-            text('trackLabel', 'Small label above the films.'),
-            {
-              type: 'row',
-              fields: [
-                {
-                  name: 'itemLabel',
-                  type: 'text',
-                  defaultValue: 'Film',
-                  admin: {
-                    width: '33%',
-                    description: 'After the number on each card: "01 / Film".',
-                  },
-                },
-                {
-                  name: 'watchLabel',
-                  type: 'text',
-                  defaultValue: 'Watch the film',
-                  admin: { width: '33%', description: 'Card link when there is a video.' },
-                },
-                {
-                  name: 'comingSoonLabel',
-                  type: 'text',
-                  defaultValue: 'Footage to come',
-                  admin: { width: '34%', description: 'Card link when there is no video yet.' },
-                },
-              ],
-            },
-            {
-              name: 'items',
-              label: 'Films',
-              type: 'array',
-              maxRows: 8,
-              labels: { singular: 'Film', plural: 'Films' },
-              admin: { components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' } },
-              fields: [
-                { name: 'title', type: 'text', required: true },
-                image('poster', 'Cover image', 'Portrait format (3:4).'),
-                {
-                  name: 'video',
-                  type: 'upload',
-                  relationTo: 'media',
-                  filterOptions: { mimeType: { contains: 'video' } },
-                  admin: {
-                    description:
-                      'MP4 or WebM, max 8 MB. Without a video, the card opens the text below.',
-                  },
-                },
-                paragraphs('text', 'Shown in the pop-up while there is no video.'),
-              ],
-            },
-            optionalLink('dialogLink', 'Link in the pop-up'),
-          ],
-          'Leave "Films" empty to hide this section.',
-        ),
       ],
     },
     {

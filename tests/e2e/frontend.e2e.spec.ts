@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test'
 
-const base = 'http://localhost:3000'
+const base = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
 
 const pages = [
   '/',
   '/about',
   '/portfolio',
-  '/portfolio/graphic-back-tattoo',
+  '/portfolio/joker-playing-cards-sleeve',
+  '/portfolio/peaky-blinders-upper-arm-tattoo',
   '/visiting-albania',
   '/journal',
   '/journal/tattoo-consultation',
@@ -33,6 +34,29 @@ test.describe('Frontend', () => {
     })
   }
 
+  test('homepage film cards open the piece’s page', async ({ page }) => {
+    await page.goto(base)
+    const film = page.getByRole('region', { name: 'Tattoo films' }).getByRole('link').first()
+    await expect(film).toHaveAttribute('href', /^\/portfolio\/[a-z0-9-]+$/)
+  })
+
+  test('a piece’s photo opens in the lightbox', async ({ page }) => {
+    await page.goto(`${base}/portfolio/clown-faces-forearm-tattoo`)
+    await page.locator('main a[href*="clown-faces-forearm-tattoo-01"]').click()
+    const dialog = page.locator('dialog[open]')
+    await expect(dialog).toContainText('1 of 2')
+    await page.keyboard.press('ArrowRight')
+    await expect(dialog).toContainText('2 of 2')
+    await dialog.getByRole('button', { name: 'Close ×' }).click()
+    await expect(page.locator('dialog[open]')).toHaveCount(0)
+  })
+
+  test('a piece’s video has its cover and caption', async ({ page }) => {
+    await page.goto(`${base}/portfolio/peaky-blinders-upper-arm-tattoo`)
+    await expect(page.locator('main video')).toHaveAttribute('poster', /.+/)
+    await expect(page.locator('main figcaption')).toContainText('Peaky Blinders')
+  })
+
   test('the travel link opens the form with the travel fields', async ({ page }) => {
     await page.goto(`${base}/contact?travel=1#tattoo-enquiry`)
     await expect(page.locator('#travelling')).toBeChecked()
@@ -57,6 +81,11 @@ test.describe('Frontend', () => {
       await page.goto(base)
       await page.locator('header summary').click()
       await expect(page.locator('header details nav')).toBeVisible()
+    })
+
+    test('a piece’s photo links to the image file', async ({ page }) => {
+      await page.goto(`${base}/portfolio/joker-playing-cards-sleeve`)
+      await expect(page.locator('main a[href*="joker-playing-cards-sleeve-01"]')).toHaveCount(1)
     })
 
     test('content is not hidden by scroll animations', async ({ page }) => {

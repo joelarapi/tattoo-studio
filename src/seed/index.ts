@@ -8,7 +8,18 @@
 import config from '@payload-config'
 import { type CollectionSlug, type DataFromCollectionSlug, getPayload, type Where } from 'payload'
 
-import { artists, categories, faqs, legalPages, portfolio, posts, styles } from './content'
+import {
+  artists,
+  categories,
+  faqs,
+  homepageFilms,
+  homepagePieces,
+  legalPages,
+  portfolio,
+  posts,
+  STUDIO_NAME,
+  styles,
+} from './content'
 import {
   aboutPage,
   contactPage,
@@ -23,6 +34,7 @@ import {
 import type { PageGlobalSlug } from '@/lib/routes'
 
 import { type PlaceholderKind, placeholderImage } from './images'
+import { photoFile, posterFile, studioFile, videoFile } from './studio-media'
 
 // Hooks skip cache revalidation: there's no Next.js server to tell.
 const context = { disableRevalidate: true }
@@ -83,6 +95,37 @@ async function image(kind: PlaceholderKind, seed: number, alt: string): Promise<
   return doc.id
 }
 
+/**
+ * One of the studio's photos or films (studio-media.ts), matched by file name so reruns don't
+ * download it again. Null when it can't be downloaded; the caller picks a fallback.
+ */
+async function studioMedia(name: string, alt: string): Promise<number | null> {
+  const { docs } = await payload.find({
+    collection: 'media',
+    where: { filename: { equals: name } },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+  })
+  if (docs[0]) {
+    counts.existing++
+    return docs[0].id
+  }
+  const file = await studioFile(name)
+  if (!file) {
+    payload.logger.warn(`Couldn't download ${name} from the design review.`)
+    return null
+  }
+  counts.created++
+  const doc = await payload.create({
+    collection: 'media',
+    data: { alt },
+    file,
+    context: { ...context },
+  })
+  return doc.id
+}
+
 /** Fills a global only while it is still empty, so CMS edits are never overwritten. */
 async function fillGlobal<T>(
   slug: Parameters<typeof payload.updateGlobal>[0]['slug'],
@@ -121,22 +164,55 @@ async function main() {
   }
   const artistID = lookup(artistDocs)
 
+  payload.logger.info('Seeding the studio’s portfolio (downloads about 50 MB on the first run)…')
+  const pieceDocs = []
+  const firstPhotos = new Map<string, number>()
   for (const [index, item] of portfolio.entries()) {
-    const picture = await image('portfolio', index + 1, item.title.toLowerCase())
-    await ensure('portfolio-items', bySlug(item.slug), () =>
-      payload.create({
-        collection: 'portfolio-items',
-        data: {
-          ...item,
-          style: styleID(item.style),
-          artist: artistID('tisi'),
-          images: [picture],
-          clientConsent: true,
-          featured: true,
-        },
-        context,
-      }),
+    const alt = `${item.title} on the ${item.placement.toLowerCase()}`
+    const photos: number[] = []
+    for (let number = 1; number <= item.photos; number++) {
+      const photo = await studioMedia(photoFile(item.slug, number), alt)
+      photos.push(photo ?? (await image('portfolio', index + 1, alt.toLowerCase())))
+    }
+    const video = item.video ? await studioMedia(videoFile(item.slug), `${item.title} video`) : null
+    const videoPoster = video
+      ? await studioMedia(posterFile(item.slug), `${item.title}, a still from the video`)
+      : null
+    // A piece needs a photo or a video.
+    if (!photos.length && !video) photos.push(await image('portfolio', index + 1, alt))
+    if (photos[0]) firstPhotos.set(item.slug, photos[0])
+
+    pieceDocs.push(
+      await ensure('portfolio-items', bySlug(item.slug), () =>
+        payload.create({
+          collection: 'portfolio-items',
+          data: {
+            title: item.title,
+            slug: item.slug,
+            summary: item.summary,
+            style: styleID(item.style),
+            placement: item.placement,
+            images: photos,
+            video,
+            videoPoster,
+            artist: artistID('tisi'),
+            // The studio supplied these for publication; confirm consent per piece before launch.
+            clientConsent: true,
+            meta: {
+              title: `${item.title} by Tisi in Albania | ${STUDIO_NAME}`,
+              description: `${item.summary} By Tisi at ${STUDIO_NAME}, Fier, Albania.`,
+            },
+          },
+          context,
+        }),
+      ),
     )
+  }
+  const pieceID = lookup(pieceDocs)
+  const photoOf = (slug: string) => {
+    const id = firstPhotos.get(slug)
+    if (!id) throw new Error(`No photo for "${slug}"`)
+    return id
   }
 
   const categoryDocs = []
@@ -185,20 +261,21 @@ async function main() {
     )
   }
 
-  const heroImages: GlobalRefs['heroImages'] = [
-    await image('portfolio', 6, 'detailed black tattoo across the back'),
-    await image('portfolio', 7, 'a botanical tattoo on the arm'),
-  ]
-  const reelPosters = [
-    await image('portrait', 2, 'still for a film about the process'),
-    await image('portrait', 3, 'still for a film about placement'),
-    await image('portrait', 4, 'still for a film about the reveal'),
-    await image('portfolio', 8, 'still for a close-up film'),
-  ]
   const refs: GlobalRefs = {
     og,
-    heroImages,
-    reelPosters,
+    heroImages: [
+      photoOf('grim-reaper-full-back-tattoo'),
+      photoOf('archangel-mary-full-sleeve-tattoo'),
+    ],
+    artistImage: photoOf('archangel-mary-full-sleeve-tattoo'),
+    backgrounds: {
+      about: photoOf('archangel-mary-full-sleeve-tattoo'),
+      portfolio: photoOf('lion-cub-family-sleeve-tattoo'),
+      visiting: photoOf('compass-map-quill-tattoo'),
+      journal: photoOf('clock-compass-map-tattoo'),
+    },
+    homepagePieces: homepagePieces.map(pieceID),
+    homepageFilms: homepageFilms.map(pieceID),
     artist: artistID('tisi'),
     featuredPost: lookup(postDocs)('tattoo-consultation'),
   }
@@ -220,8 +297,8 @@ async function main() {
   )
   await fillGlobal('homepage', await isEmpty('homepage'), homepage(refs))
   await fillGlobal('about-page', await isEmpty('about-page'), aboutPage(refs))
-  await fillGlobal('portfolio-page', await isEmpty('portfolio-page'), portfolioPage())
-  await fillGlobal('visiting-page', await isEmpty('visiting-page'), visitingPage())
+  await fillGlobal('portfolio-page', await isEmpty('portfolio-page'), portfolioPage(refs))
+  await fillGlobal('visiting-page', await isEmpty('visiting-page'), visitingPage(refs))
   await fillGlobal('journal-page', await isEmpty('journal-page'), journalPage(refs))
   await fillGlobal('contact-page', await isEmpty('contact-page'), contactPage())
 

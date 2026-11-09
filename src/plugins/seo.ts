@@ -31,6 +31,7 @@ type AnyDoc = Record<string, unknown> & {
   cover?: Relation
   portrait?: Relation
   images?: Relation[]
+  videoPoster?: Relation
   hero?: { heading?: Heading; intro?: string; label?: string }
 }
 
@@ -82,7 +83,7 @@ const generateURL: GenerateURL<AnyDoc> = ({ doc, collectionConfig, globalConfig 
   `${getServerURL()}${pathFor(globalConfig?.slug ?? collectionConfig?.slug, doc)}`
 
 const generateImage: GenerateImage<AnyDoc> = async ({ doc, collectionConfig, req }) => {
-  const own = relationID(doc.cover ?? doc.portrait ?? doc.images?.[0])
+  const own = relationID(doc.cover ?? doc.portrait ?? doc.images?.[0] ?? doc.videoPoster)
   if (own) return own
   if (collectionConfig) return ''
   const settings = await getSiteSettings(req)
