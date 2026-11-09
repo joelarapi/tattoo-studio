@@ -64,6 +64,7 @@ export type SupportedTimezones =
 export interface Config {
   auth: {
     users: UserAuthOperations;
+    'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
   blocks: {};
   collections: {
@@ -78,6 +79,7 @@ export interface Config {
     'lead-attachments': LeadAttachment;
     'legal-pages': LegalPage;
     users: User;
+    'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
     'payload-locked-documents': PayloadLockedDocument;
@@ -97,6 +99,7 @@ export interface Config {
     'lead-attachments': LeadAttachmentsSelect<false> | LeadAttachmentsSelect<true>;
     'legal-pages': LegalPagesSelect<false> | LegalPagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -131,7 +134,7 @@ export interface Config {
   widgets: {
     collections: CollectionsWidget;
   };
-  user: User;
+  user: User | PayloadMcpApiKey;
   jobs: {
     tasks: {
       schedulePublish: TaskSchedulePublish;
@@ -144,6 +147,24 @@ export interface Config {
   };
 }
 export interface UserAuthOperations {
+  forgotPassword: {
+    email: string;
+    password: string;
+  };
+  login: {
+    email: string;
+    password: string;
+  };
+  registerFirstUser: {
+    email: string;
+    password: string;
+  };
+  unlock: {
+    email: string;
+    password: string;
+  };
+}
+export interface PayloadMcpApiKeyAuthOperations {
   forgotPassword: {
     email: string;
     password: string;
@@ -648,6 +669,222 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Keys that let an AI assistant (ChatGPT, Claude) read and edit content through MCP. A key acts as the user who created it; tick only what it needs. Delete a key to revoke it.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys".
+ */
+export interface PayloadMcpApiKey {
+  id: number;
+  /**
+   * The user that the API key is associated with.
+   */
+  user: number | User;
+  /**
+   * A useful label for the API key.
+   */
+  label?: string | null;
+  /**
+   * The purpose of the API key.
+   */
+  description?: string | null;
+  portfolioItems?: {
+    /**
+     * Allow clients to find portfolio-items.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create portfolio-items.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update portfolio-items.
+     */
+    update?: boolean | null;
+  };
+  styles?: {
+    /**
+     * Allow clients to find styles.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create styles.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update styles.
+     */
+    update?: boolean | null;
+  };
+  artists?: {
+    /**
+     * Allow clients to find artists.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create artists.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update artists.
+     */
+    update?: boolean | null;
+  };
+  posts?: {
+    /**
+     * Allow clients to find posts.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create posts.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update posts.
+     */
+    update?: boolean | null;
+  };
+  categories?: {
+    /**
+     * Allow clients to find categories.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create categories.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update categories.
+     */
+    update?: boolean | null;
+  };
+  faqs?: {
+    /**
+     * Allow clients to find faqs.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create faqs.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update faqs.
+     */
+    update?: boolean | null;
+  };
+  legalPages?: {
+    /**
+     * Allow clients to find legal-pages.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create legal-pages.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update legal-pages.
+     */
+    update?: boolean | null;
+  };
+  media?: {
+    /**
+     * Allow clients to find media.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update media.
+     */
+    update?: boolean | null;
+  };
+  homepage?: {
+    /**
+     * Allow clients to find homepage global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update homepage global.
+     */
+    update?: boolean | null;
+  };
+  aboutPage?: {
+    /**
+     * Allow clients to find about-page global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update about-page global.
+     */
+    update?: boolean | null;
+  };
+  portfolioPage?: {
+    /**
+     * Allow clients to find portfolio-page global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update portfolio-page global.
+     */
+    update?: boolean | null;
+  };
+  visitingPage?: {
+    /**
+     * Allow clients to find visiting-page global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update visiting-page global.
+     */
+    update?: boolean | null;
+  };
+  journalPage?: {
+    /**
+     * Allow clients to find journal-page global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update journal-page global.
+     */
+    update?: boolean | null;
+  };
+  contactPage?: {
+    /**
+     * Allow clients to find contact-page global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update contact-page global.
+     */
+    update?: boolean | null;
+  };
+  siteSettings?: {
+    /**
+     * Allow clients to find site-settings global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update site-settings global.
+     */
+    update?: boolean | null;
+  };
+  navigation?: {
+    /**
+     * Allow clients to find navigation global.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to update navigation global.
+     */
+    update?: boolean | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
+  hasAPIKey?: boolean | null;
+  collection: 'payload-mcp-api-keys';
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -806,12 +1043,21 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
       } | null);
   globalSlug?: string | null;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   updatedAt: string;
   createdAt: string;
 }
@@ -821,10 +1067,15 @@ export interface PayloadLockedDocument {
  */
 export interface PayloadPreference {
   id: number;
-  user: {
-    relationTo: 'users';
-    value: number | User;
-  };
+  user:
+    | {
+        relationTo: 'users';
+        value: number | User;
+      }
+    | {
+        relationTo: 'payload-mcp-api-keys';
+        value: number | PayloadMcpApiKey;
+      };
   key?: string | null;
   value?:
     | {
@@ -1144,6 +1395,124 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "payload-mcp-api-keys_select".
+ */
+export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
+  user?: T;
+  label?: T;
+  description?: T;
+  portfolioItems?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  styles?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  artists?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  posts?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  categories?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  faqs?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  legalPages?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
+  media?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  homepage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  aboutPage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  portfolioPage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  visitingPage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  journalPage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  contactPage?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  siteSettings?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  navigation?:
+    | T
+    | {
+        find?: T;
+        update?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
+  hasAPIKey?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3765,10 +4134,15 @@ export interface TaskSchedulePublish {
       value: number | Post;
     } | null;
     global?: string | null;
-    user?: {
-      relationTo: 'users';
-      value: number | User;
-    } | null;
+    user?:
+      | ({
+          relationTo: 'users';
+          value: number | User;
+        } | null)
+      | ({
+          relationTo: 'payload-mcp-api-keys';
+          value: number | PayloadMcpApiKey;
+        } | null);
   };
   output?: unknown;
 }

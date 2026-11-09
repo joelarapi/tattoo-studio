@@ -96,6 +96,12 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
   - The storage plugin's columns (`prefix`, `_objectKey`) exist whether or not R2 is on (`alwaysInsertFields`), so the schema doesn't change between environments.
   - `pnpm media:to-r2` copies files already uploaded to local disk into R2.
 - **Email:** Resend, when `RESEND_API_KEY` is set. `EMAIL_FROM_ADDRESS` must be on a domain verified in Resend. Without a key, emails are printed to the console.
+- **AI assistants (MCP):** `@payloadcms/plugin-mcp` serves `POST /api/mcp`, configured in `src/plugins/mcp.ts`.
+  - It can find, create and update content collections, and find and update the page globals, studio details and menus. Media can be found and relabelled, not uploaded. Nothing can be deleted, and leads and users aren't exposed.
+  - Keys live in Settings → AI access keys. A key acts as the user who created it, so the usual access rules apply, and each key only gets the capabilities ticked on it.
+  - Clients send `Authorization: Bearer <key>`. ChatGPT can't send headers (it offers only OAuth or no authentication), so it connects to `/api/mcp?key=<key>` with "No authentication". Anyone with that URL has the key's access, and the URL shows in request logs: give such keys only what they need.
+  - Changes save as drafts only when the assistant passes `draft: true`, which the server's instructions ask it to do; otherwise they go live at once.
+  - Keys are an auth collection too, so `req.user` can be a key rather than a CMS user. Access rules check `hasRole()` or `isCmsUser()` (`src/access/`), never just that a user exists or its id.
 - **Schema changes:** development uses Payload's automatic schema push. When a change renames or removes fields, the push asks for confirmation in the terminal. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`).
 
 ## For editors: where things live in the CMS
@@ -105,7 +111,7 @@ Log in at `/admin`. The menu on the left has five groups:
 - **Content:** journal posts, journal categories, and images and videos.
 - **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. Each FAQ chooses the pages it appears on (Homepage, Contact, Visiting Albania). A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
 - **Leads:** tattoo enquiries from the website form (once it's connected), and the photos and videos clients attach.
-- **Settings:** legal pages (privacy and cookies), CMS users, studio details and menus. Studio details covers the name, address, opening hours, social links, the black-and-white photo switch, the closing call to action shared by several pages, and the "page not found" text.
+- **Settings:** legal pages (privacy and cookies), CMS users, AI access keys, studio details and menus. Studio details covers the name, address, opening hours, social links, the black-and-white photo switch, the closing call to action shared by several pages, and the "page not found" text.
 - **Pages:** the text of every page, section by section: Homepage, About, Portfolio, Visiting Albania, Journal and Contact.
 
 Headings have three boxes, **White**, **Grey** and **Orange**, shown in that order, each on a new line. Section numbers like "01 /" are added automatically.
@@ -117,5 +123,13 @@ Pages and journal posts save a draft automatically while you type. Nothing chang
 Portfolio pieces and journal posts each have their own page. The address comes from the slug, which is made from the title. **Lock the slug** (the lock icon) once a piece is published, so renaming it later doesn't change its address.
 
 Every page, post and portfolio piece has an **SEO** tab. Click "Auto-generate" to fill in the Google title and description, then adjust them. The preview shows roughly how the page will look in Google.
+
+To let ChatGPT read and edit the site's content:
+
+1. In **Settings → AI access keys**, create a key. Give it a label, tick **Enable API Key** and copy the key.
+2. In the sidebar, tick what it may do, e.g. **Find** and **Update** for Homepage. Then save.
+3. In ChatGPT, add a custom MCP server with the address `https://<the site>/api/mcp?key=<the key>` and **No authentication**.
+
+Treat that address like a password. Ask ChatGPT to save changes as drafts, then check them with the preview and publish them yourself. To cut off access, delete the key.
 
 Everything there now is starting text and placeholder images. Replace it with the real details before launch, especially what Google shows: the address, phone number, opening hours and the portfolio.

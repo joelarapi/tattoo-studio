@@ -68,6 +68,11 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
   - Uploads must go straight to the private R2 bucket in that phase (Vercel's 4.5 MB request limit).
 - **Email:** Resend (`@payloadcms/email-resend`), used only when `RESEND_API_KEY` is set. No SMTP.
 - **Post authors:** `posts.author` links to `artists` (for E-E-A-T). If it's empty, the studio gets the credit. CMS users are logins only.
+- **AI assistants (MCP):** `@payloadcms/plugin-mcp`, approved by the user on 9 Nov 2026. Configured in `src/plugins/mcp.ts`; the endpoint is `POST /api/mcp`.
+  - **What it exposes:** find, create and update on content collections, and find and update on globals. Media is find and update only. There are no deletes, and leads, lead attachments and users are left out.
+  - **Keys:** Settings → AI access keys (`payload-mcp-api-keys`). Each key acts as its owner.
+  - **Sending the key:** `Authorization: Bearer <key>`, or `?key=` in the URL for ChatGPT, which offers only OAuth or no authentication. URL keys were the user's choice, knowing the key then sits in the URL.
+  - **Keys can reach REST too:** the keys collection is an auth collection with `useAPIKey`, so a key also works against the REST API (`payload-mcp-api-keys API-Key <key>`). There, `req.user` is the key, whose id can match a CMS user's. Access rules must use `hasRole()`/`isCmsUser()` (`src/access`), never just `user` or `user.id`. Tested in `tests/int/access.int.spec.ts`.
 - **Leads export:** none for now (the user's choice). If it's wanted later, `@payloadcms/plugin-import-export` is the option, and it needs approval.
 - **Lead reference files:** a separate `lead-attachments` upload collection (photos and videos; only admins and editors can read it), stored in a private R2 bucket (`S3_PRIVATE_BUCKET`) rather than in `media`, because R2 public access is per bucket.
 - **Landing pages:** the `landing-pages` collection is built in Phase 6, together with `/lp/[slug]`.

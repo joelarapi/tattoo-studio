@@ -28,6 +28,7 @@ import { PortfolioPage } from './globals/PortfolioPage'
 import { SiteSettings } from './globals/SiteSettings'
 import { VisitingPage } from './globals/VisitingPage'
 import { bearerToken, matchesSecret } from './lib/secrets'
+import { mcp } from './plugins/mcp'
 import { seo } from './plugins/seo'
 
 const filename = fileURLToPath(import.meta.url)
@@ -117,6 +118,7 @@ export default buildConfig({
   },
   plugins: [
     seo,
+    mcp,
     s3Storage({
       enabled: Boolean(process.env.S3_BUCKET),
       // Adds the plugin's columns (prefix, _objectKey) even when disabled, so the database schema
