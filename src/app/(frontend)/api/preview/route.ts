@@ -2,6 +2,7 @@ import { draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { NextRequest } from 'next/server'
 
+import { isCmsUser } from '@/access'
 import { getPayloadClient } from '@/lib/payload'
 import { matchesSecret } from '@/lib/secrets'
 
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const payload = await getPayloadClient()
   const { user } = await payload.auth({ headers: req.headers })
-  if (!user) {
+  if (!isCmsUser(user)) {
     return new Response('Log in to the CMS to see previews', { status: 401 })
   }
 

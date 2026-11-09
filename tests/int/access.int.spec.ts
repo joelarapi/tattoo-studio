@@ -158,4 +158,27 @@ describe('access control', () => {
       expect(updated.id).toBe(faq.id)
     })
   })
+
+  // An MCP API key is also a "user", of its own auth collection, and its id can equal a CMS
+  // user's. Used directly against the REST API (not through /api/mcp) it must get nothing.
+  describe('MCP API key used directly', () => {
+    const asKey = () => ({
+      user: { id: editor.id, collection: 'payload-mcp-api-keys' } as unknown as User,
+      overrideAccess: false,
+      context,
+    })
+
+    it('cannot read or edit the CMS user with the same id', async () => {
+      await expect(
+        payload.findByID({ collection: 'users', id: editor.id, ...asKey() }),
+      ).rejects.toThrow()
+      await expect(
+        payload.update({ collection: 'users', id: editor.id, data: { name: 'x' }, ...asKey() }),
+      ).rejects.toThrow()
+    })
+
+    it('has no editor rights', async () => {
+      await expect(payload.find({ collection: 'leads', ...asKey() })).rejects.toThrow()
+    })
+  })
 })

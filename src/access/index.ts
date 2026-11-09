@@ -4,9 +4,18 @@ import type { User } from '@/payload-types'
 
 export type Role = NonNullable<User['roles']>[number]
 
+/**
+ * True for a logged-in CMS user. MCP API keys are an auth collection too, so a request made with
+ * one directly (not through /api/mcp) has a `user` from that collection, whose id can equal a CMS
+ * user's.
+ */
+export function isCmsUser(user: PayloadRequest['user']): user is User & { collection: 'users' } {
+  return user?.collection === 'users'
+}
+
 /** True when the logged-in user has at least one of the given roles. */
 export function hasRole(user: PayloadRequest['user'], ...roles: Role[]): boolean {
-  return Boolean(user?.roles?.some((role) => roles.includes(role)))
+  return isCmsUser(user) && Boolean(user.roles?.some((role) => roles.includes(role)))
 }
 
 export const anyone: Access = () => true
@@ -27,7 +36,7 @@ export const publishedOrLoggedIn: Access = ({ req: { user } }) => {
 
 /** Admins see every user; everyone else only themselves. */
 export const adminOrSelf: Access = ({ req: { user } }) => {
-  if (!user) return false
+  if (!isCmsUser(user)) return false
   if (hasRole(user, 'admin')) return true
   return { id: { equals: user.id } }
 }
