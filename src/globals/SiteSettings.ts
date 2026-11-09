@@ -1,9 +1,10 @@
 import type { GlobalConfig, TextFieldSingleValidation } from 'payload'
 
 import { adminFieldAccess, anyone, isAdminOrEditor } from '@/access'
-import { paragraphs, section, tagField } from '@/fields/content'
+import { paragraphs, section, tagField, text } from '@/fields/content'
 import { styledHeading } from '@/fields/heading'
 import { linkGroup } from '@/fields/link'
+import { basicEditor } from '@/fields/richText'
 import { revalidateGlobal } from '@/hooks/revalidate'
 
 const time: TextFieldSingleValidation = (value) =>
@@ -226,13 +227,43 @@ export const SiteSettings: GlobalConfig = {
                 linkGroup({ name: 'button', label: 'Orange button' }),
                 paragraphs('note', 'Small print under the button. Optional.'),
               ],
-              'The last section of About, Portfolio, the journal and every article.',
+              'Used by every "Call to action" section set to "The shared one", and under every journal article.',
             ),
             section(
               'notFound',
               'Page not found',
               [styledHeading(), paragraphs(), linkGroup({ name: 'button', label: 'Button' })],
               'Shown when a link leads nowhere.',
+            ),
+          ],
+        },
+        {
+          label: 'Enquiry form',
+          fields: [
+            section(
+              'enquiryForm',
+              'Enquiry form',
+              [
+                text('submitLabel', 'The button, e.g. "Send your tattoo idea".', true),
+                paragraphs('helperText', 'Small text under the button. Optional.'),
+                {
+                  name: 'privacyNote',
+                  type: 'richText',
+                  editor: basicEditor,
+                  admin: { description: 'Short note with a link to the privacy policy.' },
+                },
+                paragraphs(
+                  'pendingNotice',
+                  'Shown when someone presses the button while sending is not connected yet.',
+                  true,
+                ),
+                text(
+                  'successHeading',
+                  'Shown after a successful enquiry (once sending is connected).',
+                ),
+                paragraphs('successMessage', 'Under the success heading.'),
+              ],
+              'Used by every "Enquiry form" section. The field labels are part of the design.',
             ),
           ],
         },

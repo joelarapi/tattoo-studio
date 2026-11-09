@@ -17,6 +17,7 @@
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "seed": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/index.ts",
     "media:to-r2": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/media-to-r2.ts",
+    "blocks:thumbnails": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/block-thumbnails.ts",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts"

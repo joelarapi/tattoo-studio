@@ -4,13 +4,10 @@ import { anyone, isAdminOrEditor } from '@/access'
 import { basicEditor } from '@/fields/richText'
 import { seoTab } from '@/fields/seo'
 import { revalidateCollection } from '@/hooks/revalidate'
-import { PAGE_GLOBALS } from '@/lib/routes'
 
-// Artists appear on the homepage and the About page (chosen there), not on pages of their own.
-const { afterChange, afterDelete } = revalidateCollection({
-  collection: 'artists',
-  paths: () => [PAGE_GLOBALS.homepage, PAGE_GLOBALS['about-page']],
-})
+// Artists appear in the pages' Artist sections, not on pages of their own. Pages that show one
+// are tagged with the artists collection, so the tag refreshes them.
+const { afterChange, afterDelete } = revalidateCollection({ collection: 'artists' })
 
 export const Artists: CollectionConfig = {
   slug: 'artists',

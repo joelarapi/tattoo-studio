@@ -3,30 +3,19 @@
  * read it, so a route only ever changes here.
  */
 
-/** The page globals and the page each one edits. */
-export const PAGE_GLOBALS = {
-  homepage: '/',
-  'about-page': '/about',
-  'portfolio-page': '/portfolio',
-  'visiting-page': '/visiting-albania',
-  'journal-page': '/journal',
-  'contact-page': '/contact',
-} as const
+/** The page served at `/`. */
+export const HOME_SLUG = 'home'
 
-export type PageGlobalSlug = keyof typeof PAGE_GLOBALS
+/**
+ * Pages the site's structure depends on: `/`, and the parents of the portfolio-piece and
+ * journal-article pages. They can't be deleted, and their slug can't change.
+ */
+export const SYSTEM_PAGE_SLUGS = [HOME_SLUG, 'portfolio', 'journal']
 
-export const pageGlobalSlugs = Object.keys(PAGE_GLOBALS) as PageGlobalSlug[]
+/** Slugs a page can't take: the site's own routes. */
+export const RESERVED_PAGE_SLUGS = ['admin', 'api', 'next', '_next', 'lp']
 
-/** The pages that list FAQs (each FAQ picks its pages in the CMS). */
-export const faqPageOptions = [
-  { label: 'Homepage', value: 'home' },
-  { label: 'Contact', value: 'contact' },
-  { label: 'Visiting Albania', value: 'visiting' },
-] as const
-
-export type FaqPage = (typeof faqPageOptions)[number]['value']
-
-/** The enquiry form's anchor on the homepage and the contact page. */
+/** The enquiry form's anchor (the enquiry block always has it). */
 export const ENQUIRY_ID = 'tattoo-enquiry'
 
 /** A document's public URL, by collection. Artists have no page of their own: they live on About. */
@@ -35,14 +24,14 @@ export function pathForDoc(
   slug: string | null | undefined,
 ): string {
   switch (collection) {
+    case 'pages':
+      return !slug || slug === HOME_SLUG ? '/' : `/${slug}`
     case 'posts':
       return `/journal/${slug ?? ''}`
     case 'portfolio-items':
       return `/portfolio/${slug ?? ''}`
-    case 'legal-pages':
-      return `/${slug ?? ''}`
     case 'artists':
-      return PAGE_GLOBALS['about-page']
+      return '/about'
     default:
       return '/'
   }

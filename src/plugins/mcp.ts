@@ -10,11 +10,6 @@ import { mcpPlugin } from '@payloadcms/plugin-mcp'
  * anyone who has the URL, so those keys should be narrow and revoked when no longer used.
  */
 
-const pageText = (page: string) => ({
-  enabled: { find: true, update: true },
-  description: `Text and images of the ${page} page.`,
-})
-
 const content = (description: string) => ({
   enabled: { find: true, create: true, update: true },
   description,
@@ -22,6 +17,9 @@ const content = (description: string) => ({
 
 export const mcp = mcpPlugin({
   collections: {
+    pages: content(
+      'Every page of the site. A page’s `layout` is its list of sections (blocks, each with a `blockType`); a page top (homeHero or pageHero) may only come first. The page with slug "home" is the homepage.',
+    ),
     'portfolio-items': content(
       'Tattoo pieces. Each has its own page at /portfolio/<slug>. clientConsent must stay true.',
     ),
@@ -29,8 +27,7 @@ export const mcp = mcpPlugin({
     artists: content('The studio’s artists.'),
     posts: content('Journal articles (/journal/<slug>). content is Lexical rich text.'),
     categories: content('Journal categories.'),
-    faqs: content('Questions and answers. pages sets where each one appears.'),
-    'legal-pages': content('Privacy and cookie policy pages.'),
+    faqs: content('Questions and answers. A page’s FAQ section picks which ones it shows.'),
     // Uploading needs a file, which MCP can't send, so media can only be found and relabelled.
     media: {
       enabled: { find: true, update: true },
@@ -38,16 +35,20 @@ export const mcp = mcpPlugin({
     },
   },
   globals: {
-    homepage: pageText('home'),
-    'about-page': pageText('About'),
-    'portfolio-page': pageText('Portfolio'),
-    'visiting-page': pageText('Visiting Albania'),
-    'journal-page': pageText('Journal'),
-    'contact-page': pageText('Contact'),
+    'piece-template': {
+      enabled: { find: true, update: true },
+      description:
+        'Text shared by every portfolio piece’s own page, and the sections (`after`) shown under each piece.',
+    },
+    'article-template': {
+      enabled: { find: true, update: true },
+      description:
+        'Labels shared by every journal article’s own page, and the sections (`after`) shown under each article.',
+    },
     'site-settings': {
       enabled: { find: true, update: true },
       description:
-        'Studio details used on every page (name, contact, address, hours, socials) and shared sections.',
+        'Studio details used on every page (name, contact, address, hours, socials), the shared sections and the enquiry form’s text.',
     },
     navigation: { enabled: { find: true, update: true }, description: 'Header and footer links.' },
   },
@@ -67,7 +68,8 @@ export const mcp = mcpPlugin({
     serverOptions: {
       serverInfo: { name: 'Website CMS', version: '1.0.0' },
       instructions: [
-        'The content of this website, in Payload CMS. Each page’s text is a global; portfolio pieces, journal posts, FAQs, styles and artists are collections.',
+        'The content of this website, in Payload CMS. Pages are built from sections: a page’s `layout` is an ordered list of blocks. Portfolio pieces, journal posts, FAQs, styles and artists are collections.',
+        'To change a page, find it by slug, then send its whole `layout` back with your change: add, remove or reorder blocks, or edit their fields. Keep each block’s `blockType`.',
         'Read a document before changing it. Send only the fields you change, but arrays and groups are replaced as a whole, so send them complete.',
         'Save edits with draft: true unless the user asks to publish. Drafts can be checked in the admin panel’s preview; published changes go live at once.',
         'Never invent studio facts such as prices, address, opening hours or client stories.',

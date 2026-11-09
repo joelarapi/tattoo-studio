@@ -57,6 +57,26 @@ test.describe('Frontend', () => {
     await expect(page.locator('main figcaption')).toContainText('Peaky Blinders')
   })
 
+  test('the homepage numbers its sections in order', async ({ page }) => {
+    await page.goto(base)
+    const tags = await page.locator('main .tag').allTextContents()
+    const numbers = tags.flatMap((tag) => tag.match(/^(\d{2}) \//)?.[1] ?? [])
+    expect(numbers.slice(0, 3)).toEqual(['01', '02', '03'])
+  })
+
+  test('jump links lead to sections on the page', async ({ page }) => {
+    await page.goto(`${base}/visiting-albania`)
+    const hrefs = await page
+      .getByRole('navigation', { name: 'On this page' })
+      .getByRole('link')
+      .evaluateAll((links) => links.map((link) => link.getAttribute('href')))
+    expect(hrefs.length).toBeGreaterThan(0)
+    for (const href of hrefs) await expect(page.locator(href!)).toHaveCount(1)
+
+    await page.goto(`${base}/about`)
+    await expect(page.locator('#artist')).toHaveCount(1)
+  })
+
   test('the travel link opens the form with the travel fields', async ({ page }) => {
     await page.goto(`${base}/contact?travel=1#tattoo-enquiry`)
     await expect(page.locator('#travelling')).toBeChecked()

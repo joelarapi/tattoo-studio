@@ -2,11 +2,11 @@ import { slugField, type CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '@/access'
 import { revalidateCollection } from '@/hooks/revalidate'
-import { PAGE_GLOBALS } from '@/lib/routes'
+import { pathForDoc } from '@/lib/routes'
 
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'styles',
-  paths: () => [PAGE_GLOBALS['portfolio-page']],
+  paths: () => [pathForDoc('pages', 'portfolio')],
 })
 
 export const Styles: CollectionConfig = {

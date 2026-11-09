@@ -43,19 +43,38 @@ Schema changes reach a database through `pnpm dev` or `pnpm seed`, so run one ag
 
 ## Pages
 
-| Route                  | Content from (CMS)                                 |
-| ---------------------- | -------------------------------------------------- |
-| `/`                    | Pages → Homepage, plus portfolio, FAQs and journal |
-| `/about`               | Pages → About, plus the chosen artist's bio        |
-| `/portfolio`           | Pages → Portfolio, plus Studio → Portfolio         |
-| `/portfolio/[slug]`    | the piece, plus Pages → Portfolio → Piece pages    |
-| `/visiting-albania`    | Pages → Visiting Albania, plus FAQs                |
-| `/journal`             | Pages → Journal, plus Content → Journal posts      |
-| `/journal/[slug]`      | the post                                           |
-| `/contact`             | Pages → Contact, plus Studio details and FAQs      |
-| `/privacy`, `/cookies` | Settings → Legal pages (served by `[...slug]`)     |
+Every page is a document in **Pages → Pages**, built from sections: the page builder in `src/blocks/`. How and why it was built: `docs/PAGE_BUILDER.md`.
 
-Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
+| Route               | Content from (CMS)                                                          |
+| ------------------- | --------------------------------------------------------------------------- |
+| `/`                 | the page `home`                                                             |
+| `/<slug>`           | the page with that slug (`[...slug]`): About, Portfolio, Contact, Privacy… |
+| `/portfolio/[slug]` | the piece, plus Pages → Portfolio piece pages                               |
+| `/journal/[slug]`   | the post, plus Pages → Journal article pages                                |
+
+Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`). The `[...slug]` route checks a cached list of page slugs first, so unknown URLs never query the database.
+
+### How the page builder works
+
+- **Blocks:** one folder per section in `src/blocks/<block>/`, with `config.ts` (its CMS fields) and `Component.tsx` (how it renders). They're registered once in `config.blocks` (`src/blocks/index.ts`); `pages.layout` and the templates' `after` field use them through `blockReferences`.
+- **Rendering:** `RenderBlocks` (`src/blocks/RenderBlocks.tsx`) looks each block up in `src/blocks/registry.tsx`.
+  - It first runs every block's `load()` (the portfolio, FAQs, posts…) in parallel. A block with nothing to show drops out.
+  - It numbers the `numbered` blocks when the page has "Number the sections".
+  - It makes the first section's heading the H1 when the page has no page top.
+  - It collects the jump-bar links from each section's "Jump-link label".
+- **Section settings:** most blocks end with a background (plain, line, lines, band or grid), a section ID for `#links` and a jump-link label (`src/blocks/settings.ts`, applied by `BlockSection`).
+- **Rules** (`src/blocks/validate.ts` and `src/collections/Pages.ts`):
+  - a page top only as the first section
+  - at most one enquiry form
+  - unique section IDs
+  - Home, Portfolio and Journal can't be deleted and keep their slugs
+  - reserved slugs (`admin`, `api`, `lp`…) are refused
+- **Storage:** blocks are stored as JSON on their page (`blocksAsJSON` in the Postgres adapter), so adding a block adds no tables.
+- **Admin:** each section's header shows its heading (`src/components/admin/BlockLabel.tsx`). The pictures in the "Add section" drawer come from `pnpm blocks:thumbnails`, run against a server with the seeded pages; run it again after changing how a block looks.
+- **Adding a block:**
+  1. Add `src/blocks/<name>/config.ts` and `Component.tsx`.
+  2. List it in `src/blocks/index.ts` and `registry.tsx`.
+  3. Run `pnpm generate:types` and `pnpm generate:importmap`, then `pnpm blocks:thumbnails`.
 
 ## Design system
 
@@ -86,7 +105,7 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
 
 - Config: `src/payload.config.ts`. Collections are in `src/collections/`, globals in `src/globals/`, access rules in `src/access/` and shared fields in `src/fields/`. Routes are mapped in `src/lib/routes.ts`.
 - **Roles:** `admin` can do everything. `editor` can manage all content and read enquiries, but can't change or delete them, manage users or change tracking IDs. The first account created at `/admin` becomes an admin.
-- **Drafts and scheduling:** journal posts and all page globals have drafts and autosave, and posts can also be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET`. It runs once a day (06:00 UTC) because Vercel Hobby rejects anything more frequent. On Pro, change the schedule to `* * * * *`.
+- **Drafts and scheduling:** pages and journal posts have drafts and autosave, and both can be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET`. It runs once a day (06:00 UTC) because Vercel Hobby rejects anything more frequent. On Pro, change the schedule to `* * * * *`.
 - **Live preview:** `/api/preview` needs `PREVIEW_SECRET` and a logged-in CMS session, then turns on Next.js draft mode. `/api/exit-preview` turns it off. While in draft mode, the layout mounts `src/components/LivePreviewListener.tsx`.
 - **Revalidation:** every collection and global calls `src/hooks/revalidate.ts` after published changes. Data fetchers (`src/lib/data.ts`) must tag their caches with the tag of **every** collection they read (`src/lib/cache-tags.ts`). Code running outside a request (the job runner) revalidates through `POST /api/revalidate` with `REVALIDATE_SECRET`.
 - **Media storage:** local disk in development (`/media`, plus `/media-private` for enquiry reference files), or Cloudflare R2 when the `S3_*` variables are set.
@@ -97,7 +116,7 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
   - `pnpm media:to-r2` copies files already uploaded to local disk into R2.
 - **Email:** Resend, when `RESEND_API_KEY` is set. `EMAIL_FROM_ADDRESS` must be on a domain verified in Resend. Without a key, emails are printed to the console.
 - **AI assistants (MCP):** `@payloadcms/plugin-mcp` serves `POST /api/mcp`, configured in `src/plugins/mcp.ts`.
-  - It can find, create and update content collections, and find and update the page globals, studio details and menus. Media can be found and relabelled, not uploaded. Nothing can be deleted, and leads and users aren't exposed.
+  - It can find, create and update pages and the content collections, and find and update the two templates, studio details and menus. Media can be found and relabelled, not uploaded. Nothing can be deleted, and leads and users aren't exposed.
   - Keys live in Settings → AI access keys. A key acts as the user who created it, so the usual access rules apply, and each key only gets the capabilities ticked on it.
   - Clients send `Authorization: Bearer <key>`. ChatGPT can't send headers (it offers only OAuth or no authentication), so it connects to `/api/mcp?key=<key>` with "No authentication". Anyone with that URL has the key's access, and the URL shows in request logs: give such keys only what they need.
   - Changes save as drafts only when the assistant passes `draft: true`, which the server's instructions ask it to do; otherwise they go live at once.
@@ -109,14 +128,52 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
 Log in at `/admin`. The menu on the left has five groups:
 
 - **Content:** journal posts, journal categories, and images and videos.
-- **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. Each FAQ chooses the pages it appears on (Homepage, Contact, Visiting Albania). A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
+- **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. A page's "Questions (FAQ)" section chooses which questions it shows. A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
 - **Leads:** tattoo enquiries from the website form (once it's connected), and the photos and videos clients attach.
-- **Settings:** legal pages (privacy and cookies), CMS users, AI access keys, studio details and menus. Studio details covers the name, address, opening hours, social links, the black-and-white photo switch, the closing call to action shared by several pages, and the "page not found" text.
-- **Pages:** the text of every page, section by section: Homepage, About, Portfolio, Visiting Albania, Journal and Contact.
+- **Settings:** CMS users, AI access keys, studio details and menus. Studio details covers:
+  - the name, address, opening hours and social links
+  - the black-and-white photo switch
+  - the shared call to action
+  - the enquiry form's button and notes
+  - the "page not found" text
+- **Pages:** every page of the site, built from sections (Privacy and Cookies included), plus two templates: **Portfolio piece pages** and **Journal article pages**.
 
 Headings have three boxes, **White**, **Grey** and **Orange**, shown in that order, each on a new line. Section numbers like "01 /" are added automatically.
 
-The homepage galleries show the pieces chosen in **Pages → Homepage → Portfolio**: **Photos** and **Films**, each in the order you drag them into. The pages About, Portfolio, Visiting Albania and Journal can each have a **Background photo** at the top (Hero tab); it's shown darkened behind the heading.
+### Building pages
+
+Open a page in **Pages → Pages**. The **Sections** tab is the page from top to bottom:
+
+- **Add a section** with the button under the list, and pick from the pictures. They're grouped: Page top, Text, Cards and lists, Work and studio, Contact and calls to action.
+- **Reorder** sections by dragging a section's handle.
+- **Duplicate or remove** a section with ⋯ on its right.
+- **Fold** sections with the arrow on their header. The header shows each section's heading, so a long page stays readable.
+- **Section settings** are folded at the end of most sections. They choose:
+  - the background
+  - an ID for links: "plan" makes `/this-page#plan`
+  - a label for the jump bar under the page top
+
+A few rules keep pages working:
+
+- A page top ("Big intro with photos" or "Page top") can only be the first section.
+- A page has at most one enquiry form.
+- Home, Portfolio and Journal can't be deleted or moved.
+
+**A new page:**
+
+1. Go to Pages → Pages → Create new.
+2. Give it a title. The address is made from it: "Aftercare" makes `/aftercare`.
+3. Add sections, then Publish.
+4. Add it to the menus in Settings → Menus.
+
+**Options tab:**
+
+- "Number the sections" adds "01 /" to each section's label. Home and Visiting Albania use it.
+- The phone button is the orange bar pinned to the bottom on phones.
+
+The homepage galleries ("Portfolio gallery (sideways)") show the pieces chosen in that section: **Photos** and **Films**, each in the order you drag them into. A "Page top" can have a **Background photo**, shown darkened behind the heading.
+
+The text around every portfolio piece and every journal article is in **Portfolio piece pages** and **Journal article pages**. Their **Sections after…** tab holds the sections shown under each piece or article.
 
 Pages and journal posts save a draft automatically while you type. Nothing changes on the website until you press **Publish**. To publish a post on a later date, use the arrow next to Publish. The eye icon at the top opens a live preview next to the form, and you can switch between Mobile and Desktop above the preview.
 
@@ -127,7 +184,7 @@ Every page, post and portfolio piece has an **SEO** tab. Click "Auto-generate" t
 To let ChatGPT read and edit the site's content:
 
 1. In **Settings → AI access keys**, create a key. Give it a label, tick **Enable API Key** and copy the key.
-2. In the sidebar, tick what it may do, e.g. **Find** and **Update** for Homepage. Then save.
+2. In the sidebar, tick what it may do, e.g. **Find** and **Update** for Pages. Then save.
 3. In ChatGPT, add a custom MCP server with the address `https://<the site>/api/mcp?key=<the key>` and **No authentication**.
 
 Treat that address like a password. Ask ChatGPT to save changes as drafts, then check them with the preview and publish them yourself. To cut off access, delete the key.

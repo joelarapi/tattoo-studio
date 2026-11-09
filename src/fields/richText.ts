@@ -16,9 +16,9 @@ import {
 import { CallToAction } from '@/blocks/CallToAction'
 
 const linkFeature = () =>
-  LinkFeature({ enabledCollections: ['posts', 'portfolio-items', 'legal-pages'] })
+  LinkFeature({ enabledCollections: ['pages', 'posts', 'portfolio-items'] })
 
-/** Short formatted text: bios, FAQ answers, legal pages. */
+/** Short formatted text: bios, FAQ answers, text sections (privacy and cookie pages too). */
 export const basicEditor = lexicalEditor({
   features: () => [
     ParagraphFeature(),

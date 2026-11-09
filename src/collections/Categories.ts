@@ -2,12 +2,8 @@ import { slugField, type CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '@/access'
 import { revalidateCollection } from '@/hooks/revalidate'
-import { PAGE_GLOBALS } from '@/lib/routes'
 
-const { afterChange, afterDelete } = revalidateCollection({
-  collection: 'categories',
-  paths: () => [PAGE_GLOBALS['journal-page']],
-})
+const { afterChange, afterDelete } = revalidateCollection({ collection: 'categories' })
 
 export const Categories: CollectionConfig = {
   slug: 'categories',
