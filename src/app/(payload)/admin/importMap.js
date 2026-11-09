@@ -22,11 +22,7 @@ import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
-import { HeadingRowLabel as HeadingRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
-import { StatRowLabel as StatRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
-import { TitleRowLabel as TitleRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
-import { PlatformRowLabel as PlatformRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
-import { LinkRowLabel as LinkRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
+import { ItemRowLabel as ItemRowLabel_a22f15833f5c099d83eec5874403c04c } from '../../../components/admin/RowLabel'
 import { S3ClientUploadHandler as S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24 } from '@payloadcms/storage-s3/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -56,11 +52,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
-  "/components/admin/RowLabel#HeadingRowLabel": HeadingRowLabel_a22f15833f5c099d83eec5874403c04c,
-  "/components/admin/RowLabel#StatRowLabel": StatRowLabel_a22f15833f5c099d83eec5874403c04c,
-  "/components/admin/RowLabel#TitleRowLabel": TitleRowLabel_a22f15833f5c099d83eec5874403c04c,
-  "/components/admin/RowLabel#PlatformRowLabel": PlatformRowLabel_a22f15833f5c099d83eec5874403c04c,
-  "/components/admin/RowLabel#LinkRowLabel": LinkRowLabel_a22f15833f5c099d83eec5874403c04c,
+  "/components/admin/RowLabel#ItemRowLabel": ItemRowLabel_a22f15833f5c099d83eec5874403c04c,
   "@payloadcms/storage-s3/client#S3ClientUploadHandler": S3ClientUploadHandler_f97aa6c64367fa259c5bc0567239ef24,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

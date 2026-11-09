@@ -29,7 +29,6 @@ export default defineConfig([
     'node_modules/',
     'playwright-report/',
     'test-results/',
-    'public/sequences/',
     'src/payload-types.ts',
     'src/payload-generated-schema.ts',
     'src/app/(payload)/admin/importMap.js',

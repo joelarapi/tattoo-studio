@@ -1,6 +1,9 @@
 import type { GlobalConfig, TextFieldSingleValidation } from 'payload'
 
 import { adminFieldAccess, anyone, isAdminOrEditor } from '@/access'
+import { paragraphs, section, tagField } from '@/fields/content'
+import { styledHeading } from '@/fields/heading'
+import { linkGroup } from '@/fields/link'
 import { revalidateGlobal } from '@/hooks/revalidate'
 
 const time: TextFieldSingleValidation = (value) =>
@@ -50,13 +53,25 @@ export const SiteSettings: GlobalConfig = {
               relationTo: 'media',
               filterOptions: { mimeType: { contains: 'image' } },
               admin: {
-                description: 'Optional. Leave empty to use the built-in wordmark (recommended).',
+                description:
+                  'Optional. Leave empty to use the built-in wordmark, made from the studio name (first word on top).',
               },
             },
             {
               name: 'brandParagraph',
+              label: 'Footer tagline',
               type: 'textarea',
-              admin: { description: 'Short paragraph next to the logo in the footer.' },
+              admin: { description: 'Short line under the city in the footer.' },
+            },
+            {
+              name: 'monochromePhotos',
+              label: 'Show photos in black and white',
+              type: 'checkbox',
+              defaultValue: true,
+              admin: {
+                description:
+                  'The design shows every photo in black and white. Untick to show them in colour.',
+              },
             },
             {
               name: 'priceRange',
@@ -72,7 +87,11 @@ export const SiteSettings: GlobalConfig = {
               name: 'address',
               type: 'group',
               fields: [
-                { name: 'street', type: 'text', required: true },
+                {
+                  name: 'street',
+                  type: 'text',
+                  admin: { description: 'Leave empty until the address is confirmed.' },
+                },
                 {
                   type: 'row',
                   fields: [
@@ -161,7 +180,7 @@ export const SiteSettings: GlobalConfig = {
               name: 'socialLinks',
               type: 'array',
               admin: {
-                components: { RowLabel: '/components/admin/RowLabel#PlatformRowLabel' },
+                components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' },
               },
               fields: [
                 {
@@ -193,6 +212,28 @@ export const SiteSettings: GlobalConfig = {
                 },
               ],
             },
+          ],
+        },
+        {
+          label: 'Shared sections',
+          fields: [
+            section(
+              'endCta',
+              'Closing call to action',
+              [
+                tagField(),
+                styledHeading(),
+                linkGroup({ name: 'button', label: 'Orange button' }),
+                paragraphs('note', 'Small print under the button. Optional.'),
+              ],
+              'The last section of About, Portfolio, the journal and every article.',
+            ),
+            section(
+              'notFound',
+              'Page not found',
+              [styledHeading(), paragraphs(), linkGroup({ name: 'button', label: 'Button' })],
+              'Shown when a link leads nowhere.',
+            ),
           ],
         },
         {

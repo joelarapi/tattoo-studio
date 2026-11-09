@@ -1,283 +1,270 @@
-import type { IconName } from '@/lib/icons'
-
-import { b, block, doc, h2, link, ol, p, quote, ul } from './lexical'
+import { block, doc, h2, link, p } from './lexical'
 
 /*
- * Placeholder content: plausible copy for a Tirana studio, all editable in the CMS. Business
- * facts (phone, email, numbers, policies) are deliberately generic placeholders; the real ones
- * come from the studio (docs/RESOURCES_NEEDED.md).
+ * Starting content for London InkTattoo in Fier, adapted from the approved design, all editable in
+ * the CMS. Contact details (phone, email, street, hours) are deliberately left as placeholders or
+ * empty; the real ones come from the studio (docs/RESOURCES_NEEDED.md).
  */
 
-export const STUDIO_NAME = 'Linja Tattoo Studio'
+export const STUDIO_NAME = 'London InkTattoo'
 
-export const styles: Array<{
-  name: string
-  slug: string
-  icon: IconName
-  featured: boolean
-  shortDescription: string
-  longDescription: ReturnType<typeof doc>
-}> = [
+/** Portfolio categories (the `styles` collection). */
+export const styles = [
+  { name: 'Graphic', slug: 'graphic' },
+  { name: 'Botanical', slug: 'botanical' },
+  { name: 'Symbolic', slug: 'symbolic' },
+  { name: 'The process', slug: 'process' },
+]
+
+export const artists = [
   {
-    name: 'Fine line',
-    slug: 'fine-line',
-    icon: 'fine-line',
-    featured: true,
-    shortDescription:
-      'Delicate single-needle work: botanicals, script and small symbols with crisp, lasting lines.',
-    longDescription: doc(
+    name: 'Tisi',
+    slug: 'tisi',
+    yearsOfExperience: 18,
+    bio: doc(
       p(
-        'Fine line tattoos use very thin needle groupings to build detail that looks drawn with a pen. We design them with a little more spacing than they look like they need, so the lines stay clean as the skin ages.',
+        'Behind London InkTattoo is Tisi, an artist with 18 years of tattoo experience and an extensive body of work. From large tattoos that become part of a person’s identity to portraits that keep someone close, his work begins with the story the client wants to carry.',
       ),
-      p('Good first pieces: wrist and forearm florals, short script, small constellations.'),
-    ),
-  },
-  {
-    name: 'Blackwork',
-    slug: 'blackwork',
-    icon: 'blackwork',
-    featured: true,
-    shortDescription:
-      'Bold, saturated black: patterns, ornamental pieces and graphic shapes that read from across a room.',
-    longDescription: doc(
       p(
-        'Blackwork is all about contrast. Solid fills, heavy outlines and negative space make designs that stay legible for decades, and it is one of the best options for covering older work.',
+        'A large piece asks you to think beyond a single image: how the composition sits on the body, how its elements connect and how the details work together. Portrait tattoos bring a different focus: the expression, character and small features that make a face familiar.',
       ),
-    ),
-  },
-  {
-    name: 'Realism',
-    slug: 'realism',
-    icon: 'realism',
-    featured: true,
-    shortDescription:
-      'Black and grey portraits, animals and still life, built up in soft layers from your reference photos.',
-    longDescription: doc(
       p(
-        'Realism takes longer than most styles, usually several sessions. We work from your photos, plan the light and contrast together, and size the piece so the detail holds up as it heals.',
+        'For Tisi, every new project is another personal conversation. Bring the person, subject or idea you have in mind, and talk through the placement, references and direction of the piece together. You don’t need every detail figured out before you begin.',
       ),
-    ),
-  },
-  {
-    name: 'Traditional',
-    slug: 'traditional',
-    icon: 'traditional',
-    featured: true,
-    shortDescription:
-      'Classic bold outlines and a limited palette: swallows, roses, daggers and sacred hearts that age beautifully.',
-    longDescription: doc(
       p(
-        'Traditional tattooing has rules for a reason: bold lines, solid colour and simple shapes look as good in twenty years as they do on day one. We draw new designs in the classic language.',
-      ),
-    ),
-  },
-  {
-    name: 'Lettering',
-    slug: 'lettering',
-    icon: 'lettering',
-    featured: false,
-    shortDescription:
-      'Names, dates and words in hand-drawn script or clean type, sized and spaced to stay readable.',
-    longDescription: doc(
-      p(
-        'We draw lettering by hand for each client and check spelling with you twice: once on paper and once as a stencil on your skin.',
-      ),
-    ),
-  },
-  {
-    name: 'Cover-ups',
-    slug: 'cover-ups',
-    icon: 'cover-up',
-    featured: false,
-    shortDescription:
-      'A new design that hides or reworks an old tattoo. We start with an honest look at what is possible.',
-    longDescription: doc(
-      p(
-        'Not every tattoo can be covered in one go. At the consultation we look at the old piece in daylight, talk through options, and tell you if a few laser sessions first would give a better result.',
+        'Choosing an artist means trusting someone with something permanent. Take time to explore Tisi’s portfolio, look closely at the work that connects with you and imagine the possibilities for your own tattoo.',
       ),
     ),
   },
 ]
 
-export const artists: Array<{
-  name: string
-  slug: string
-  specialities: string[]
-  instagram: string
-  yearsOfExperience: number
-  bio: ReturnType<typeof doc>
-}> = [
-  {
-    name: 'Arta',
-    slug: 'arta',
-    specialities: ['fine-line', 'lettering'],
-    instagram: 'https://www.instagram.com/example.arta',
-    yearsOfExperience: 9,
-    bio: doc(
-      p(
-        'Arta trained as an illustrator before she picked up a machine, and it shows in her fine line botanicals and hand-drawn script. She likes small, considered pieces and clients who bring a story rather than a screenshot.',
-      ),
-    ),
-  },
-  {
-    name: 'Dren',
-    slug: 'dren',
-    specialities: ['blackwork', 'cover-ups'],
-    instagram: 'https://www.instagram.com/example.dren',
-    yearsOfExperience: 12,
-    bio: doc(
-      p(
-        'Dren works in heavy black: ornamental patterns, graphic shapes and large-scale pieces that follow the body. He is the studio’s go-to artist for difficult cover-ups.',
-      ),
-    ),
-  },
-  {
-    name: 'Elira',
-    slug: 'elira',
-    specialities: ['realism'],
-    instagram: 'https://www.instagram.com/example.elira',
-    yearsOfExperience: 7,
-    bio: doc(
-      p(
-        'Elira specialises in black and grey realism, especially portraits and animals. She plans every piece from your reference photos and is happy to spread larger work over several sessions.',
-      ),
-    ),
-  },
-  {
-    name: 'Genti',
-    slug: 'genti',
-    specialities: ['traditional', 'lettering'],
-    instagram: 'https://www.instagram.com/example.genti',
-    yearsOfExperience: 10,
-    bio: doc(
-      p(
-        'Genti draws traditional tattoos with bold lines and a tight palette, from walk-in flash to full sleeves. He also runs the studio’s aftercare follow-ups.',
-      ),
-    ),
-  },
-]
-
-export const portfolio: Array<{
+type PortfolioSeed = {
   title: string
-  artist: string
+  slug: string
   style: string
   placement: string
-  featured: boolean
-}> = [
+  summary: string
+  detailsHeading: string
+  story: { title: string; text: string }[]
+}
+
+const makeItPersonal = (text: string) => ({ title: 'Make it personal.', text })
+const lookCloser = (text: string) => ({ title: 'Look closer.', text })
+
+export const portfolio: PortfolioSeed[] = [
   {
-    title: 'Peony on the forearm',
-    artist: 'arta',
-    style: 'fine-line',
-    placement: 'Forearm',
-    featured: true,
+    title: 'Graphic Back Tattoo',
+    slug: 'graphic-back-tattoo',
+    style: 'graphic',
+    placement: 'Back',
+    summary:
+      'Strong contrast, layered detail and a composition that uses the back as a single canvas. A starting point for discussing a larger tattoo and the elements you want it to bring together.',
+    detailsHeading: 'A statement across the back.',
+    story: [
+      lookCloser(
+        'The broad placement creates room for a central motif and supporting patterns. Look at how areas of dark ink sit beside open skin, and how the smaller details fit within the overall shape.',
+      ),
+      makeItPersonal(
+        'For your own back piece, bring the subject, references and meaning you have in mind. Discuss the composition and placement with Tisi, along with the session plan, estimated cost and time the work may need.',
+      ),
+    ],
   },
   {
-    title: 'Raven over the shoulder',
-    artist: 'dren',
-    style: 'blackwork',
+    title: 'Botanical Arm Tattoo',
+    slug: 'botanical-arm-tattoo',
+    style: 'botanical',
+    placement: 'Arm',
+    summary:
+      'A botanical subject gives this arm tattoo its direction. The flower forms and flowing lines show how a natural motif can become a personal piece.',
+    detailsHeading: 'Nature, carried with you.',
+    story: [
+      lookCloser(
+        'Notice the relationship between the flower, its surrounding lines and the space around the design. The placement is part of the composition, rather than a separate decision made at the end.',
+      ),
+      makeItPersonal(
+        'Tell Tisi whether a particular flower or plant has meaning for you, or bring references for a visual direction you like. You can also begin without a reference and discuss a design together.',
+      ),
+    ],
+  },
+  {
+    title: 'Symbolic Shoulder Tattoos',
+    slug: 'symbolic-shoulder-tattoos',
+    style: 'symbolic',
     placement: 'Shoulder',
-    featured: true,
+    summary:
+      'Separate symbolic motifs create a collection of details around the shoulder and upper chest: small tattoos that relate to one another while keeping their own identity.',
+    detailsHeading: 'Small marks. Personal meaning.',
+    story: [
+      lookCloser(
+        'Open space matters here. Consider the size and position of each motif, the distance between the pieces and how the arrangement sits alongside existing tattoos.',
+      ),
+      makeItPersonal(
+        'Bring the symbols or memories you want to express, whether you are starting with one small piece or thinking about several. Discuss the overall arrangement with Tisi before settling on the individual designs.',
+      ),
+    ],
   },
   {
-    title: 'Portrait in black and grey',
-    artist: 'elira',
-    style: 'realism',
-    placement: 'Upper arm',
-    featured: true,
+    title: 'Tattoo Process: A Close-Up',
+    slug: 'tattoo-process-close-up',
+    style: 'process',
+    placement: 'Arm',
+    summary:
+      'Tattooing in progress, up close. A process study rather than a finished piece, with space to look at the detail involved in creating a tattoo.',
+    detailsHeading: 'A closer look at the craft.',
+    story: [
+      lookCloser(
+        'A process photograph tells a different story from a finished or healed image. Use it to begin asking questions about how a session is organised and how a design develops on the skin.',
+      ),
+      makeItPersonal(
+        'Before your appointment, discuss the design review, expected session time, preparation and aftercare with Tisi. Ask to see relevant finished and healed work when choosing the direction for your own tattoo.',
+      ),
+    ],
   },
   {
-    title: 'Swallow and dagger',
-    artist: 'genti',
-    style: 'traditional',
-    placement: 'Calf',
-    featured: true,
-  },
-  {
-    title: 'Botanical script',
-    artist: 'arta',
-    style: 'lettering',
-    placement: 'Collarbone',
-    featured: true,
-  },
-  {
-    title: 'Ornamental back panel',
-    artist: 'dren',
-    style: 'blackwork',
-    placement: 'Upper back',
-    featured: true,
-  },
-  { title: 'Lion study', artist: 'elira', style: 'realism', placement: 'Thigh', featured: false },
-  {
-    title: 'Sacred heart',
-    artist: 'genti',
-    style: 'traditional',
-    placement: 'Chest',
-    featured: false,
+    title: 'Inside a Tattoo Session',
+    slug: 'inside-a-tattoo-session',
+    style: 'process',
+    placement: 'Arm',
+    summary:
+      'A wider view of tattooing in progress puts the working process in context, and opens the conversation about what your own appointment could involve.',
+    detailsHeading: 'From a conversation to a piece.',
+    story: [
+      lookCloser(
+        'The artist, the arm and the working space in one frame: a reminder that a tattoo is made over time, in a calm and focused session.',
+      ),
+      makeItPersonal(
+        'Share your idea and placement first. Then discuss the design approach, timing and cost, along with anything you want to understand before confirming your appointment. If you are travelling, include your dates in Albania.',
+      ),
+    ],
   },
 ]
 
+/** Journal categories. */
 export const categories = [
-  { title: 'Guides', slug: 'guides', description: 'Practical advice for planning your tattoo.' },
-  {
-    title: 'Aftercare',
-    slug: 'aftercare',
-    description: 'How to heal well and keep your tattoo looking sharp.',
-  },
-  { title: 'Styles', slug: 'styles', description: 'The tattoo styles we work in, explained.' },
+  { title: 'Planning', slug: 'planning' },
+  { title: 'Visiting Albania', slug: 'visiting-albania' },
+  { title: 'Inspiration', slug: 'inspiration' },
 ]
 
-export const faqs: Array<{ question: string; answer: ReturnType<typeof doc> }> = [
+type Page = 'home' | 'contact' | 'visiting'
+
+export const faqs: Array<{ question: string; answer: ReturnType<typeof doc>; pages: Page[] }> = [
   {
-    question: 'How much does a tattoo cost?',
+    question: 'Where is London InkTattoo?',
+    pages: ['home', 'visiting'],
     answer: doc(
       p(
-        'Every piece is quoted individually, based on size, detail and placement. You get a clear price at your consultation, before anything is booked, and it doesn’t change on the day.',
+        'London InkTattoo is a tattoo studio in Fier, Albania. Tisi is the artist behind the studio, with 18 years of tattoo experience. Confirm the exact address and your appointment time with the studio before visiting.',
       ),
     ),
   },
   {
-    question: 'Does getting a tattoo hurt?',
+    question: 'Who is the artist behind London InkTattoo?',
+    pages: ['home'],
     answer: doc(
       p(
-        'A little. Most people describe it as a hot scratch that becomes easier to ignore after the first few minutes. Bony areas like ribs and ankles are more sensitive; we take breaks whenever you need one.',
+        'Tisi is the artist behind London InkTattoo, with 18 years of tattoo experience. Visit the ',
+        link('About page', '/about'),
+        ' to get to know the artist, and use the portfolio to begin discussing your own direction.',
       ),
     ),
   },
   {
-    question: 'How do I look after a new tattoo?',
+    question: 'Can I enquire from outside Albania?',
+    pages: ['home'],
     answer: doc(
       p(
-        'Keep it clean, moisturise lightly and keep it out of the sun and the sea for two weeks. You leave with written aftercare instructions, and you can message your artist any time while it heals. Read our ',
-        link('aftercare guide', '/journal/tattoo-aftercare-first-two-weeks'),
-        ' for the details.',
+        'Yes. Include the country you’re travelling from and your planned dates in Albania. Confirm availability and the appointment before arranging travel around your tattoo.',
       ),
     ),
   },
   {
-    question: 'How old do I need to be?',
-    answer: doc(p('You need to be 18 or over, and we ask everyone to bring a valid photo ID.')),
-  },
-  {
-    question: 'Do I need to pay a deposit?',
+    question: 'Can I send reference photos or a video?',
+    pages: ['home'],
     answer: doc(
       p(
-        'Yes. A deposit secures your appointment and comes off the final price. If you need to move your appointment, let us know at least 48 hours before and we carry the deposit over.',
+        'Yes. The enquiry form lets you add reference photos or a short video. They help explain the direction you have in mind; the design itself is drawn for you.',
       ),
     ),
   },
   {
-    question: 'Can you cover up an old tattoo?',
+    question: 'Can I enquire before travelling to Albania?',
+    pages: ['contact'],
     answer: doc(
       p(
-        'Often, yes. Send us a photo with your booking request. At the consultation we tell you honestly what is possible and whether a couple of laser sessions first would help.',
+        'Yes. Share your idea and include your planned dates. Wait for the studio to confirm availability before finalising your travel.',
       ),
     ),
   },
   {
-    question: 'How long will my session take?',
+    question: 'Do I need to know the exact design?',
+    pages: ['contact'],
     answer: doc(
       p(
-        'Small pieces take one to two hours. Larger work is split into sessions of up to five hours, a few weeks apart, so your skin can heal in between.',
+        'No. A subject, a reference or a direction gives the consultation somewhere to begin. Tell the artist which details matter to you.',
+      ),
+    ),
+  },
+  {
+    question: 'How much will my tattoo cost?',
+    pages: ['home', 'contact'],
+    answer: doc(
+      p(
+        'Every tattoo is quoted individually, based on the design, detail and placement. Ask for a personal estimate, and confirm what it includes, any deposit and the cancellation terms before booking.',
+      ),
+    ),
+  },
+  {
+    question: 'Can you help with a hotel or transport?',
+    pages: ['visiting'],
+    answer: doc(
+      p(
+        'Tell us what help you need in your enquiry. Hotel suggestions and help arranging a transfer depend on availability and are confirmed with you, including any price, before anything is arranged. Nothing is booked through this website.',
+      ),
+    ),
+  },
+  {
+    question: 'Are accommodation or transfers included in the tattoo price?',
+    pages: ['visiting'],
+    answer: doc(
+      p(
+        'No. Ask for separate written details of any hotel, transfer or other help before agreeing to it.',
+      ),
+    ),
+  },
+  {
+    question: 'How many days should I stay?',
+    pages: ['visiting'],
+    answer: doc(
+      p(
+        'That depends on the design, the number of sessions and the appointment schedule. Discuss your tattoo and travel dates first; not every tattoo can be finished within a fixed stay.',
+      ),
+    ),
+  },
+  {
+    question: 'Can I combine the appointment with a beach holiday?',
+    pages: ['visiting'],
+    answer: doc(
+      p(
+        'Tell the artist about your plans before confirming your dates. Ask for personal guidance about swimming, sun exposure and aftercare rather than assuming every activity fits straight after a session.',
+      ),
+    ),
+  },
+  {
+    question: 'Can a friend or partner come with me?',
+    pages: ['visiting'],
+    answer: doc(
+      p(
+        'Include the number of travellers when asking about accommodation or transport. Ask the studio separately about guests during the appointment.',
+      ),
+    ),
+  },
+  {
+    question: 'Is my appointment booked when I send an enquiry?',
+    pages: ['contact', 'visiting'],
+    answer: doc(
+      p(
+        'No. An enquiry starts the conversation. Your appointment is booked only once the studio confirms it, and any travel help is confirmed separately.',
       ),
     ),
   },
@@ -289,8 +276,7 @@ export const legalPages = [
     slug: 'privacy',
     content: doc(
       p(
-        b('Placeholder.'),
-        ' The studio’s privacy policy goes here. Albanian data-protection law follows the EU’s GDPR, so it should explain what we collect through the booking form (name, contact details, your idea and any reference image), why, how long we keep it, and how to ask us to delete it.',
+        'Placeholder. The studio’s privacy policy goes here. Albanian data-protection law follows the EU’s GDPR, so it should explain what we collect through the enquiry form (name, contact details, your idea, travel dates and any reference photos or videos), why, how long we keep it, and how to ask us to delete it.',
       ),
     ),
   },
@@ -299,8 +285,7 @@ export const legalPages = [
     slug: 'cookies',
     content: doc(
       p(
-        b('Placeholder.'),
-        ' The studio’s cookie policy goes here: which cookies the site sets (analytics and advertising only after you accept them) and how to change your choice.',
+        'Placeholder. The studio’s cookie policy goes here: which cookies the site sets (analytics and advertising only after you accept them) and how to change your choice.',
       ),
     ),
   },
@@ -311,122 +296,91 @@ type PostSeed = {
   slug: string
   excerpt: string
   category: string
-  author: string
   publishedAt: string
-  /** Built after artists exist, because posts embed artist cards. */
-  content: (artistID: (slug: string) => number) => ReturnType<typeof doc>
+  content: ReturnType<typeof doc>
 }
-
-const cta = (heading: string, text: string) =>
-  block('cta', { heading, text, button: { label: 'Book a consult', href: '/#book' } })
 
 export const posts: PostSeed[] = [
   {
-    title: 'Your first tattoo: how to prepare',
-    slug: 'first-tattoo-how-to-prepare',
-    excerpt:
-      'From the first idea to the morning of your session: what to think about, what to bring, and what to skip.',
-    category: 'guides',
-    author: 'arta',
-    publishedAt: '2026-10-06T09:00:00.000Z',
-    content: () =>
-      doc(
-        p(
-          'A first tattoo is mostly decided before the needle ever touches skin. A little preparation makes the session calmer and the result better.',
-        ),
-        h2('Start with the idea, not the design'),
-        p(
-          'Bring the story behind the piece, a few reference images you like, and a rough idea of size and placement. Your artist turns that into an original design; you don’t need to draw anything.',
-        ),
-        h2('Book a consultation'),
-        p('The consultation is where we agree on the details:'),
-        ul(
-          'Style and size',
-          'Placement, checked on your body',
-          'Price and number of sessions',
-          'A date',
-        ),
-        cta(
-          'Thinking about your first piece?',
-          'Tell us the idea. We reply within one working day.',
-        ),
-        h2('The day before'),
-        ul('Sleep well', 'Skip alcohol', 'Moisturise the area, but don’t shave it'),
-        h2('On the day'),
-        p(
-          'Eat a proper meal, wear clothes that give easy access to the placement, and bring water and a snack for longer sessions.',
-        ),
-        quote('The best first tattoos are the ones people still choose ten years later.'),
+    title: 'What to bring to your tattoo consultation.',
+    slug: 'tattoo-consultation',
+    excerpt: 'An idea, a few references and the details that make it yours.',
+    category: 'planning',
+    publishedAt: '2026-10-28T09:00:00.000Z',
+    content: doc(
+      h2('Start with what matters to you.'),
+      p(
+        'A consultation is a chance to describe the tattoo you have in mind and understand the next steps. You don’t need to arrive with a finished design. A subject, a memory or a rough direction gives the conversation somewhere to begin.',
       ),
+      h2('Choose a few useful references.'),
+      p(
+        'Save examples that show specific things you like: line weight, shading, composition or mood. Explain which detail matters in each reference. References are a way to communicate your direction; discuss an original design rather than asking for an exact copy.',
+      ),
+      h2('Talk about placement and timing.'),
+      p(
+        'Say where you imagine the tattoo and whether you have a preferred date. If you’re travelling to Albania, share the dates you’ll be here. Ask how the design review will work.',
+      ),
+      h2('Leave with the practical details.'),
+      p(
+        'Before confirming, ask for the estimated cost, what it includes, any deposit and cancellation terms, and how many sessions might be needed. Confirm preparation and aftercare directly with your artist. Sending an enquiry is the start of a conversation, not a confirmed appointment.',
+      ),
+    ),
   },
   {
-    title: 'Tattoo aftercare: the first two weeks',
-    slug: 'tattoo-aftercare-first-two-weeks',
-    excerpt:
-      'A simple day-by-day routine to help your new tattoo heal cleanly, plus the signs that mean you should call us.',
-    category: 'aftercare',
-    author: 'genti',
-    publishedAt: '2026-10-20T09:00:00.000Z',
-    content: () =>
-      doc(
-        p(
-          'How a tattoo heals decides how it looks for years. Follow the instructions your artist gives you; this is the routine we recommend for most pieces.',
-        ),
-        h2('The first 24 hours'),
-        ol(
-          'Leave the wrap on for as long as your artist told you to',
-          'Wash gently with lukewarm water and unscented soap',
-          'Pat dry with a clean paper towel and let it breathe',
-        ),
-        h2('Days 2 to 7'),
-        p(
-          'Wash twice a day and apply a very thin layer of the aftercare cream we give you. Some redness and flaking is normal. ',
-          b('Don’t scratch or pick.'),
-        ),
-        h2('Days 8 to 14'),
-        p(
-          'Keep moisturising. Stay out of the sun, the sea, pools and saunas until the skin has fully closed.',
-        ),
-        h2('When to get in touch'),
-        p(
-          'If redness spreads, the area gets hotter or more painful after the first few days, or anything worries you, message your artist straight away and see a doctor.',
-        ),
-        cta(
-          'Questions while it heals?',
-          'Message your artist directly. We’re here until it’s fully healed.',
-        ),
+    title: 'Travelling for a tattoo? Start with the appointment.',
+    slug: 'tattoo-travel-albania',
+    excerpt: 'How to organise the conversation before you organise the trip.',
+    category: 'visiting-albania',
+    publishedAt: '2026-10-14T09:00:00.000Z',
+    content: doc(
+      h2('Confirm the tattoo plan first.'),
+      p(
+        'If your tattoo is an important part of your visit to Albania, begin with the studio conversation. Share your idea, placement and the dates you expect to be in the country. Ask for availability before committing to travel around an assumed appointment.',
       ),
+      block('cta', {
+        heading: 'Planning your stay?',
+        text: 'The visitor guide covers accommodation and transport questions, places to explore and a practical planning outline.',
+        button: { label: 'Read the visitor guide', href: '/visiting-albania' },
+      }),
+      h2('Ask about the session schedule.'),
+      p(
+        'A consultation and a tattoo appointment may happen at different times. Ask whether your piece may require more than one session, how long to allow and when you’ll review the design. Keep the details in writing so everyone is planning around the same dates.',
+      ),
+      h2('Know where you’re going.'),
+      p(
+        'London InkTattoo is in Fier, Albania. Confirm the exact studio address and appointment time directly before travelling. Work out your transport and allow flexibility; journey times depend on your route and conditions.',
+      ),
+      h2('Discuss the rest of your itinerary.'),
+      p(
+        'Tell the artist about planned beach days, outdoor activities and onward travel. Ask for personalised preparation and aftercare guidance when deciding where the appointment fits into your visit.',
+      ),
+    ),
   },
   {
-    title: 'Fine line or blackwork? Choosing a style',
-    slug: 'fine-line-or-blackwork',
-    excerpt:
-      'Two styles at opposite ends of the scale. How they differ, how they age, and how to tell which one suits your idea.',
-    category: 'styles',
-    author: 'dren',
-    publishedAt: '2026-10-30T09:00:00.000Z',
-    content: (artistID) =>
-      doc(
-        p(
-          'Fine line and blackwork are two of the most requested styles in the studio, and they couldn’t be more different.',
-        ),
-        h2('Fine line'),
-        p(
-          'Thin, precise lines and small detail. Perfect for florals, script and minimal symbols. Fine line needs a little more space than it seems to, so the lines stay crisp as the skin ages.',
-        ),
-        block('artistCard', { artist: artistID('arta') }),
-        h2('Blackwork'),
-        p(
-          'Bold outlines, solid fills and strong contrast. Blackwork reads from a distance, ages very well, and is often the best way to cover an older tattoo.',
-        ),
-        block('artistCard', { artist: artistID('dren') }),
-        h2('How to choose'),
-        ul(
-          'Want something subtle and personal? Start with fine line.',
-          'Want impact, or need to cover old work? Go for blackwork.',
-          'Not sure? Bring both ideas to a consultation.',
-        ),
-        cta('Still deciding?', 'Bring your references and we’ll talk through both options.'),
+    title: 'Find your direction, before your design.',
+    slug: 'choosing-tattoo-style',
+    excerpt: 'A closer look at subject, style and placement.',
+    category: 'inspiration',
+    publishedAt: '2026-09-30T09:00:00.000Z',
+    content: doc(
+      h2('Separate the subject from the style.'),
+      p(
+        'The subject is what your tattoo depicts. The style is how it is expressed. A flower, for example, can be drawn with delicate lines, strong graphic shapes or detailed shading. Looking at those choices separately can help you explain your idea.',
       ),
+      h2('Notice the details you return to.'),
+      p(
+        'When browsing work, ask yourself what catches your eye. Is it the contrast, the amount of open space, the texture or the way the composition follows the body? Save a small selection and write a sentence about each.',
+      ),
+      h2('Think about the placement.'),
+      p(
+        'Bring your preferred placement to the conversation, while leaving room to discuss composition with the artist. Ask to see relevant examples, including healed work where available, to understand the direction more clearly.',
+      ),
+      h2('Let the portfolio guide the conversation.'),
+      p(
+        'Look for work that relates to your idea and ask about the artist’s experience with it. A good next step is a clear brief, followed by a conversation about feasibility, design and cost. ',
+        link('Explore the portfolio', '/portfolio'),
+        '.',
+      ),
+    ),
   },
 ]

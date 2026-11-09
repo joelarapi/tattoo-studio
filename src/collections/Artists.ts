@@ -4,10 +4,12 @@ import { anyone, isAdminOrEditor } from '@/access'
 import { basicEditor } from '@/fields/richText'
 import { seoTab } from '@/fields/seo'
 import { revalidateCollection } from '@/hooks/revalidate'
+import { PAGE_GLOBALS } from '@/lib/routes'
 
+// Artists appear on the homepage and the About page (chosen there), not on pages of their own.
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'artists',
-  paths: (doc) => (doc.slug ? [`/artists/${doc.slug}`] : []),
+  paths: () => [PAGE_GLOBALS.homepage, PAGE_GLOBALS['about-page']],
 })
 
 export const Artists: CollectionConfig = {
@@ -15,8 +17,9 @@ export const Artists: CollectionConfig = {
   admin: {
     group: 'Studio',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'specialities', 'featured', 'updatedAt'],
-    description: 'Resident artists. Drag rows to change the order they appear on the site.',
+    defaultColumns: ['name', 'yearsOfExperience', 'updatedAt'],
+    description:
+      'The studio’s artists: portrait and bio. The homepage and About page show the artist chosen there; journal posts can name one as author.',
   },
   orderable: true,
   access: {
@@ -46,14 +49,7 @@ export const Artists: CollectionConfig = {
               name: 'bio',
               type: 'richText',
               editor: basicEditor,
-              admin: { description: '3–5 sentences, written in the third person.' },
-            },
-            {
-              name: 'specialities',
-              type: 'relationship',
-              relationTo: 'styles',
-              hasMany: true,
-              admin: { description: 'The styles this artist is known for.' },
+              admin: { description: 'A few short paragraphs. Shown on the About page.' },
             },
             {
               type: 'row',
@@ -82,12 +78,5 @@ export const Artists: CollectionConfig = {
       ],
     },
     slugField({ useAsSlug: 'name' }),
-    {
-      name: 'featured',
-      label: 'Show on homepage',
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { position: 'sidebar', description: 'The homepage shows up to 4 artists.' },
-    },
   ],
 }

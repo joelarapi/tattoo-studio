@@ -34,17 +34,6 @@ export function formatDate(iso: string | null | undefined): string {
   }).format(new Date(iso))
 }
 
-/** "4,000", "4.9". */
-export function formatNumber(value: number): string {
-  return new Intl.NumberFormat(defaultLocale).format(value)
-}
-
-/** "@handle" from an Instagram profile URL. */
-export function instagramHandle(url: string | null | undefined): string | null {
-  const match = url?.match(/instagram\.com\/([\w.]+)/i)
-  return match ? `@${match[1]}` : null
-}
-
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`
 
 export const whatsappHref = (phone: string) => `https://wa.me/${phone.replace(/\D/g, '')}`

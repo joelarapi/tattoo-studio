@@ -36,7 +36,14 @@ describe('access control', () => {
     })
     lead = await payload.create({
       collection: 'leads',
-      data: { name: 'Access test lead', phone: '+355 69 000 0000', status: 'new' },
+      data: {
+        firstName: 'Access',
+        surname: 'Test lead',
+        phone: '+355 69 000 0000',
+        placement: 'Forearm',
+        description: 'Access test',
+        status: 'new',
+      },
       context,
     })
     draftPost = await payload.create({
@@ -70,7 +77,14 @@ describe('access control', () => {
       await expect(
         payload.create({
           collection: 'leads',
-          data: { name: 'Spam', phone: '0', status: 'new' },
+          data: {
+            firstName: 'Spam',
+            surname: 'Spam',
+            phone: '0',
+            placement: 'x',
+            description: 'x',
+            status: 'new',
+          },
           ...asPublic,
         }),
       ).rejects.toThrow()
@@ -80,7 +94,7 @@ describe('access control', () => {
   describe('editor', () => {
     it('can read leads', async () => {
       const found = await payload.findByID({ collection: 'leads', id: lead.id, ...asEditor() })
-      expect(found.name).toBe('Access test lead')
+      expect(found.name).toBe('Access Test lead')
     })
 
     it('cannot update or delete leads', async () => {

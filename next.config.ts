@@ -16,10 +16,6 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/media/file/**',
       },
-      // Posters of the scroll sequences (public/sequences/<name>/poster.avif).
-      {
-        pathname: '/sequences/**',
-      },
     ],
     remotePatterns: publicMediaURL
       ? [

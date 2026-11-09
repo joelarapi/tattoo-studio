@@ -1,113 +1,99 @@
 @import 'tailwindcss';
-@import 'lenis/dist/lenis.css';
 
 /*
- * Design tokens.
- * `@theme static` emits every token as a CSS custom property on :root (even if no utility
- * uses it), so components, inline SVG and canvas code can read them with var(--…).
+ * Design tokens, taken from the approved design (docs/design/). `@theme static` emits every token
+ * as a CSS custom property on :root, so components and inline SVG can read them with var(--…).
  */
 @theme static {
   /* Colour: drop Tailwind's default palette so only on-system colours exist. */
   --color-*: initial;
-  --color-bg: #000000;
-  --color-surface: #111111; /* cards */
-  --color-surface-2: #212121; /* secondary buttons, borders */
-  --color-line: #343434; /* line-art strokes, grid */
-  --color-muted: #4e4e4e;
-  --color-text-muted: #a8a8a8; /* body copy: 8.8:1 on black */
-  --color-text-faint: #717171; /* non-essential captions only: 4.3:1 on black, fails AA for body text */
-  --color-text: #ffffff;
-  --color-accent: #ff4800; /* SINGLE accent: change it here and everything follows */
-  --color-accent-hover: color-mix(in srgb, var(--color-accent), black 20%);
+  --color-bg: #050505;
+  --color-panel: #111111; /* cards, nav pill, form */
+  --color-panel-2: #151515; /* image wells, filter buttons */
+  --color-band: #0c0c0c; /* alternate section background */
+  --color-line: #292929;
+  --color-line-strong: #333333;
+  --color-text: #f6f5f2;
+  --color-muted: #a6a6a6; /* body copy: 8.4:1 on the background */
+  --color-soft: #818181; /* the grey part of headings: 5.2:1, large text only */
+  --color-faint: #8f8f8f; /* small labels and captions: 6.2:1 */
+  --color-accent: #ff5100; /* SINGLE accent: change it here and everything follows */
+  --color-accent-hover: #d94400;
   /*
-   * Text drawn ON the accent. White on #FF4800 is only 3.4:1 (fails WCAG AA for 12–14px labels);
-   * black is 6.2:1. To use white, darken the accent to about #D93D00 or deeper (4.5:1).
+   * Text drawn ON the accent. White on #FF5100 is only 3.3:1 (fails WCAG AA for the 11px button
+   * labels); black is 6.4:1, and 4.8:1 on the hover colour.
    */
   --color-on-accent: #000000;
+  --color-white: #ffffff;
+  --color-black: #000000;
 
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --ease-studio: cubic-bezier(0.625, 0.05, 0, 1);
+  /* Breakpoints of the design: tablet from 681px, desktop from 1001px, wide from 1700px. */
+  --breakpoint-*: initial;
+  --breakpoint-md: 681px;
+  --breakpoint-lg: 1001px;
+  --breakpoint-2xl: 1700px;
 
-  /* Fluid type: clamp between a 320px and 1920px viewport */
-  --text-display: clamp(3rem, 1.6rem + 4.6vw, 7.64rem);
-  --text-display--line-height: 1.2;
-  --text-h1: clamp(2.25rem, 1.45rem + 3.2vw, 5.46rem);
-  --text-h1--line-height: 1.2;
-  --text-h2: clamp(2rem, 1.3rem + 2.9vw, 4.86rem);
-  --text-h2--line-height: 1.2;
-  --text-h3: clamp(1.75rem, 1.15rem + 2.5vw, 4.25rem);
-  --text-h3--line-height: 1.2;
-  --text-h5: clamp(1.25rem, 1.05rem + 1.1vw, 2.32rem);
-  --text-h5--line-height: 1.2;
-  --text-large: clamp(1.125rem, 1.09rem + 0.18vw, 1.3rem);
-  --text-large--line-height: 1.4;
-  --text-main: clamp(0.9375rem, 0.92rem + 0.09vw, 1.03rem);
-  --text-main--line-height: 1.4;
-  --text-label: 0.875rem;
-  --text-label--line-height: 1.2;
-  --text-label-sm: 0.75rem;
-  --text-label-sm--line-height: 1.2;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --ease-out-soft: cubic-bezier(0.2, 0.65, 0.3, 1);
 }
 
-/* Layout tokens (not a Tailwind namespace, so plain custom properties). */
+/*
+ * Layout: the side gutter is 6% on phones, 5% on tablets and 7% on desktop; from 1700px wide the
+ * content stops growing at 1450px.
+ */
 :root {
-  --site-margin: clamp(1.5rem, 0.5rem + 5vw, 9.36rem); /* side gutter */
-  --site-max: 120rem;
-  --gutter: 0.5rem;
-  --section-space: clamp(4rem, 3.2rem + 3vw, 7rem);
-  --section-space-lg: clamp(5.5rem, 4.6rem + 4.5vw, 10rem);
-  --nav-height: 4rem;
+  --site-x: 6%;
+  --section-y: 55px;
+}
+@media (width >= 681px) {
+  :root {
+    --site-x: 5%;
+    --section-y: 65px;
+  }
+}
+@media (width >= 1001px) {
+  :root {
+    --site-x: max(7%, calc((100% - 1450px) / 2));
+    --section-y: 85px;
+  }
 }
 
-/* Utilities that point at runtime variables (fonts come from next/font on <html>). */
+/* Utilities that point at runtime variables (Inter comes from next/font on <html>). */
 @theme inline {
-  --font-sans: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-roboto-mono), ui-monospace, monospace;
-
-  /* Spacing and container names must not collide: max-w-* checks --spacing-* first. */
-  --spacing-site-margin: var(--site-margin); /* px-site-margin */
-  --spacing-gutter: var(--gutter); /* gap-gutter */
-  --spacing-section: var(--section-space); /* py-section */
-  --spacing-section-lg: var(--section-space-lg); /* py-section-lg */
-  --spacing-nav: var(--nav-height); /* h-nav, pt-nav */
-  --container-site: var(--site-max); /* max-w-site */
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-label: var(--font-inter), Arial, Helvetica, sans-serif;
 }
 
 @layer base {
   html {
     background-color: var(--color-bg);
     color-scheme: dark;
+    scroll-padding-top: 30px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
 
   body {
     min-height: 100svh;
     font-family: var(--font-sans);
-    font-size: var(--text-main);
-    line-height: 1.4;
-    color: var(--color-text-muted);
+    font-size: 15px;
+    line-height: 1.65;
+    color: var(--color-muted);
+    background-color: var(--color-bg);
   }
 
   h1,
   h2,
   h3,
-  h4,
-  h5,
-  h6 {
+  h4 {
     color: var(--color-text);
     font-weight: 400;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
   }
 
   p,
   li,
-  dd,
-  blockquote {
+  dd {
     text-wrap: pretty;
   }
 
@@ -118,78 +104,321 @@
 
   :focus-visible {
     outline: 2px solid var(--color-accent);
-    outline-offset: 3px;
+    outline-offset: 5px;
   }
 }
 
-/* Small UPPERCASE Roboto Mono labels: nav links, eyebrows, buttons, index numbers. */
-@utility mono-label {
-  font-family: var(--font-mono);
-  font-size: var(--text-label);
-  font-weight: 500;
-  line-height: 1.2;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ---------- Layout ---------- */
+
+@utility px-site {
+  padding-inline: var(--site-x);
+}
+
+@utility py-section {
+  padding-block: var(--section-y);
+}
+
+/* ---------- Type ---------- */
+
+/* Inner-page titles (H1). */
+@utility text-display {
+  font-size: 54px;
+  line-height: 1.06;
+  letter-spacing: -3px;
+  @media (width >= 681px) {
+    font-size: clamp(58px, 7.1vw, 110px);
+  }
+  @media (width >= 1001px) {
+    letter-spacing: -5px;
+  }
+}
+
+/* The homepage title (H1). */
+@utility text-hero {
+  font-size: clamp(43px, 10.3vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -2.5px;
+  @media (width >= 681px) {
+    font-size: 60px;
+    letter-spacing: -3px;
+  }
+  @media (width >= 1001px) {
+    font-size: clamp(55px, 5.8vw, 92px);
+    letter-spacing: -4px;
+  }
+}
+
+/* Section headings (H2). */
+@utility text-h2 {
+  font-size: 39px;
+  line-height: 1.13;
+  letter-spacing: -1.5px;
+  @media (width >= 681px) {
+    font-size: clamp(34px, 4vw, 60px);
+    letter-spacing: -2.4px;
+  }
+}
+
+/* Larger section headings on the homepage. */
+@utility text-h2-lg {
+  font-size: 40px;
+  line-height: 1.13;
+  letter-spacing: -1.5px;
+  @media (width >= 681px) {
+    font-size: clamp(38px, 4.2vw, 65px);
+    letter-spacing: -2.4px;
+  }
+}
+
+/* Smaller section headings (journal list, portfolio intro, suggestions). */
+@utility text-h2-sm {
+  font-size: 34px;
+  line-height: 1.13;
+  letter-spacing: -1.2px;
+  @media (width >= 681px) {
+    font-size: 40px;
+    letter-spacing: -1.6px;
+  }
+}
+
+/* Closing calls to action. */
+@utility text-cta {
+  font-size: 54px;
+  line-height: 1.06;
+  letter-spacing: -3px;
+  @media (width >= 681px) {
+    font-size: clamp(50px, 7vw, 100px);
+    letter-spacing: -4px;
+  }
+}
+
+@utility text-h3 {
+  font-size: 23px;
+  line-height: 1.25;
+  letter-spacing: -0.7px;
+}
+
+/* Small uppercase Inter labels: nav, tags, buttons, captions. */
+@utility label {
+  font-family: var(--font-label);
+  font-size: 10px;
+  line-height: 1.5;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
-@utility mono-label-sm {
-  font-family: var(--font-mono);
-  font-size: var(--text-label-sm);
-  font-weight: 500;
-  line-height: 1.2;
+@utility label-sm {
+  font-family: var(--font-label);
+  font-size: 9px;
+  line-height: 1.6;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
+
+@utility label-xs {
+  font-family: var(--font-label);
+  font-size: 8px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+/* The small orange label above a heading. */
+@utility tag {
+  display: block;
+  margin-bottom: 24px;
+  font-family: var(--font-label);
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  @media (width >= 681px) {
+    font-size: 10px;
+  }
+}
+
+/* ---------- Buttons and links ---------- */
+
+@utility btn {
+  display: inline-block;
+  padding: 16px 22px;
+  border-radius: 5px;
+  font-family: var(--font-label);
+  font-size: 11px;
+  line-height: 1.5;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s;
+}
+
+@utility btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-on-accent);
+  &:hover {
+    background-color: var(--color-accent-hover);
+  }
+}
+
+@utility btn-outline {
+  background-color: #202020;
+  border: 1px solid var(--color-line-strong);
+  color: var(--color-text);
+  &:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+/* An underlined uppercase link ("Explore the work ↓"). */
+@utility link-plain {
+  display: inline-block;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #666;
+  font-family: var(--font-label);
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  transition: border-color 0.2s;
+  &:hover {
+    border-color: var(--color-accent);
+  }
+  @media (width >= 681px) {
+    font-size: 10px;
+  }
+}
+
+/* A quieter underlined link inside cards. */
+@utility link-text {
+  display: inline-block;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #777;
+  font-family: var(--font-label);
+  font-size: 9px;
+  line-height: 1.5;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--color-text);
+  &:hover {
+    border-color: var(--color-accent);
+  }
+}
+
+/* ---------- Surfaces ---------- */
+
+/* Faint 70px grid, a large circle and a vignette (heroes and closing sections). */
+@utility grid-bg {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(#ffffff07 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff07 1px, transparent 1px);
+  background-size: 45px 45px;
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    left: var(--circle-x, 50%);
+    top: var(--circle-y, 48%);
+    width: var(--circle-size, 400px);
+    height: var(--circle-size, 400px);
+    border: 1px solid #ffffff16;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 25%, var(--color-bg) 95%);
+    pointer-events: none;
+  }
+  @media (width >= 681px) {
+    background-size: 70px 70px;
+    --circle-size: 570px;
+  }
+}
+
+/* An image in a thin frame with orange corner brackets. */
+@utility framed {
+  position: relative;
+  padding: 10px;
+  border: 1px solid var(--color-line-strong);
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--color-accent);
+    pointer-events: none;
+  }
+  &::before {
+    left: -5px;
+    top: -5px;
+    border-right: 0;
+    border-bottom: 0;
+  }
+  &::after {
+    right: -5px;
+    bottom: -5px;
+    border-left: 0;
+    border-top: 0;
+  }
+}
+
+/* Photos follow the "black and white" switch in Studio details. */
+@utility photo {
+  html[data-mono-photos] & {
+    filter: grayscale(1);
+  }
+}
+
+/* ---------- Motion ---------- */
 
 /*
- * Pre-animation states. `js-ready` is added to <html> by an inline script, so without JS
- * nothing is ever hidden. Reduced-motion users never get hidden states either.
- * Mark elements with data-reveal; motion components animate them in and set data-revealed.
+ * Scroll reveals and drawn line art (src/components/motion/PageMotion.tsx). `js-ready` is added to
+ * <html> by an inline script, so without JS nothing is ever hidden; reduced-motion users never get
+ * hidden states either. Focused content is always shown.
  */
 @media (prefers-reduced-motion: no-preference) {
-  .js-ready [data-reveal]:not([data-revealed]) {
+  .js-ready [data-reveal] {
     opacity: 0;
+    transform: translate3d(0, 12px, 0);
+    transition:
+      opacity 0.6s ease var(--reveal-delay, 0ms),
+      transform 0.7s var(--ease-out-soft) var(--reveal-delay, 0ms);
   }
-}
-
-/* Dashed beams travelling along line art (<DashedBeam>; pathLength is 100). */
-@keyframes beam-travel {
-  to {
-    stroke-dashoffset: -100;
+  @media (width >= 681px) {
+    .js-ready [data-reveal] {
+      transform: translate3d(0, 20px, 0);
+      transition-duration: 0.75s, 0.85s;
+    }
   }
-}
-
-.beam {
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  animation: beam-travel 8s linear infinite;
-}
-
-/*
- * The nav fades in on load. CSS only, so it also ends visible without JS. Opacity only: a
- * transform on the header would trap the fixed mobile menu inside it.
- */
-@keyframes nav-in {
-  from {
-    opacity: 0;
+  .js-ready [data-reveal][data-revealed],
+  .js-ready [data-reveal]:focus-within {
+    opacity: 1;
+    transform: none;
   }
-}
 
-/* "Scroll to begin": a dot running down a short line. */
-@keyframes scroll-hint {
-  0% {
-    transform: translateY(-100%);
+  [data-stencil] :is(path, circle) {
+    stroke-dasharray: 1;
+    transition: stroke-dashoffset 1.9s ease var(--stroke-delay, 0ms);
   }
-  60%,
-  100% {
-    transform: translateY(250%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .beam {
-    animation: none;
-    opacity: 0;
+  .js-ready [data-stencil]:not([data-drawn]) :is(path, circle) {
+    stroke-dashoffset: 1;
   }
 }
 

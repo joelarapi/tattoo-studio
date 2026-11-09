@@ -2,10 +2,11 @@ import { slugField, type CollectionConfig } from 'payload'
 
 import { anyone, isAdminOrEditor } from '@/access'
 import { revalidateCollection } from '@/hooks/revalidate'
+import { PAGE_GLOBALS } from '@/lib/routes'
 
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'categories',
-  paths: (doc) => (doc.slug ? [`/journal/category/${doc.slug}`] : []),
+  paths: () => [PAGE_GLOBALS['journal-page']],
 })
 
 export const Categories: CollectionConfig = {
@@ -15,7 +16,8 @@ export const Categories: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'updatedAt'],
-    description: 'Topics for journal posts, e.g. Aftercare or Styles. Each gets its own page.',
+    description:
+      'Topics for journal posts, e.g. Planning or Aftercare. Shown as a label on each article.',
   },
   access: {
     read: anyone,
@@ -31,7 +33,9 @@ export const Categories: CollectionConfig = {
       name: 'description',
       type: 'textarea',
       maxLength: 160,
-      admin: { description: 'Shown on the category page and used for Google. Max 160 characters.' },
+      admin: {
+        description: 'Optional. For editors; not shown on the site yet. Max 160 characters.',
+      },
     },
   ],
 }

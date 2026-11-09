@@ -1,52 +1,59 @@
 # What we need from the studio
 
-We're building the new studio website. Until the real content arrives, the site runs on realistic placeholder text and images. Everything below can be changed later in the website's editor (the CMS), so it's fine to send things in batches.
+We're building the new website for London InkTattoo in Fier. Until the real content arrives, the site runs on starting text adapted from the approved design and on placeholder images. Everything below can be changed later in the website's editor (the CMS), so it's fine to send things in batches.
 
 ## 1. Brand
 
-- [ ] The studio's exact name, spelled as it should appear on the site
-- [ ] Logo as an SVG file: a full wordmark and a square icon (used for the browser tab and social sharing images)
-- [ ] Brand colour, if you have one (the current design uses one bright orange accent)
+- [ ] Confirm the studio's name exactly as it should appear (the site currently says "London InkTattoo")
+- [ ] Logo as an SVG file: a full wordmark and a square icon (for the browser tab and social sharing images). Until then the site shows the name as a text wordmark.
+- [ ] Brand colour, if it should differ from the current orange
 
 ## 2. Studio details (must be accurate: Google shows these)
 
-- [ ] Street address, city, postcode
+- [ ] Street address and postcode in Fier
 - [ ] Google Maps link / Google Business Profile link
 - [ ] Phone number and WhatsApp number
 - [ ] Email address for enquiries
 - [ ] Opening hours for each day
-- [ ] Instagram, Facebook, TikTok and any other social links
+- [ ] Instagram, TikTok and any other social links
 - [ ] Price range (e.g. "from €80", or €/€€/€€€)
 
-## 3. Numbers for the "Studio in numbers" section (real figures only)
+## 3. The artist
 
-- [ ] Years open
-- [ ] Approximate number of tattoos completed
-- [ ] Google rating and number of reviews
-- [ ] Number of resident artists
+- [ ] Confirm Tisi's name as it should appear and the years of experience (the site says 18)
+- [ ] Portrait photo of Tisi, at least 1200px tall
+- [ ] A short bio, or approval of the current one on the About page
+- [ ] Instagram link, if Tisi has a personal one
 
-## 4. Artists (for each one)
+## 4. Portfolio
 
-- [ ] Name
-- [ ] Portrait photo, at least 1200px, ideally all shot in a similar style
-- [ ] Short bio (3–5 sentences)
-- [ ] Styles they specialise in
-- [ ] Instagram handle
-- [ ] Years of experience
-
-## 5. Portfolio
-
-- [ ] At least 8 strong pieces to feature: high-resolution photos (fresh and/or healed)
-- [ ] For each: a short title, the artist, the style and the body placement
-- [ ] Optional: short video clips of finished pieces (under 8 MB each)
+- [ ] At least 8 strong pieces: high-resolution photos (fresh and/or healed)
+- [ ] For each: a short title, the category, the body placement and two or three sentences about the piece
+- [ ] Which pieces to feature on the homepage
 - [ ] **Confirmation that each client has agreed to their tattoo being published**
 
-## 6. Styles you offer
+## 5. Portfolio categories
 
-- [ ] List of styles (e.g. fine line, blackwork, realism, traditional)
-- [ ] One or two sentences on how the studio approaches each
+- [ ] The categories to filter by (the site starts with Graphic, Botanical, Symbolic and The process)
 
-## 7. Policies (for the FAQ)
+## 6. Films for the video portfolio
+
+- [ ] Up to 8 short clips (MP4, under 8 MB each): the process, placement, the reveal, close-ups, the studio
+- [ ] A still image for each, used as its cover
+
+## 7. Photos
+
+- [ ] Two strong photos for the top of the homepage
+- [ ] Studio interior photos
+- [ ] Black and white or colour? The design shows every photo in black and white; one switch in the CMS turns colour back on.
+
+## 8. Travel help (Visiting Albania page)
+
+- [ ] Does the studio help visitors with hotels or transport? If so, how, and at what price
+- [ ] Languages spoken at consultations
+- [ ] Any tips for visitors you'd like on the page
+
+## 9. Policies (for the FAQ)
 
 - [ ] Pricing: hourly rate, minimum charge, how quotes work
 - [ ] Deposit amount and refund rules
@@ -54,22 +61,6 @@ We're building the new studio website. Until the real content arrives, the site 
 - [ ] Age policy (minimum age, ID)
 - [ ] Aftercare instructions
 - [ ] Anything clients ask about often (pain, sessions, cover-ups)
-
-## 8. Our standards
-
-Tell us which of these are true; we'll only publish what is:
-
-- [ ] Sterile, single-use needles
-- [ ] Vegan inks
-- [ ] Licensed / certified artists
-- [ ] Aftercare support after the session
-- [ ] Anything else (hygiene certificates, awards, guest artists)
-
-## 9. Photos and video
-
-- [ ] Studio interior photos (4+)
-- [ ] 4 images for the "Studio in numbers" cards
-- [ ] **Process video:** a 6–10 second 3D render or clip shot on a **pure black background**, subject centred, at least 1080p, with **no text** in the video. Ideally it shows four moments: consultation → design → stencil and ink → healed result. This can come from a 3D artist, an AI video tool or stock footage.
 
 ## 10. Legal
 
@@ -80,7 +71,7 @@ Tell us which of these are true; we'll only publish what is:
 - [ ] Domain name, and access to its DNS settings
 - [ ] Google: Tag Manager, Analytics, Ads, Search Console, Business Profile
 - [ ] Meta: Business Manager with a Pixel, and a Conversions API token
-- [ ] Cloudflare: an account (for image storage and spam protection on the booking form)
+- [ ] Cloudflare: an account (for image storage and spam protection on the enquiry form)
 - [ ] An email-sending service (Resend), or the SMTP login for the studio mailbox
-- [ ] Which inbox should receive new booking requests
+- [ ] Which inbox should receive new enquiries
 - [ ] Hosting: Vercel Pro (about $20/month; the free plan doesn't allow business sites) or a server of your own

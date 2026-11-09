@@ -1,5 +1,6 @@
 import Image, { type ImageProps } from 'next/image'
 
+import { cn } from '@/lib/cn'
 import type { Media } from '@/payload-types'
 
 type CmsImageProps = Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & {
@@ -7,13 +8,23 @@ type CmsImageProps = Omit<ImageProps, 'src' | 'alt' | 'width' | 'height'> & {
   media: Media | number | null | undefined
   /** Override the CMS alt text, e.g. "" when the image is decorative next to its caption. */
   alt?: string
+  /** Photos follow the "black and white" switch in Studio details; graphics can opt out. */
+  photo?: boolean
 }
 
 /**
  * `next/image` for CMS uploads: alt text from the CMS (required there), the editor's focal point
  * as `object-position`, and the original's dimensions unless `fill` is used.
  */
-export function CmsImage({ media, alt, fill, style, ...rest }: CmsImageProps) {
+export function CmsImage({
+  media,
+  alt,
+  fill,
+  style,
+  className,
+  photo = true,
+  ...rest
+}: CmsImageProps) {
   if (!media || typeof media !== 'object' || !media.url) return null
   const objectPosition =
     media.focalX != null && media.focalY != null ? `${media.focalX}% ${media.focalY}%` : undefined
@@ -24,6 +35,7 @@ export function CmsImage({ media, alt, fill, style, ...rest }: CmsImageProps) {
       src={media.url}
       alt={alt ?? media.alt}
       {...(fill ? { fill: true } : { width: media.width ?? 1200, height: media.height ?? 800 })}
+      className={cn(photo && 'photo', className)}
       style={{ objectPosition, ...style }}
     />
   )

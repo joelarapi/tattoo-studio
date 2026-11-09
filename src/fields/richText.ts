@@ -13,11 +13,10 @@ import {
   UploadFeature,
 } from '@payloadcms/richtext-lexical'
 
-import { ArtistCard } from '@/blocks/ArtistCard'
 import { CallToAction } from '@/blocks/CallToAction'
 
 const linkFeature = () =>
-  LinkFeature({ enabledCollections: ['posts', 'artists', 'styles', 'legal-pages'] })
+  LinkFeature({ enabledCollections: ['posts', 'portfolio-items', 'legal-pages'] })
 
 /** Short formatted text: bios, FAQ answers, legal pages. */
 export const basicEditor = lexicalEditor({
@@ -53,7 +52,7 @@ export const postEditor = lexicalEditor({
     HeadingFeature({ enabledHeadingSizes: ['h2', 'h3', 'h4'] }),
     linkFeature(),
     UploadFeature({ enabledCollections: ['media'] }),
-    BlocksFeature({ blocks: [CallToAction, ArtistCard] }),
+    BlocksFeature({ blocks: [CallToAction] }),
     FixedToolbarFeature(),
   ],
 })
