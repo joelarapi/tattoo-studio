@@ -34,3 +34,5 @@ The design has 30 piece pages built from one template. Two are kept here: `clown
 - The homepage colour cycle stops for good once the visitor scrolls, swipes or clicks in the gallery, rather than resuming after a pause (WCAG 2.2.2).
 - The Journal's page-top photo is a studio photo; the design uses a demo photo there.
 - Each portfolio category has one name, used on the cards and the filter ("Portrait"; the design's filter button says "Portraits").
+- Every page is built from page-builder sections (`docs/PAGE_BUILDER.md`), so the owner can rearrange it. The darker bands that the design draws in three shades (`#0b0b0b`, `#0c0c0c`, `#0d0d0d`) with a top line or lines above and below are one "Dark band" background, with lines above and below.
+- Under a portfolio piece, the "More work by Tisi" section has no line underneath (the design draws one before the footer).

@@ -3,18 +3,19 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RichText } from '@/components/RichText'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { Action } from '@/components/ui/Action'
-import { EndCta, Notice } from '@/components/ui/Blocks'
+import { Notice } from '@/components/ui/Blocks'
 import { CmsImage } from '@/components/ui/CmsImage'
 import { Tag } from '@/components/ui/Tag'
-import { getJournalPage, getPost, getPosts, getSiteSettings } from '@/lib/data'
+import { getArticleTemplate, getPost, getPosts, getSiteSettings } from '@/lib/data'
 import { formatDate } from '@/lib/format'
 import { pageMetadata } from '@/lib/metadata'
 import { categoryTitle } from '@/lib/posts'
 import { getServerURL } from '@/lib/preview'
-import { PAGE_GLOBALS, pathForDoc } from '@/lib/routes'
+import { pathForDoc } from '@/lib/routes'
 import { headingNodeId, tableOfContents } from '@/lib/toc'
 import type { Artist, CallToActionBlock, Media } from '@/payload-types'
 
@@ -75,9 +76,9 @@ const articleBody = [
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params
-  const [post, page, settings] = await Promise.all([
+  const [post, labels, settings] = await Promise.all([
     getPost(slug),
-    getJournalPage(),
+    getArticleTemplate(),
     getSiteSettings(),
   ])
   if (!post) notFound()
@@ -88,6 +89,7 @@ export default async function ArticlePage({ params }: Props) {
   const category = categoryTitle(post)
   const date = formatDate(post.publishedAt)
   const url = `${getServerURL()}${pathForDoc('posts', slug)}`
+  const journalPath = pathForDoc('pages', 'journal')
 
   return (
     <main id="main">
@@ -109,11 +111,8 @@ export default async function ArticlePage({ params }: Props) {
       />
 
       <section className="grid-bg overflow-hidden px-[6%] pt-[45px] pb-[60px] md:px-[12%] md:pt-[65px] md:pb-20">
-        <Link
-          href={PAGE_GLOBALS['journal-page']}
-          className="mb-[45px] block label text-[#999] hover:text-text"
-        >
-          ← {page.article.backLabel}
+        <Link href={journalPath} className="mb-[45px] block label text-[#999] hover:text-text">
+          ← {labels.backLabel}
         </Link>
         <Tag>{[category, date].filter(Boolean).join(' / ')}</Tag>
         <h1 className="max-w-[1000px] text-[49px] leading-[1.06] tracking-[-2px] md:text-[clamp(46px,6vw,86px)] md:tracking-[-3px]">
@@ -127,8 +126,8 @@ export default async function ArticlePage({ params }: Props) {
       <div className="grid grid-cols-1 gap-[30px] px-site py-section md:grid-cols-[1fr_3fr] md:gap-[8%]">
         <aside className="border-b border-line-strong pb-[25px] md:border-0 md:pb-0">
           {contents.length > 0 && (
-            <nav aria-label={page.article.tocLabel ?? 'Contents'} className="md:sticky md:top-8">
-              {page.article.tocLabel && <span className="tag">{page.article.tocLabel}</span>}
+            <nav aria-label={labels.tocLabel ?? 'Contents'} className="md:sticky md:top-8">
+              {labels.tocLabel && <span className="tag">{labels.tocLabel}</span>}
               <ol className="flex flex-col gap-2.5 text-[11px]">
                 {contents.map((item) => (
                   <li key={item.id}>
@@ -154,13 +153,13 @@ export default async function ArticlePage({ params }: Props) {
             />
           )}
           <RichText data={post.content} converters={converters} className={articleBody} />
-          <Action href={PAGE_GLOBALS['journal-page']} variant="outline" className="mt-10">
-            {page.article.backButtonLabel}
+          <Action href={journalPath} variant="outline" className="mt-10">
+            {labels.backButtonLabel}
           </Action>
         </article>
       </div>
 
-      <EndCta cta={settings.endCta} />
+      <RenderBlocks blocks={labels.after} titleFromFirst={false} />
     </main>
   )
 }

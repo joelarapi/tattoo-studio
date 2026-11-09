@@ -4,12 +4,12 @@ import { anyone, isAdminOrEditor } from '@/access'
 import { seoTab } from '@/fields/seo'
 import { revalidateCollection } from '@/hooks/revalidate'
 import { generatePreviewPath } from '@/lib/preview'
-import { PAGE_GLOBALS, pathForDoc } from '@/lib/routes'
+import { pathForDoc } from '@/lib/routes'
 
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'portfolio-items',
   paths: (doc) =>
-    doc.slug ? [PAGE_GLOBALS['portfolio-page'], pathForDoc('portfolio-items', doc.slug)] : [],
+    doc.slug ? [pathForDoc('pages', 'portfolio'), pathForDoc('portfolio-items', doc.slug)] : [],
 })
 
 const piecePath = (data: { slug?: string | null } | undefined) =>

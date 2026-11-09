@@ -66,7 +66,26 @@ export interface Config {
     users: UserAuthOperations;
     'payload-mcp-api-keys': PayloadMcpApiKeyAuthOperations;
   };
-  blocks: {};
+  blocks: {
+    homeHero: HomeHeroBlock;
+    pageHero: PageHeroBlock;
+    textStrip: TextStripBlock;
+    text: TextBlock;
+    imageText: ImageTextBlock;
+    cards: CardsBlock;
+    steps: StepsBlock;
+    faq: FaqBlock;
+    latestPosts: LatestPostsBlock;
+    journalList: JournalListBlock;
+    workShowcase: WorkShowcaseBlock;
+    portfolioGrid: PortfolioGridBlock;
+    gallery: GalleryBlock;
+    artist: ArtistBlock;
+    pieceSuggestions: PieceSuggestionsBlock;
+    enquiry: EnquiryBlock;
+    pageCta: PageCtaBlock;
+    divider: DividerBlock;
+  };
   collections: {
     posts: Post;
     categories: Category;
@@ -77,8 +96,8 @@ export interface Config {
     faqs: Faq;
     leads: Lead;
     'lead-attachments': LeadAttachment;
-    'legal-pages': LegalPage;
     users: User;
+    pages: Page;
     'payload-mcp-api-keys': PayloadMcpApiKey;
     'payload-kv': PayloadKv;
     'payload-jobs': PayloadJob;
@@ -97,8 +116,8 @@ export interface Config {
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
     'lead-attachments': LeadAttachmentsSelect<false> | LeadAttachmentsSelect<true>;
-    'legal-pages': LegalPagesSelect<false> | LegalPagesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
     'payload-mcp-api-keys': PayloadMcpApiKeysSelect<false> | PayloadMcpApiKeysSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-jobs': PayloadJobsSelect<false> | PayloadJobsSelect<true>;
@@ -111,24 +130,16 @@ export interface Config {
   };
   fallbackLocale: null;
   globals: {
-    homepage: Homepage;
-    'about-page': AboutPage;
-    'portfolio-page': PortfolioPage;
-    'visiting-page': VisitingPage;
-    'journal-page': JournalPage;
-    'contact-page': ContactPage;
     'site-settings': SiteSetting;
     navigation: Navigation;
+    'piece-template': PieceTemplate;
+    'article-template': ArticleTemplate;
   };
   globalsSelect: {
-    homepage: HomepageSelect<false> | HomepageSelect<true>;
-    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
-    'portfolio-page': PortfolioPageSelect<false> | PortfolioPageSelect<true>;
-    'visiting-page': VisitingPageSelect<false> | VisitingPageSelect<true>;
-    'journal-page': JournalPageSelect<false> | JournalPageSelect<true>;
-    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
+    'piece-template': PieceTemplateSelect<false> | PieceTemplateSelect<true>;
+    'article-template': ArticleTemplateSelect<false> | ArticleTemplateSelect<true>;
   };
   locale: null;
   widgets: {
@@ -181,6 +192,769 @@ export interface PayloadMcpApiKeyAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HomeHeroBlock".
+ */
+export interface HomeHeroBlock {
+  /**
+   * Small label next to the orange dot, e.g. the studio name and country.
+   */
+  label: string;
+  /**
+   * The page title (H1). White, then grey, then orange.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * The first paragraph under the title.
+   */
+  intro: string;
+  /**
+   * A shorter, quieter line under the intro. Optional.
+   */
+  supporting?: string | null;
+  primaryCta: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label: string;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href: string;
+  };
+  secondaryLink?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * e.g. 18
+   */
+  factValue?: string | null;
+  /**
+   * e.g. "Years of tattoo experience".
+   */
+  factLabel?: string | null;
+  /**
+   * Short; Enter for a line break.
+   */
+  secondFact?: string | null;
+  /**
+   * Portrait format (3:4) works best.
+   */
+  primaryImage: number | Media;
+  /**
+   * Small caption on the large image. Optional.
+   */
+  primaryCaption?: string | null;
+  /**
+   * Overlaps the large one. Portrait or square.
+   */
+  secondaryImage: number | Media;
+  /**
+   * Small caption on the small image. Optional.
+   */
+  secondaryCaption?: string | null;
+  imagesLink?: string | null;
+  /**
+   * Tiny text under the images, e.g. "Art. Identity. Expression."
+   */
+  artNote?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'homeHero';
+}
+/**
+ * Every image and video on the site. Upload large originals; the site makes smaller copies automatically.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  /**
+   * Describe what the image shows, for blind visitors and for Google. e.g. "Fine-line rose tattoo on a forearm".
+   */
+  alt: string;
+  /**
+   * Optional. Shown under the image where the design has room for it.
+   */
+  caption?: string | null;
+  prefix?: string | null;
+  _objectKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    card?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    hero?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    og?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageHeroBlock".
+ */
+export interface PageHeroBlock {
+  layout?: ('centred' | 'split') | null;
+  height?: ('tall' | 'compact') | null;
+  /**
+   * Small label above the title.
+   */
+  tag?: string | null;
+  /**
+   * The page title (H1). White, then grey, then orange.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Under the title. Enter for a line break.
+   */
+  intro?: string | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Small print under the button. Optional.
+   */
+  note?: string | null;
+  /**
+   * e.g. "Get to know Tisi" to #artist (a section ID further down).
+   */
+  jumpLink?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Tiny line at the bottom, e.g. "01 / About us".
+   */
+  indexLabel?: string | null;
+  sidePanel?: {
+    /**
+     * Small label at the top of the box.
+     */
+    title?: string | null;
+    stops?:
+      | {
+          /**
+           * e.g. "Arrive"
+           */
+          label?: string | null;
+          title: string;
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Small label at the bottom of the box.
+     */
+    footnote?: string | null;
+  };
+  /**
+   * Lists every section on the page that has a jump-link label (in its Section settings).
+   */
+  showJumpBar?: boolean | null;
+  /**
+   * Optional. Shown in colour, darkened, behind the heading.
+   */
+  background?: (number | null) | Media;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pageHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextStripBlock".
+ */
+export interface TextStripBlock {
+  /**
+   * Short phrases in a band across the page, separated by asterisks.
+   */
+  phrases?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'textStrip';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TextBlock".
+ */
+export interface TextBlock {
+  /**
+   * Use "Document" for policies and other long pages.
+   */
+  layout?: ('split' | 'stacked' | 'document') | null;
+  /**
+   * Small orange label above the heading.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading?: {
+    text?: string | null;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Bold, italic, lists and links.
+   */
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  link?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Small note at the end, with a line beside it. Optional.
+   */
+  note?: string | null;
+  showUpdated?: boolean | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'text';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ImageTextBlock".
+ */
+export interface ImageTextBlock {
+  imageSide?: ('left' | 'right') | null;
+  /**
+   * Portrait or square works best.
+   */
+  image: number | Media;
+  /**
+   * Small note on the image. Optional.
+   */
+  imageNote?: string | null;
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'imageText';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "CardsBlock".
+ */
+export interface CardsBlock {
+  style?: ('numbered' | 'panel' | 'feature' | 'place') | null;
+  columns?: ('2' | '3') | null;
+  headingSize?: ('lg' | 'md' | 'sm') | null;
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Next to the heading. Enter for a line break.
+   */
+  intro?: string | null;
+  cards?:
+    | {
+        /**
+         * Small label after the number, e.g. "Your idea".
+         */
+        label?: string | null;
+        /**
+         * Small orange label above the title.
+         */
+        tag?: string | null;
+        /**
+         * Optional.
+         */
+        graphic?: ('sketch' | 'machine' | 'ink' | 'circles' | 'bars' | 'asterisk') | null;
+        symbol?: ('home' | 'arrow') | null;
+        motif?: ('columns' | 'windows' | 'waves') | null;
+        title: string;
+        /**
+         * Leave an empty line between paragraphs.
+         */
+        text?: string | null;
+        /**
+         * One item per line. Optional.
+         */
+        checklist?: string | null;
+        link?: {
+          /**
+           * The text on the button. Keep it short.
+           */
+          label?: string | null;
+          /**
+           * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+           */
+          href?: string | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A line with an asterisk under the cards. Optional.
+   */
+  note?: {
+    /**
+     * Bold start of the note, e.g. a question.
+     */
+    title?: string | null;
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    link?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+  };
+  /**
+   * A boxed note under the cards. Optional.
+   */
+  notice?: string | null;
+  /**
+   * Small print under the cards. Optional.
+   */
+  smallPrint?: string | null;
+  /**
+   * A titled note at the end of the section, under a line. Optional.
+   */
+  closingNote?: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    title?: string | null;
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'cards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsBlock".
+ */
+export interface StepsBlock {
+  style?: ('compact' | 'timeline') | null;
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Leave an empty line between paragraphs.
+   */
+  text?: string | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  steps?:
+    | {
+        /**
+         * Small label above the title, e.g. "Before you travel". Optional.
+         */
+        label?: string | null;
+        title: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  link?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'steps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "FaqBlock".
+ */
+export interface FaqBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * The questions to show, in this order (Studio → FAQs). Leave empty to show them all.
+   */
+  faqs?: (number | Faq)[] | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'faq';
+}
+/**
+ * Questions and answers. Google can show these directly in search results. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "faqs".
+ */
+export interface Faq {
+  id: number;
+  _order?: string | null;
+  /**
+   * Phrase it the way a client would ask it.
+   */
+  question: string;
+  /**
+   * Two to four sentences. Answer the question in the first one.
+   */
+  answer: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LatestPostsBlock".
+ */
+export interface LatestPostsBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  link?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * The newest published posts. Hidden when there are none.
+   */
+  count: number;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'latestPosts';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "JournalListBlock".
+ */
+export interface JournalListBlock {
+  featured: {
+    /**
+     * Small label above the featured article.
+     */
+    tag?: string | null;
+    /**
+     * Leave empty to feature the latest article.
+     */
+    post?: (number | null) | Post;
+    /**
+     * Small label on the featured card, e.g. "Featured guide".
+     */
+    label?: string | null;
+    /**
+     * e.g. "Read the guide"
+     */
+    buttonLabel: string;
+  };
+  list: {
+    /**
+     * e.g. "From the journal."
+     */
+    heading: string;
+    /**
+     * Label above the search box.
+     */
+    searchLabel?: string | null;
+    /**
+     * Grey text inside the search box.
+     */
+    searchPlaceholder?: string | null;
+    /**
+     * Shown when a search finds nothing.
+     */
+    emptyText: string;
+    /**
+     * Link text on each card, e.g. "Read article".
+     */
+    readLabel: string;
+  };
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'journalList';
 }
 /**
  * The blog ("Journal"). Save as draft while writing; publish now, or schedule a date with the arrow next to Publish.
@@ -246,70 +1020,6 @@ export interface Post {
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
-}
-/**
- * Every image and video on the site. Upload large originals; the site makes smaller copies automatically.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  /**
-   * Describe what the image shows, for blind visitors and for Google. e.g. "Fine-line rose tattoo on a forearm".
-   */
-  alt: string;
-  /**
-   * Optional. Shown under the image where the design has room for it.
-   */
-  caption?: string | null;
-  prefix?: string | null;
-  _objectKey?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    card?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    hero?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    og?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
 }
 /**
  * The studio’s artists: portrait and bio. The homepage and About page show the artist chosen there; journal posts can name one as author.
@@ -383,25 +1093,87 @@ export interface Category {
   createdAt: string;
 }
 /**
- * Categories for portfolio pieces, e.g. Graphic or Botanical. They become the portfolio filter buttons. Drag rows to reorder.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "styles".
+ * via the `definition` "WorkShowcaseBlock".
  */
-export interface Style {
-  id: number;
-  _order?: string | null;
+export interface WorkShowcaseBlock {
   /**
-   * e.g. Botanical
+   * Small orange label above the heading. A few words.
    */
-  name: string;
+  tag?: string | null;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
    */
-  generateSlug?: boolean | null;
-  slug: string;
-  updatedAt: string;
-  createdAt: string;
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Next to the heading. Enter for a line break.
+   */
+  intro?: string | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Tiny line above the photos and under the films, e.g. "Original work by Tisi".
+   */
+  creditLine?: string | null;
+  /**
+   * Small label above the photos, e.g. "Photos · scroll at your own pace".
+   */
+  trackLabel?: string | null;
+  /**
+   * The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.
+   */
+  pieces?: (number | PortfolioItem)[] | null;
+  /**
+   * Every few seconds one photo turns to its original colours. Stops as soon as a visitor scrolls the gallery.
+   */
+  colourCycle?: boolean | null;
+  /**
+   * A second gallery under the photos.
+   */
+  films?: {
+    /**
+     * Small label above the films.
+     */
+    trackLabel?: string | null;
+    /**
+     * Top of each card, e.g. "Tisi / film".
+     */
+    itemLabel?: string | null;
+    /**
+     * Link at the bottom of each card.
+     */
+    watchLabel?: string | null;
+    /**
+     * Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to leave the films out.
+     */
+    pieces?: (number | PortfolioItem)[] | null;
+  };
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'workShowcase';
 }
 /**
  * Finished tattoos. Each piece gets its own page. Drag rows to reorder. The homepage shows the pieces chosen in Pages → Homepage → Portfolio.
@@ -479,42 +1251,375 @@ export interface PortfolioItem {
   createdAt: string;
 }
 /**
- * Questions and answers. Google can show these directly in search results. Drag rows to reorder.
+ * Categories for portfolio pieces, e.g. Graphic or Botanical. They become the portfolio filter buttons. Drag rows to reorder.
  *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "faqs".
+ * via the `definition` "styles".
  */
-export interface Faq {
+export interface Style {
   id: number;
   _order?: string | null;
   /**
-   * Phrase it the way a client would ask it.
+   * e.g. Botanical
    */
-  question: string;
+  name: string;
   /**
-   * Two to four sentences. Answer the question in the first one.
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
-  answer: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  /**
-   * The pages this question appears on. Aim for 4–8 per page.
-   */
-  pages?: ('home' | 'contact' | 'visiting')[] | null;
+  generateSlug?: boolean | null;
+  slug: string;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PortfolioGridBlock".
+ */
+export interface PortfolioGridBlock {
+  intro?: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading?: {
+      text?: string | null;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * You can link to other pages, e.g. the contact page.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  /**
+   * Optional. Leave empty to show every piece, with the filter.
+   */
+  style?: (number | null) | Style;
+  /**
+   * The first filter button, e.g. "All work".
+   */
+  allLabel: string;
+  /**
+   * After the number of pieces, e.g. "Projects".
+   */
+  countLabel?: string | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'portfolioGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "GalleryBlock".
+ */
+export interface GalleryBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading?: {
+    text?: string | null;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Next to the heading. Optional.
+   */
+  intro?: string | null;
+  /**
+   * Drag to reorder. Each photo’s alt text is used as its caption.
+   */
+  images: (number | Media)[];
+  columns?: ('2' | '3') | null;
+  showCaptions?: boolean | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'gallery';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ArtistBlock".
+ */
+export interface ArtistBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Their portrait and bio come from Studio → Artists.
+   */
+  artist: number | Artist;
+  style?: ('large' | 'standard') | null;
+  imageSide?: ('left' | 'right') | null;
+  /**
+   * Optional. Replaces the artist’s portrait here.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Small note on the image, e.g. "Original work by Tisi". Optional.
+   */
+  imageNote?: string | null;
+  /**
+   * Leave empty to show the artist’s bio. Leave an empty line between paragraphs.
+   */
+  text?: string | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Small note under the button, with a line beside it. Optional.
+   */
+  note?: string | null;
+  /**
+   * Small text next to an asterisk at the end. Optional.
+   */
+  signoff?: string | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'artist';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PieceSuggestionsBlock".
+ */
+export interface PieceSuggestionsBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Link text on each card, e.g. "View this piece".
+   */
+  cardLink?: string | null;
+  /**
+   * Optional. On a piece’s own page, leave empty to suggest three others automatically.
+   */
+  pieces?: (number | PortfolioItem)[] | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pieceSuggestions';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "EnquiryBlock".
+ */
+export interface EnquiryBlock {
+  /**
+   * Small orange label above the heading. A few words.
+   */
+  tag?: string | null;
+  /**
+   * White, then grey, then orange. If this is the first section of the page, it is the page title.
+   */
+  heading: {
+    text: string;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Leave an empty line between paragraphs.
+   */
+  intro?: string | null;
+  /**
+   * The details come from Settings → Studio details. The form’s button and notes are in Studio details → Enquiry form.
+   */
+  side?: ('text' | 'details') | null;
+  /**
+   * Under the studio name and city, e.g. "Tattoo artist: Tisi · 18 years of experience."
+   */
+  detailText?: string | null;
+  contactLink?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Label above the address, e.g. "The studio".
+   */
+  studioLabel?: string | null;
+  /**
+   * Label above phone and email, e.g. "Direct contact".
+   */
+  directLabel?: string | null;
+  /**
+   * A boxed note under the details. Optional.
+   */
+  notice?: string | null;
+  settings?: {
+    background?: ('plain' | 'line' | 'lines' | 'band' | 'grid') | null;
+    /**
+     * For links to this section: "plan" makes /this-page#plan.
+     */
+    anchor?: string | null;
+    /**
+     * Listed in the jump bar under the page top, e.g. "Plan your visit". Needs a section ID.
+     */
+    jumpLabel?: string | null;
+  };
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'enquiry';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PageCtaBlock".
+ */
+export interface PageCtaBlock {
+  /**
+   * The shared one is edited once and appears on every page that uses it.
+   */
+  source?: ('shared' | 'own') | null;
+  style?: ('centred' | 'band') | null;
+  /**
+   * Small orange label above the heading.
+   */
+  tag?: string | null;
+  heading?: {
+    text?: string | null;
+    soft?: string | null;
+    accent?: string | null;
+  };
+  /**
+   * Optional.
+   */
+  text?: string | null;
+  button?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  /**
+   * Up to two buttons.
+   */
+  links?:
+    | {
+        label: string;
+        href: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Small print under the button. Optional.
+   */
+  note?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pageCta';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DividerBlock".
+ */
+export interface DividerBlock {
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'divider';
 }
 /**
  * Every enquiry from the website, newest first. Filter by status, travel or ad campaign.
@@ -604,38 +1709,6 @@ export interface LeadAttachment {
   };
 }
 /**
- * Privacy and cookie policies. Paste the text from your lawyer; the "last updated" date is set automatically.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal-pages".
- */
-export interface LegalPage {
-  id: number;
-  title: string;
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  updatedAt: string;
-  createdAt: string;
-}
-/**
  * People who can log in to this CMS. Admins manage users and settings; editors manage content.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -669,6 +1742,80 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Every page of the site, built from sections. Portfolio pieces and journal articles use their own templates (below).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  /**
+   * The page’s name in the CMS and in Google, unless the SEO tab sets one.
+   */
+  title: string;
+  /**
+   * The page from top to bottom. Add sections with the button below, drag to reorder, and use ⋯ to duplicate or remove one.
+   */
+  layout?:
+    | (
+        | HomeHeroBlock
+        | PageHeroBlock
+        | TextStripBlock
+        | TextBlock
+        | ImageTextBlock
+        | CardsBlock
+        | StepsBlock
+        | FaqBlock
+        | LatestPostsBlock
+        | JournalListBlock
+        | WorkShowcaseBlock
+        | PortfolioGridBlock
+        | GalleryBlock
+        | ArtistBlock
+        | PieceSuggestionsBlock
+        | EnquiryBlock
+        | PageCtaBlock
+        | DividerBlock
+      )[]
+    | null;
+  /**
+   * Adds a number to each section’s small label, in page order.
+   */
+  numberSections?: boolean | null;
+  /**
+   * Optional. An orange bar pinned to the bottom of the screen on phones, e.g. "Your next tattoo" to #tattoo-enquiry.
+   */
+  mobileCta?: {
+    /**
+     * The text on the button. Keep it short.
+     */
+    label?: string | null;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  /**
+   * The page’s address: "aftercare" makes /aftercare. The homepage is "home". Home, Portfolio and Journal keep theirs.
+   */
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
  * Keys that let an AI assistant (ChatGPT, Claude) read and edit content through MCP. A key acts as the user who created it; tick only what it needs. Delete a key to revoke it.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -688,6 +1835,20 @@ export interface PayloadMcpApiKey {
    * The purpose of the API key.
    */
   description?: string | null;
+  pages?: {
+    /**
+     * Allow clients to find pages.
+     */
+    find?: boolean | null;
+    /**
+     * Allow clients to create pages.
+     */
+    create?: boolean | null;
+    /**
+     * Allow clients to update pages.
+     */
+    update?: boolean | null;
+  };
   portfolioItems?: {
     /**
      * Allow clients to find portfolio-items.
@@ -772,20 +1933,6 @@ export interface PayloadMcpApiKey {
      */
     update?: boolean | null;
   };
-  legalPages?: {
-    /**
-     * Allow clients to find legal-pages.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to create legal-pages.
-     */
-    create?: boolean | null;
-    /**
-     * Allow clients to update legal-pages.
-     */
-    update?: boolean | null;
-  };
   media?: {
     /**
      * Allow clients to find media.
@@ -796,63 +1943,23 @@ export interface PayloadMcpApiKey {
      */
     update?: boolean | null;
   };
-  homepage?: {
+  pieceTemplate?: {
     /**
-     * Allow clients to find homepage global.
+     * Allow clients to find piece-template global.
      */
     find?: boolean | null;
     /**
-     * Allow clients to update homepage global.
+     * Allow clients to update piece-template global.
      */
     update?: boolean | null;
   };
-  aboutPage?: {
+  articleTemplate?: {
     /**
-     * Allow clients to find about-page global.
+     * Allow clients to find article-template global.
      */
     find?: boolean | null;
     /**
-     * Allow clients to update about-page global.
-     */
-    update?: boolean | null;
-  };
-  portfolioPage?: {
-    /**
-     * Allow clients to find portfolio-page global.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to update portfolio-page global.
-     */
-    update?: boolean | null;
-  };
-  visitingPage?: {
-    /**
-     * Allow clients to find visiting-page global.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to update visiting-page global.
-     */
-    update?: boolean | null;
-  };
-  journalPage?: {
-    /**
-     * Allow clients to find journal-page global.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to update journal-page global.
-     */
-    update?: boolean | null;
-  };
-  contactPage?: {
-    /**
-     * Allow clients to find contact-page global.
-     */
-    find?: boolean | null;
-    /**
-     * Allow clients to update contact-page global.
+     * Allow clients to update article-template global.
      */
     update?: boolean | null;
   };
@@ -1037,12 +2144,12 @@ export interface PayloadLockedDocument {
         value: number | LeadAttachment;
       } | null)
     | ({
-        relationTo: 'legal-pages';
-        value: number | LegalPage;
-      } | null)
-    | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'payload-mcp-api-keys';
@@ -1281,7 +2388,6 @@ export interface FaqsSelect<T extends boolean = true> {
   _order?: T;
   question?: T;
   answer?: T;
-  pages?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1361,18 +2467,6 @@ export interface LeadAttachmentsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "legal-pages_select".
- */
-export interface LegalPagesSelect<T extends boolean = true> {
-  title?: T;
-  generateSlug?: T;
-  slug?: T;
-  content?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
@@ -1398,12 +2492,46 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  layout?: T | {};
+  numberSections?: T;
+  mobileCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-mcp-api-keys_select".
  */
 export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
   user?: T;
   label?: T;
   description?: T;
+  pages?:
+    | T
+    | {
+        find?: T;
+        create?: T;
+        update?: T;
+      };
   portfolioItems?:
     | T
     | {
@@ -1446,50 +2574,19 @@ export interface PayloadMcpApiKeysSelect<T extends boolean = true> {
         create?: T;
         update?: T;
       };
-  legalPages?:
-    | T
-    | {
-        find?: T;
-        create?: T;
-        update?: T;
-      };
   media?:
     | T
     | {
         find?: T;
         update?: T;
       };
-  homepage?:
+  pieceTemplate?:
     | T
     | {
         find?: T;
         update?: T;
       };
-  aboutPage?:
-    | T
-    | {
-        find?: T;
-        update?: T;
-      };
-  portfolioPage?:
-    | T
-    | {
-        find?: T;
-        update?: T;
-      };
-  visitingPage?:
-    | T
-    | {
-        find?: T;
-        update?: T;
-      };
-  journalPage?:
-    | T
-    | {
-        find?: T;
-        update?: T;
-      };
-  contactPage?:
+  articleTemplate?:
     | T
     | {
         find?: T;
@@ -1586,1366 +2683,6 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * All homepage text, section by section. Changes autosave as a draft; press Publish to put them live.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage".
- */
-export interface Homepage {
-  id: number;
-  hero: {
-    /**
-     * Small label next to the orange dot, e.g. the studio name and country.
-     */
-    label: string;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * The first paragraph under the title.
-     */
-    intro: string;
-    /**
-     * A shorter, quieter line under the intro. Optional.
-     */
-    supporting?: string | null;
-    primaryCta: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label: string;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href: string;
-    };
-    secondaryLink?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    /**
-     * e.g. 18
-     */
-    factValue?: string | null;
-    /**
-     * e.g. "Years of tattoo experience".
-     */
-    factLabel?: string | null;
-    /**
-     * Short; Enter for a line break.
-     */
-    secondFact?: string | null;
-    /**
-     * Portrait format (3:4) works best.
-     */
-    primaryImage: number | Media;
-    /**
-     * Small caption on the large image. Optional.
-     */
-    primaryCaption?: string | null;
-    /**
-     * Overlaps the large one. Portrait or square.
-     */
-    secondaryImage: number | Media;
-    /**
-     * Small caption on the small image. Optional.
-     */
-    secondaryCaption?: string | null;
-    imagesLink?: string | null;
-    /**
-     * Tiny text under the images, e.g. "Art. Identity. Expression."
-     */
-    artNote?: string | null;
-  };
-  /**
-   * Short phrases in the band under the hero, separated by asterisks.
-   */
-  strip?:
-    | {
-        text: string;
-        id?: string | null;
-      }[]
-    | null;
-  work: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    button?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    /**
-     * Tiny line above the photos and under the films, e.g. "Original work by Tisi".
-     */
-    creditLine?: string | null;
-    /**
-     * Small label above the photos, e.g. "Photos · scroll at your own pace".
-     */
-    trackLabel?: string | null;
-    /**
-     * The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.
-     */
-    pieces?: (number | PortfolioItem)[] | null;
-  };
-  /**
-   * A second gallery under the photos.
-   */
-  films?: {
-    /**
-     * Small label above the films.
-     */
-    trackLabel?: string | null;
-    /**
-     * Top of each card, e.g. "Tisi / film".
-     */
-    itemLabel?: string | null;
-    /**
-     * Link at the bottom of each card.
-     */
-    watchLabel?: string | null;
-    /**
-     * Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to hide the films.
-     */
-    pieces?: (number | PortfolioItem)[] | null;
-  };
-  meetArtist: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * The artist whose portrait is shown.
-     */
-    artist: number | Artist;
-    /**
-     * Optional. Replaces the artist portrait here.
-     */
-    image?: (number | null) | Media;
-    /**
-     * Small note on the image, e.g. "Original work by Tisi". Optional.
-     */
-    imageNote?: string | null;
-    /**
-     * A short introduction. Leave an empty line between paragraphs.
-     */
-    text?: string | null;
-    button?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    /**
-     * Small text next to the asterisk. Optional.
-     */
-    signoff?: string | null;
-  };
-  visit: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    text?: string | null;
-    button?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    steps?:
-      | {
-          title: string;
-          text: string;
-          id?: string | null;
-        }[]
-      | null;
-    link?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-  };
-  plan: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    cards?:
-      | {
-          label?: string | null;
-          icon: 'sketch' | 'machine' | 'ink';
-          title: string;
-          text: string;
-          id?: string | null;
-        }[]
-      | null;
-    priceNote?: {
-      /**
-       * Bold start of the note, e.g. a question.
-       */
-      title?: string | null;
-      text?: string | null;
-      link?: {
-        /**
-         * The text on the button. Keep it short.
-         */
-        label?: string | null;
-        /**
-         * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-         */
-        href?: string | null;
-      };
-    };
-  };
-  /**
-   * The form itself (button, notes) is edited in Pages → Contact.
-   */
-  enquiry: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    intro?: string | null;
-    /**
-     * Under the studio name and city, e.g. "Tattoo artist: Tisi · 18 years of experience."
-     */
-    detailText?: string | null;
-    contactLink?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-  };
-  /**
-   * Shows the FAQs set to appear on the homepage (Studio → FAQs).
-   */
-  faq: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-  };
-  journal: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    link?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-  };
-  finalCta: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    button: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label: string;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href: string;
-    };
-  };
-  /**
-   * The orange bar pinned to the bottom of the screen on phones.
-   */
-  mobileCta: {
-    /**
-     * The text on the button. Keep it short.
-     */
-    label: string;
-    /**
-     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-     */
-    href: string;
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The About page: the artist, the work and the studio.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-page".
- */
-export interface AboutPage {
-  id: number;
-  hero: {
-    /**
-     * Small label in a box above the title.
-     */
-    tag?: string | null;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Under the title. Enter for a line break.
-     */
-    intro?: string | null;
-    /**
-     * Link down to the artist, e.g. "Get to know Tisi".
-     */
-    scrollLabel?: string | null;
-    /**
-     * Tiny line at the bottom, e.g. "01 / About us".
-     */
-    indexLabel?: string | null;
-    /**
-     * Optional. Shown in colour, darkened, behind the heading.
-     */
-    background?: (number | null) | Media;
-  };
-  /**
-   * The text comes from the artist’s bio.
-   */
-  meetArtist: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Their portrait and bio (Studio → Artists) are shown here.
-     */
-    artist: number | Artist;
-    /**
-     * Optional. Replaces the artist portrait on this page.
-     */
-    image?: (number | null) | Media;
-    button?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    /**
-     * Small note under the button. Optional.
-     */
-    note?: string | null;
-  };
-  focus: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    items?:
-      | {
-          /**
-           * Small label after the number, e.g. "Your idea".
-           */
-          label?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text: string;
-          link?: {
-            /**
-             * The text on the button. Keep it short.
-             */
-            label?: string | null;
-            /**
-             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-             */
-            href?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-  };
-  values: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Three cards, each with its own small graphic.
-     */
-    cards?:
-      | {
-          /**
-           * Small label after the number, e.g. "Your idea".
-           */
-          label?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  studio: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    text?: string | null;
-    link?: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label?: string | null;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href?: string | null;
-    };
-    /**
-     * Small note at the end. Optional.
-     */
-    note?: string | null;
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The portfolio page, plus the text shared by every piece’s own page. The pieces themselves are in Studio → Portfolio.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "portfolio-page".
- */
-export interface PortfolioPage {
-  id: number;
-  hero: {
-    /**
-     * Small label in a box above the title.
-     */
-    tag?: string | null;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Under the title. Enter for a line break.
-     */
-    intro?: string | null;
-    /**
-     * Tiny line at the bottom, e.g. "01 / About us".
-     */
-    indexLabel?: string | null;
-    /**
-     * Optional. Shown in colour, darkened, behind the heading.
-     */
-    background?: (number | null) | Media;
-  };
-  intro: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * You can link to other pages, e.g. the contact page.
-     */
-    text?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-  };
-  filter: {
-    /**
-     * The first filter button, e.g. "All work".
-     */
-    allLabel: string;
-    /**
-     * After the number of pieces, e.g. "pieces".
-     */
-    countLabel?: string | null;
-  };
-  detail: {
-    /**
-     * Small label above the title, e.g. "Tisi / London InkTattoo".
-     */
-    label?: string | null;
-    /**
-     * Under each photo; it opens the photo in colour.
-     */
-    photoLabel?: string | null;
-    /**
-     * Under the video, after the piece’s title.
-     */
-    videoCaption?: string | null;
-    /**
-     * Heading next to the photos, e.g. "Look closer." A piece can replace it.
-     */
-    storyHeading?: string | null;
-    /**
-     * After the piece’s summary. Optional.
-     */
-    storyNote?: string | null;
-    direction?: {
-      title?: string | null;
-      /**
-       * Leave an empty line between paragraphs.
-       */
-      text?: string | null;
-    };
-    /**
-     * The orange button to the enquiry form.
-     */
-    ctaLabel: string;
-    travel: {
-      /**
-       * Small orange label above the heading. A few words.
-       */
-      tag?: string | null;
-      /**
-       * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-       */
-      heading: {
-        text: string;
-        soft?: string | null;
-        accent?: string | null;
-      };
-      /**
-       * Leave an empty line between paragraphs.
-       */
-      text?: string | null;
-      /**
-       * Up to two buttons.
-       */
-      links?:
-        | {
-            label: string;
-            href: string;
-            id?: string | null;
-          }[]
-        | null;
-    };
-    suggestions: {
-      /**
-       * Small orange label above the heading. A few words.
-       */
-      tag?: string | null;
-      /**
-       * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-       */
-      heading: {
-        text: string;
-        soft?: string | null;
-        accent?: string | null;
-      };
-      button?: {
-        /**
-         * The text on the button. Keep it short.
-         */
-        label?: string | null;
-        /**
-         * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-         */
-        href?: string | null;
-      };
-      /**
-       * Link text on each card, e.g. "View this piece".
-       */
-      cardLink?: string | null;
-    };
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The travel guide for visitors coming to Albania for a tattoo.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "visiting-page".
- */
-export interface VisitingPage {
-  id: number;
-  hero: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    intro?: string | null;
-    button: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label: string;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href: string;
-    };
-    /**
-     * Small print under the button. Optional.
-     */
-    note?: string | null;
-    route?: {
-      /**
-       * Small label at the top of the box.
-       */
-      title?: string | null;
-      stops?:
-        | {
-            /**
-             * e.g. "Arrive"
-             */
-            label?: string | null;
-            title: string;
-            text?: string | null;
-            id?: string | null;
-          }[]
-        | null;
-      /**
-       * Small label at the bottom of the box.
-       */
-      footnote?: string | null;
-    };
-    /**
-     * Optional. Shown in colour, darkened, behind the heading.
-     */
-    background?: (number | null) | Media;
-  };
-  plan: {
-    /**
-     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
-     */
-    navLabel?: string | null;
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    cards?:
-      | {
-          /**
-           * Small label after the number, e.g. "Your idea".
-           */
-          label?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text: string;
-          link?: {
-            /**
-             * The text on the button. Keep it short.
-             */
-            label?: string | null;
-            /**
-             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-             */
-            href?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-  };
-  stay: {
-    /**
-     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
-     */
-    navLabel?: string | null;
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    cards?:
-      | {
-          symbol: 'home' | 'arrow';
-          /**
-           * Small orange label.
-           */
-          tag?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text?: string | null;
-          /**
-           * One item per line.
-           */
-          bullets?: string | null;
-          button?: {
-            /**
-             * The text on the button. Keep it short.
-             */
-            label?: string | null;
-            /**
-             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-             */
-            href?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * The boxed note under the cards. Optional.
-     */
-    notice?: string | null;
-    arrival?: {
-      title?: string | null;
-      text?: {
-        root: {
-          type: string;
-          children: {
-            type: any;
-            version: number;
-            [k: string]: unknown;
-          }[];
-          direction: ('ltr' | 'rtl') | null;
-          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-          indent: number;
-          version: number;
-        };
-        [k: string]: unknown;
-      } | null;
-    };
-  };
-  explore: {
-    /**
-     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
-     */
-    navLabel?: string | null;
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Next to the heading. Enter for a line break.
-     */
-    intro?: string | null;
-    destinations?:
-      | {
-          motif: 'columns' | 'windows' | 'waves';
-          /**
-           * Small orange label.
-           */
-          tag?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text?: string | null;
-          link?: {
-            /**
-             * The text on the button. Keep it short.
-             */
-            label?: string | null;
-            /**
-             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-             */
-            href?: string | null;
-          };
-          id?: string | null;
-        }[]
-      | null;
-    /**
-     * Small print under the places. Optional.
-     */
-    note?: string | null;
-    slow?: {
-      /**
-       * Small orange label above the heading. A few words.
-       */
-      tag?: string | null;
-      title?: string | null;
-      /**
-       * Leave an empty line between paragraphs.
-       */
-      text?: string | null;
-    };
-  };
-  itinerary: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    text?: string | null;
-    items?:
-      | {
-          /**
-           * e.g. "Before you travel"
-           */
-          label?: string | null;
-          title: string;
-          text?: string | null;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * Shows the FAQs set to appear on Visiting Albania (Studio → FAQs).
-   */
-  questions: {
-    /**
-     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
-     */
-    navLabel?: string | null;
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-  };
-  endCta: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    text?: string | null;
-    button: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label: string;
-      /**
-       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
-       */
-      href: string;
-    };
-    /**
-     * Small print under the button. Optional.
-     */
-    note?: string | null;
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The journal page and the labels on every article. The articles are in Content → Journal posts.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-page".
- */
-export interface JournalPage {
-  id: number;
-  hero: {
-    /**
-     * Small label in a box above the title.
-     */
-    tag?: string | null;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Under the title. Enter for a line break.
-     */
-    intro?: string | null;
-    /**
-     * Tiny line at the bottom, e.g. "01 / About us".
-     */
-    indexLabel?: string | null;
-    /**
-     * Optional. Shown in colour, darkened, behind the heading.
-     */
-    background?: (number | null) | Media;
-  };
-  featured: {
-    /**
-     * Small label above the featured article.
-     */
-    tag?: string | null;
-    /**
-     * Leave empty to feature the latest article.
-     */
-    post?: (number | null) | Post;
-    /**
-     * Small label on the featured card, e.g. "Featured guide".
-     */
-    label?: string | null;
-    /**
-     * e.g. "Read the guide"
-     */
-    buttonLabel: string;
-  };
-  list: {
-    /**
-     * e.g. "From the journal."
-     */
-    heading: string;
-    /**
-     * Label above the search box.
-     */
-    searchLabel?: string | null;
-    /**
-     * Grey text inside the search box.
-     */
-    searchPlaceholder?: string | null;
-    /**
-     * Shown when a search finds nothing.
-     */
-    emptyText: string;
-    /**
-     * Link text on each card, e.g. "Read article".
-     */
-    readLabel: string;
-  };
-  article: {
-    /**
-     * Above the list of sections, e.g. "In this guide".
-     */
-    tocLabel?: string | null;
-    /**
-     * Small link at the top, e.g. "All articles".
-     */
-    backLabel: string;
-    /**
-     * Button at the end, e.g. "Back to the journal".
-     */
-    backButtonLabel?: string | null;
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * The contact page and the enquiry form (the form also appears on the homepage). Address, phone and hours are in Settings → Studio details.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-page".
- */
-export interface ContactPage {
-  id: number;
-  hero: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * The page title (H1). White, then grey, then orange.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    /**
-     * Leave an empty line between paragraphs.
-     */
-    intro?: string | null;
-    /**
-     * Label above the address, e.g. "The studio".
-     */
-    studioLabel?: string | null;
-    /**
-     * Label above phone and email, e.g. "Direct contact".
-     */
-    directLabel?: string | null;
-    /**
-     * The boxed note under the details. Optional.
-     */
-    notice?: string | null;
-  };
-  /**
-   * Used on this page and on the homepage. Field labels are part of the design.
-   */
-  form: {
-    /**
-     * The button, e.g. "Send your tattoo idea".
-     */
-    submitLabel: string;
-    /**
-     * Small text under the button. Optional.
-     */
-    helperText?: string | null;
-    /**
-     * Short note with a link to the privacy policy.
-     */
-    privacyNote?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    /**
-     * Shown when someone presses the button while sending is not connected yet.
-     */
-    pendingNotice: string;
-    /**
-     * Shown after a successful enquiry (once sending is connected).
-     */
-    successHeading?: string | null;
-    /**
-     * Under the success heading.
-     */
-    successMessage?: string | null;
-  };
-  next: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-    cards?:
-      | {
-          /**
-           * Small label after the number, e.g. "Your idea".
-           */
-          label?: string | null;
-          title: string;
-          /**
-           * Leave an empty line between paragraphs.
-           */
-          text: string;
-          id?: string | null;
-        }[]
-      | null;
-  };
-  /**
-   * Shows the FAQs set to appear on Contact (Studio → FAQs).
-   */
-  faq: {
-    /**
-     * Small orange label above the heading. A few words.
-     */
-    tag?: string | null;
-    /**
-     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
-     */
-    heading: {
-      text: string;
-      soft?: string | null;
-      accent?: string | null;
-    };
-  };
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  _status?: ('draft' | 'published') | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
  * Name, address, opening hours and contact details. These must match your Google Business Profile exactly.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -3012,7 +2749,7 @@ export interface SiteSetting {
       }[]
     | null;
   /**
-   * The last section of About, Portfolio, the journal and every article.
+   * Used by every "Call to action" section set to "The shared one", and under every journal article.
    */
   endCta: {
     /**
@@ -3068,6 +2805,49 @@ export interface SiteSetting {
        */
       href: string;
     };
+  };
+  /**
+   * Used by every "Enquiry form" section. The field labels are part of the design.
+   */
+  enquiryForm: {
+    /**
+     * The button, e.g. "Send your tattoo idea".
+     */
+    submitLabel: string;
+    /**
+     * Small text under the button. Optional.
+     */
+    helperText?: string | null;
+    /**
+     * Short note with a link to the privacy policy.
+     */
+    privacyNote?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    /**
+     * Shown when someone presses the button while sending is not connected yet.
+     */
+    pendingNotice: string;
+    /**
+     * Shown after a successful enquiry (once sending is connected).
+     */
+    successHeading?: string | null;
+    /**
+     * Under the success heading.
+     */
+    successMessage?: string | null;
   };
   seo: {
     /**
@@ -3153,821 +2933,99 @@ export interface Navigation {
   createdAt?: string | null;
 }
 /**
+ * Shared by every portfolio piece’s own page. The pieces themselves are in Studio → Portfolio.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "homepage_select".
+ * via the `definition` "piece-template".
  */
-export interface HomepageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        label?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        supporting?: T;
-        primaryCta?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        secondaryLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        factValue?: T;
-        factLabel?: T;
-        secondFact?: T;
-        primaryImage?: T;
-        primaryCaption?: T;
-        secondaryImage?: T;
-        secondaryCaption?: T;
-        imagesLink?: T;
-        artNote?: T;
-      };
-  strip?:
-    | T
-    | {
-        text?: T;
-        id?: T;
-      };
-  work?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        creditLine?: T;
-        trackLabel?: T;
-        pieces?: T;
-      };
-  films?:
-    | T
-    | {
-        trackLabel?: T;
-        itemLabel?: T;
-        watchLabel?: T;
-        pieces?: T;
-      };
-  meetArtist?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        artist?: T;
-        image?: T;
-        imageNote?: T;
-        text?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        signoff?: T;
-      };
-  visit?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        text?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        steps?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-              id?: T;
-            };
-        link?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-      };
-  plan?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        cards?:
-          | T
-          | {
-              label?: T;
-              icon?: T;
-              title?: T;
-              text?: T;
-              id?: T;
-            };
-        priceNote?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-              link?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-            };
-      };
-  enquiry?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        detailText?: T;
-        contactLink?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-      };
-  faq?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-      };
-  journal?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        link?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-      };
-  finalCta?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-      };
-  mobileCta?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
+export interface PieceTemplate {
+  id: number;
+  /**
+   * Small label above the title, e.g. "Tisi / London InkTattoo".
+   */
+  label?: string | null;
+  /**
+   * Under each photo; it opens the photo in colour.
+   */
+  photoLabel?: string | null;
+  /**
+   * Under the video, after the piece’s title.
+   */
+  videoCaption?: string | null;
+  /**
+   * Heading next to the photos, e.g. "Look closer." A piece can replace it.
+   */
+  storyHeading?: string | null;
+  /**
+   * After the piece’s summary. Optional.
+   */
+  storyNote?: string | null;
+  direction?: {
+    title?: string | null;
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+  };
+  /**
+   * The orange button to the enquiry form.
+   */
+  ctaLabel: string;
+  /**
+   * Shown under every piece, top to bottom. "More portfolio pieces" suggests three other pieces by itself.
+   */
+  after?:
+    | (
+        | PageCtaBlock
+        | PieceSuggestionsBlock
+        | LatestPostsBlock
+        | TextBlock
+        | ImageTextBlock
+        | CardsBlock
+        | GalleryBlock
+        | DividerBlock
+      )[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
+ * Shared by every journal article’s own page. The articles themselves are in Content → Journal posts.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "about-page_select".
+ * via the `definition` "article-template".
  */
-export interface AboutPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        scrollLabel?: T;
-        indexLabel?: T;
-        background?: T;
-      };
-  meetArtist?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        artist?: T;
-        image?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        note?: T;
-      };
-  focus?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        items?:
-          | T
-          | {
-              label?: T;
-              title?: T;
-              text?: T;
-              link?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-              id?: T;
-            };
-      };
-  values?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        cards?:
-          | T
-          | {
-              label?: T;
-              title?: T;
-              text?: T;
-              id?: T;
-            };
-      };
-  studio?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        text?: T;
-        link?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        note?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "portfolio-page_select".
- */
-export interface PortfolioPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        indexLabel?: T;
-        background?: T;
-      };
-  intro?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        text?: T;
-      };
-  filter?:
-    | T
-    | {
-        allLabel?: T;
-        countLabel?: T;
-      };
-  detail?:
-    | T
-    | {
-        label?: T;
-        photoLabel?: T;
-        videoCaption?: T;
-        storyHeading?: T;
-        storyNote?: T;
-        direction?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-            };
-        ctaLabel?: T;
-        travel?:
-          | T
-          | {
-              tag?: T;
-              heading?:
-                | T
-                | {
-                    text?: T;
-                    soft?: T;
-                    accent?: T;
-                  };
-              text?: T;
-              links?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                    id?: T;
-                  };
-            };
-        suggestions?:
-          | T
-          | {
-              tag?: T;
-              heading?:
-                | T
-                | {
-                    text?: T;
-                    soft?: T;
-                    accent?: T;
-                  };
-              button?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-              cardLink?: T;
-            };
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "visiting-page_select".
- */
-export interface VisitingPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        note?: T;
-        route?:
-          | T
-          | {
-              title?: T;
-              stops?:
-                | T
-                | {
-                    label?: T;
-                    title?: T;
-                    text?: T;
-                    id?: T;
-                  };
-              footnote?: T;
-            };
-        background?: T;
-      };
-  plan?:
-    | T
-    | {
-        navLabel?: T;
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        cards?:
-          | T
-          | {
-              label?: T;
-              title?: T;
-              text?: T;
-              link?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-              id?: T;
-            };
-      };
-  stay?:
-    | T
-    | {
-        navLabel?: T;
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        cards?:
-          | T
-          | {
-              symbol?: T;
-              tag?: T;
-              title?: T;
-              text?: T;
-              bullets?: T;
-              button?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-              id?: T;
-            };
-        notice?: T;
-        arrival?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-            };
-      };
-  explore?:
-    | T
-    | {
-        navLabel?: T;
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        destinations?:
-          | T
-          | {
-              motif?: T;
-              tag?: T;
-              title?: T;
-              text?: T;
-              link?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                  };
-              id?: T;
-            };
-        note?: T;
-        slow?:
-          | T
-          | {
-              tag?: T;
-              title?: T;
-              text?: T;
-            };
-      };
-  itinerary?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        text?: T;
-        items?:
-          | T
-          | {
-              label?: T;
-              title?: T;
-              text?: T;
-              id?: T;
-            };
-      };
-  questions?:
-    | T
-    | {
-        navLabel?: T;
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-      };
-  endCta?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        text?: T;
-        button?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        note?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "journal-page_select".
- */
-export interface JournalPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        indexLabel?: T;
-        background?: T;
-      };
-  featured?:
-    | T
-    | {
-        tag?: T;
-        post?: T;
-        label?: T;
-        buttonLabel?: T;
-      };
-  list?:
-    | T
-    | {
-        heading?: T;
-        searchLabel?: T;
-        searchPlaceholder?: T;
-        emptyText?: T;
-        readLabel?: T;
-      };
-  article?:
-    | T
-    | {
-        tocLabel?: T;
-        backLabel?: T;
-        backButtonLabel?: T;
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "contact-page_select".
- */
-export interface ContactPageSelect<T extends boolean = true> {
-  hero?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        intro?: T;
-        studioLabel?: T;
-        directLabel?: T;
-        notice?: T;
-      };
-  form?:
-    | T
-    | {
-        submitLabel?: T;
-        helperText?: T;
-        privacyNote?: T;
-        pendingNotice?: T;
-        successHeading?: T;
-        successMessage?: T;
-      };
-  next?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-        cards?:
-          | T
-          | {
-              label?: T;
-              title?: T;
-              text?: T;
-              id?: T;
-            };
-      };
-  faq?:
-    | T
-    | {
-        tag?: T;
-        heading?:
-          | T
-          | {
-              text?: T;
-              soft?: T;
-              accent?: T;
-            };
-      };
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
-  _status?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
+export interface ArticleTemplate {
+  id: number;
+  /**
+   * Above the list of sections, e.g. "In this guide".
+   */
+  tocLabel?: string | null;
+  /**
+   * Small link at the top, e.g. "All articles".
+   */
+  backLabel: string;
+  /**
+   * Button at the end, e.g. "Back to the journal".
+   */
+  backButtonLabel?: string | null;
+  /**
+   * Shown under every article, top to bottom.
+   */
+  after?:
+    | (
+        | PageCtaBlock
+        | PieceSuggestionsBlock
+        | LatestPostsBlock
+        | TextBlock
+        | ImageTextBlock
+        | CardsBlock
+        | GalleryBlock
+        | DividerBlock
+      )[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -4049,6 +3107,16 @@ export interface SiteSettingsSelect<T extends boolean = true> {
               href?: T;
             };
       };
+  enquiryForm?:
+    | T
+    | {
+        submitLabel?: T;
+        helperText?: T;
+        privacyNote?: T;
+        pendingNotice?: T;
+        successHeading?: T;
+        successMessage?: T;
+      };
   seo?:
     | T
     | {
@@ -4113,6 +3181,41 @@ export interface NavigationSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "piece-template_select".
+ */
+export interface PieceTemplateSelect<T extends boolean = true> {
+  label?: T;
+  photoLabel?: T;
+  videoCaption?: T;
+  storyHeading?: T;
+  storyNote?: T;
+  direction?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+      };
+  ctaLabel?: T;
+  after?: T | {};
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "article-template_select".
+ */
+export interface ArticleTemplateSelect<T extends boolean = true> {
+  tocLabel?: T;
+  backLabel?: T;
+  backButtonLabel?: T;
+  after?: T | {};
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -4129,10 +3232,15 @@ export interface TaskSchedulePublish {
   input: {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
-    doc?: {
-      relationTo: 'posts';
-      value: number | Post;
-    } | null;
+    doc?:
+      | ({
+          relationTo: 'posts';
+          value: number | Post;
+        } | null)
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null);
     global?: string | null;
     user?:
       | ({

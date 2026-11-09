@@ -7,26 +7,23 @@ import sharp from 'sharp'
 import { fileURLToPath } from 'url'
 
 import { hasRole } from './access'
+import { blocks } from './blocks'
 import { Artists } from './collections/Artists'
 import { Categories } from './collections/Categories'
 import { Faqs } from './collections/Faqs'
 import { LeadAttachments } from './collections/LeadAttachments'
 import { Leads } from './collections/Leads'
-import { LegalPages } from './collections/LegalPages'
 import { Media } from './collections/Media'
+import { Pages } from './collections/Pages'
 import { PortfolioItems } from './collections/PortfolioItems'
 import { Posts } from './collections/Posts'
 import { Styles } from './collections/Styles'
 import { Users } from './collections/Users'
 import { basicEditor } from './fields/richText'
-import { AboutPage } from './globals/AboutPage'
-import { ContactPage } from './globals/ContactPage'
-import { Homepage } from './globals/Homepage'
-import { JournalPage } from './globals/JournalPage'
+import { ArticleTemplate } from './globals/ArticleTemplate'
 import { Navigation } from './globals/Navigation'
-import { PortfolioPage } from './globals/PortfolioPage'
+import { PieceTemplate } from './globals/PieceTemplate'
 import { SiteSettings } from './globals/SiteSettings'
-import { VisitingPage } from './globals/VisitingPage'
 import { bearerToken, matchesSecret } from './lib/secrets'
 import { mcp } from './plugins/mcp'
 import { seo } from './plugins/seo'
@@ -62,7 +59,7 @@ export default buildConfig({
       ],
     },
   },
-  // Sidebar order: Content, Studio, Leads, Settings, then Pages (globals).
+  // Sidebar order: Content, Studio, Leads, Settings, then Pages (the page builder and templates).
   collections: [
     Posts,
     Categories,
@@ -73,19 +70,12 @@ export default buildConfig({
     Faqs,
     Leads,
     LeadAttachments,
-    LegalPages,
     Users,
+    Pages,
   ],
-  globals: [
-    Homepage,
-    AboutPage,
-    PortfolioPage,
-    VisitingPage,
-    JournalPage,
-    ContactPage,
-    SiteSettings,
-    Navigation,
-  ],
+  globals: [SiteSettings, Navigation, PieceTemplate, ArticleTemplate],
+  // The page builder's sections (src/blocks), shared by pages and templates.
+  blocks,
   editor: basicEditor,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -95,6 +85,9 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
+    // Page sections are stored as JSON on their page rather than in a table per block type:
+    // nothing queries inside them, and the schema stays small as blocks are added.
+    blocksAsJSON: true,
   }),
   // Without an API key, Payload prints outgoing emails to the console (fine in development).
   email: process.env.RESEND_API_KEY

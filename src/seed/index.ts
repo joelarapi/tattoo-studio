@@ -3,6 +3,7 @@
  *
  * Safe to run again: it only creates what is missing (matched by slug, title, email or file name)
  * and only fills globals that are still empty. It never deletes or overwrites anything.
+ * Pages are built from sections (src/seed/pages.ts); edit them in the CMS afterwards.
  * Documents are created one at a time: orderable lists take their order from creation order.
  */
 import config from '@payload-config'
@@ -14,27 +15,26 @@ import {
   faqs,
   homepageFilms,
   homepagePieces,
-  legalPages,
   portfolio,
   posts,
   STUDIO_NAME,
   styles,
 } from './content'
+import { navigation, siteSettings } from './globals'
+import { type PlaceholderKind, placeholderImage } from './images'
 import {
   aboutPage,
   contactPage,
-  type GlobalRefs,
-  homepage,
+  homePage,
   journalPage,
-  navigation,
+  legalPageSeeds,
+  type PageRefs,
+  type PageSeed,
   portfolioPage,
-  siteSettings,
   visitingPage,
-} from './globals'
-import type { PageGlobalSlug } from '@/lib/routes'
-
-import { type PlaceholderKind, placeholderImage } from './images'
+} from './pages'
 import { photoFile, posterFile, studioFile, videoFile } from './studio-media'
+import { articleTemplate, pieceTemplate } from './templates'
 
 // Hooks skip cache revalidation: there's no Next.js server to tell.
 const context = { disableRevalidate: true }
@@ -249,19 +249,16 @@ async function main() {
     )
   }
 
-  for (const faq of faqs) {
-    await ensure('faqs', { question: { equals: faq.question } }, () =>
+  // Each FAQ lists the pages whose FAQ section shows it (seed data only).
+  const faqIDs: PageRefs['faqs'] = { home: [], contact: [], visiting: [] }
+  for (const { pages, ...faq } of faqs) {
+    const doc = await ensure('faqs', { question: { equals: faq.question } }, () =>
       payload.create({ collection: 'faqs', data: faq, context }),
     )
+    for (const page of pages) faqIDs[page].push(doc.id)
   }
 
-  for (const page of legalPages) {
-    await ensure('legal-pages', bySlug(page.slug), () =>
-      payload.create({ collection: 'legal-pages', data: page, context }),
-    )
-  }
-
-  const refs: GlobalRefs = {
+  const refs: PageRefs = {
     og,
     heroImages: [
       photoOf('grim-reaper-full-back-tattoo'),
@@ -278,13 +275,10 @@ async function main() {
     homepageFilms: homepageFilms.map(pieceID),
     artist: artistID('tisi'),
     featuredPost: lookup(postDocs)('tattoo-consultation'),
+    faqs: faqIDs,
   }
 
   // Globals: fill only while still empty, so edits made in the CMS are never overwritten.
-  const draft = { depth: 0, draft: true } as const
-  const isEmpty = async (slug: PageGlobalSlug) =>
-    !(await payload.findGlobal({ slug, ...draft })).hero?.heading?.text
-
   await fillGlobal(
     'site-settings',
     !(await payload.findGlobal({ slug: 'site-settings', depth: 0 })).studioName,
@@ -295,12 +289,32 @@ async function main() {
     !(await payload.findGlobal({ slug: 'navigation', depth: 0 })).header?.links?.length,
     navigation(),
   )
-  await fillGlobal('homepage', await isEmpty('homepage'), homepage(refs))
-  await fillGlobal('about-page', await isEmpty('about-page'), aboutPage(refs))
-  await fillGlobal('portfolio-page', await isEmpty('portfolio-page'), portfolioPage(refs))
-  await fillGlobal('visiting-page', await isEmpty('visiting-page'), visitingPage(refs))
-  await fillGlobal('journal-page', await isEmpty('journal-page'), journalPage(refs))
-  await fillGlobal('contact-page', await isEmpty('contact-page'), contactPage())
+  await fillGlobal(
+    'piece-template',
+    !(await payload.findGlobal({ slug: 'piece-template', depth: 0 })).ctaLabel,
+    pieceTemplate(),
+  )
+  await fillGlobal(
+    'article-template',
+    !(await payload.findGlobal({ slug: 'article-template', depth: 0 })).backLabel,
+    articleTemplate(),
+  )
+
+  // Pages, in menu order.
+  const pages: PageSeed[] = [
+    homePage(refs),
+    aboutPage(refs),
+    portfolioPage(refs),
+    visitingPage(refs),
+    journalPage(refs),
+    contactPage(refs),
+    ...legalPageSeeds(),
+  ]
+  for (const page of pages) {
+    await ensure('pages', bySlug(page.slug), () =>
+      payload.create({ collection: 'pages', data: page, context }),
+    )
+  }
 
   payload.logger.info(
     `Seed finished: ${counts.created} documents created, ${counts.existing} already existed.`,

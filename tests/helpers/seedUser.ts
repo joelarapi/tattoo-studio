@@ -9,9 +9,9 @@ export const testUser = {
 }
 
 /**
- * Seeds a test user for e2e admin tests.
+ * Seeds a test user for e2e admin tests. Specs that run in parallel pass their own user.
  */
-export async function seedTestUser(): Promise<void> {
+export async function seedTestUser(user = testUser): Promise<void> {
   const payload = await getPayload({ config })
 
   // Delete existing test user if any
@@ -19,7 +19,7 @@ export async function seedTestUser(): Promise<void> {
     collection: 'users',
     where: {
       email: {
-        equals: testUser.email,
+        equals: user.email,
       },
     },
   })
@@ -27,21 +27,21 @@ export async function seedTestUser(): Promise<void> {
   // Create fresh test user
   await payload.create({
     collection: 'users',
-    data: testUser,
+    data: user,
   })
 }
 
 /**
  * Cleans up test user after tests
  */
-export async function cleanupTestUser(): Promise<void> {
+export async function cleanupTestUser(user = testUser): Promise<void> {
   const payload = await getPayload({ config })
 
   await payload.delete({
     collection: 'users',
     where: {
       email: {
-        equals: testUser.email,
+        equals: user.email,
       },
     },
   })

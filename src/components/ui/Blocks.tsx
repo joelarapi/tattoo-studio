@@ -58,6 +58,7 @@ export function SectionHead({
   intro,
   action,
   size = 'lg',
+  as = 'h2',
   className,
 }: {
   tag?: string | null
@@ -66,6 +67,7 @@ export function SectionHead({
   intro?: string | null
   action?: ReactNode
   size?: 'lg' | 'md' | 'sm'
+  as?: 'h1' | 'h2'
   className?: string
 }) {
   const headingClass = { lg: 'text-h2-lg', md: 'text-h2', sm: 'text-h2-sm' }[size]
@@ -79,7 +81,7 @@ export function SectionHead({
     >
       <div>
         <Tag number={number}>{tag}</Tag>
-        <StyledHeading value={heading} className={headingClass} />
+        <StyledHeading as={as} value={heading} className={headingClass} />
       </div>
       {(intro || action) && (
         <div className="mt-6 md:mt-0 md:shrink-0">
@@ -118,59 +120,11 @@ export function HeroPhoto({ media }: { media: Media | number | null | undefined 
   )
 }
 
-/** The top of an inner page: grid background, boxed label, title, intro and a small index line. */
-export function PageHero({
-  hero,
-  short = false,
-  children,
-  className,
-}: {
-  hero: {
-    tag?: string | null
-    heading: HeadingValue
-    intro?: string | null
-    indexLabel?: string | null
-    background?: Media | number | null
-  }
-  /** A lower minimum height on tablet and desktop (Portfolio, Journal). */
-  short?: boolean
-  children?: ReactNode
-  className?: string
-}) {
-  return (
-    <section
-      className={cn(
-        'grid-bg flex min-h-[530px] flex-col items-center justify-center overflow-hidden px-[6%] pt-[65px] pb-[45px] text-center md:pt-[85px] md:pb-[65px]',
-        short ? 'md:min-h-[500px]' : 'md:min-h-[570px]',
-        className,
-      )}
-    >
-      <HeroPhoto media={hero.background} />
-      {hero.tag && (
-        <span className="mb-6 rounded-[5px] border border-line bg-panel-2 px-3 py-2 label-xs text-accent md:px-4 md:py-2.5 md:text-[10px]">
-          {hero.tag}
-        </span>
-      )}
-      <StyledHeading as="h1" value={hero.heading} className="text-display" />
-      {hero.intro && (
-        <p className="mt-[23px] text-[14px] md:text-[17px]">
-          <Lines text={hero.intro} />
-        </p>
-      )}
-      {children}
-      {hero.indexLabel && (
-        <span className="mt-[35px] label-xs tracking-[2px] text-faint md:mt-[45px]">
-          {hero.indexLabel}
-        </span>
-      )}
-    </section>
-  )
-}
-
 /** The closing call to action at the end of a page. */
 export function EndCta({
   cta,
   as = 'h2',
+  className,
 }: {
   cta:
     | {
@@ -182,11 +136,18 @@ export function EndCta({
       }
     | null
     | undefined
-  as?: 'h2' | 'h3'
+  as?: 'h1' | 'h2' | 'h3'
+  className?: string
 }) {
   if (!cta?.heading?.text) return null
   return (
-    <section className="grid-bg overflow-hidden border-t border-[#222] px-[6%] py-[70px] text-center md:py-[100px]">
+    <section
+      data-block="pageCta"
+      className={cn(
+        'grid-bg overflow-hidden border-t border-line px-[6%] py-[70px] text-center md:py-[100px]',
+        className,
+      )}
+    >
       <div data-reveal>
         <Tag className="mb-5">{cta.tag}</Tag>
         <StyledHeading as={as} value={cta.heading} className="text-cta" />
@@ -208,25 +169,34 @@ type Card = {
   id?: string | null
   label?: string | null
   title: string
-  text: string
+  text?: string | null
   link?: CmsLink
 }
 
-/** Three numbered cards ("01 / Your idea"). `visual` adds a graphic above each title. */
+/** Numbered cards ("01 / Your idea"), three to a row. `visual` adds a graphic above each title. */
 export function NumberedCards({
   cards,
   visual,
+  columns = 3,
   className,
   titleClassName,
 }: {
   cards: Card[] | null | undefined
   visual?: (index: number) => ReactNode
+  columns?: 2 | 3
   className?: string
-  titleClassName?: string
+  titleClassName?: string | ((index: number) => string | undefined)
 }) {
   if (!cards?.length) return null
   return (
-    <div data-reveal-group className={cn('grid grid-cols-1 gap-3 md:grid-cols-3', className)}>
+    <div
+      data-reveal-group
+      className={cn(
+        'grid grid-cols-1 gap-3',
+        columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3',
+        className,
+      )}
+    >
       {cards.map((card, index) => (
         <article
           key={card.id ?? index}
@@ -241,7 +211,7 @@ export function NumberedCards({
           <h3
             className={cn(
               'mt-[30px] text-[25px] leading-[1.25] tracking-[-0.7px] md:text-[20px] lg:text-[23px]',
-              titleClassName,
+              typeof titleClassName === 'function' ? titleClassName(index) : titleClassName,
             )}
           >
             <Lines text={card.title} />

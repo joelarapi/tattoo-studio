@@ -4,7 +4,6 @@ import type { CollectionSlug, GlobalSlug, Where } from 'payload'
 
 import { collectionTag, globalTag } from './cache-tags'
 import { getPayloadClient } from './payload'
-import type { FaqPage, PageGlobalSlug } from './routes'
 
 /*
  * CMS reads for the frontend. Published content is cached and tagged with every collection and
@@ -26,13 +25,21 @@ async function isDraft(): Promise<boolean> {
   }
 }
 
+/**
+ * Part of every cache key. Cached results outlive deployments (and Vercel restores `.next/cache`
+ * between builds), so bump this whenever the shape of what's cached changes, e.g. a new schema.
+ */
+const CACHE_VERSION = 'page-builder-1'
+
 function cmsQuery<Args extends unknown[], T>(
   key: string,
   { collections = [], globals = [] }: Tags,
   load: (draft: boolean, ...args: Args) => Promise<T>,
 ) {
   const tags = [...collections.map(collectionTag), ...globals.map(globalTag)]
-  const cached = unstable_cache((...args: Args) => load(false, ...args), [key], { tags })
+  const cached = unstable_cache((...args: Args) => load(false, ...args), [CACHE_VERSION, key], {
+    tags,
+  })
   return async (...args: Args): Promise<T> =>
     (await isDraft()) ? load(true, ...args) : cached(...args)
 }
@@ -41,25 +48,72 @@ function cmsQuery<Args extends unknown[], T>(
 const publishedOnly = (draft: boolean): Where => (draft ? {} : { _status: { equals: 'published' } })
 
 // Rich text can link to these, so readers of rich text are tagged with them too.
-const linkable: CollectionSlug[] = ['posts', 'portfolio-items', 'legal-pages']
+const linkable: CollectionSlug[] = ['pages', 'posts', 'portfolio-items']
+
+/* ---------- Pages ---------- */
+
+// Everything a page's sections can show (populated at depth 2), so a change to any of it
+// refreshes the pages.
+const pageContent: CollectionSlug[] = [
+  'pages',
+  'media',
+  'artists',
+  'portfolio-items',
+  'styles',
+  'posts',
+  'categories',
+  'faqs',
+]
+
+/** The published page with this slug (or its draft, in preview), or null. */
+export const getPage = cmsQuery(
+  'page',
+  { collections: pageContent },
+  async (draft, slug: string) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'pages',
+      where: { and: [{ slug: { equals: slug } }, publishedOnly(draft)] },
+      depth: 2,
+      limit: 1,
+      draft,
+    })
+    return docs[0] ?? null
+  },
+)
+
+/** Every published page's slug: unknown URLs are answered with a 404 without a query. */
+export const getPageSlugs = cmsQuery('page-slugs', { collections: ['pages'] }, async (draft) => {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'pages',
+    where: publishedOnly(draft),
+    select: { slug: true },
+    depth: 0,
+    limit: 500,
+    pagination: false,
+    draft,
+  })
+  return docs.map((doc) => doc.slug).filter((slug): slug is string => Boolean(slug))
+})
+
+/** Text and sections shared by every portfolio piece's page. */
+export const getPieceTemplate = cmsQuery(
+  'piece-template',
+  { globals: ['piece-template'], collections: pageContent },
+  async (draft) =>
+    (await getPayloadClient()).findGlobal({ slug: 'piece-template', depth: 2, draft }),
+)
+
+/** Labels and sections shared by every journal article's page. */
+export const getArticleTemplate = cmsQuery(
+  'article-template',
+  { globals: ['article-template'], collections: pageContent },
+  async (draft) =>
+    (await getPayloadClient()).findGlobal({ slug: 'article-template', depth: 2, draft }),
+)
 
 /* ---------- Globals ---------- */
-
-// Every page global has a share image (media) in its SEO tab.
-function pageGlobal<S extends PageGlobalSlug>(slug: S, collections: CollectionSlug[], depth = 1) {
-  return cmsQuery(
-    slug,
-    { globals: [slug], collections: ['media', ...collections] },
-    async (draft) => (await getPayloadClient()).findGlobal({ slug, depth, draft }),
-  )
-}
-
-export const getHomepage = pageGlobal('homepage', ['artists', 'portfolio-items', 'styles'], 2)
-export const getAboutPage = pageGlobal('about-page', ['artists'], 2)
-export const getPortfolioPage = pageGlobal('portfolio-page', linkable)
-export const getVisitingPage = pageGlobal('visiting-page', linkable)
-export const getJournalPage = pageGlobal('journal-page', ['posts'])
-export const getContactPage = pageGlobal('contact-page', linkable)
 
 export const getSiteSettings = cmsQuery(
   'site-settings',
@@ -172,54 +226,18 @@ export const getPost = cmsQuery(
   },
 )
 
-/* ---------- FAQs and legal pages ---------- */
+/* ---------- FAQs ---------- */
 
-export const getFaqs = cmsQuery(
-  'faqs',
-  { collections: ['faqs', ...linkable] },
-  async (draft, page: FaqPage) => {
-    const payload = await getPayloadClient()
-    const { docs } = await payload.find({
-      collection: 'faqs',
-      where: { pages: { in: [page] } },
-      sort: '_order',
-      depth: 1,
-      limit: 20,
-      draft,
-    })
-    return docs
-  },
-)
-
-export const getLegalPageSlugs = cmsQuery(
-  'legal-page-slugs',
-  { collections: ['legal-pages'] },
-  async (draft) => {
-    const payload = await getPayloadClient()
-    const { docs } = await payload.find({
-      collection: 'legal-pages',
-      select: { slug: true },
-      depth: 0,
-      limit: 50,
-      pagination: false,
-      draft,
-    })
-    return docs.map((doc) => doc.slug).filter((slug): slug is string => Boolean(slug))
-  },
-)
-
-export const getLegalPage = cmsQuery(
-  'legal-page',
-  { collections: linkable },
-  async (draft, slug: string) => {
-    const payload = await getPayloadClient()
-    const { docs } = await payload.find({
-      collection: 'legal-pages',
-      where: { slug: { equals: slug } },
-      depth: 1,
-      limit: 1,
-      draft,
-    })
-    return docs[0] ?? null
-  },
-)
+/** Every FAQ in CMS order (an FAQ section without picks shows them all). */
+export const getFaqs = cmsQuery('faqs', { collections: ['faqs', ...linkable] }, async (draft) => {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'faqs',
+    sort: '_order',
+    depth: 1,
+    limit: 50,
+    pagination: false,
+    draft,
+  })
+  return docs
+})

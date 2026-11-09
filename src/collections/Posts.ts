@@ -6,13 +6,13 @@ import { seoTab } from '@/fields/seo'
 import { populatePublishedAt } from '@/hooks/populatePublishedAt'
 import { revalidateCollection } from '@/hooks/revalidate'
 import { generatePreviewPath } from '@/lib/preview'
-import { PAGE_GLOBALS, pathForDoc } from '@/lib/routes'
+import { pathForDoc } from '@/lib/routes'
 
 const postPath = (slug?: string | null) => pathForDoc('posts', slug)
 
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'posts',
-  paths: (doc) => (doc.slug ? [PAGE_GLOBALS['journal-page'], postPath(doc.slug)] : []),
+  paths: (doc) => (doc.slug ? [pathForDoc('pages', 'journal'), postPath(doc.slug)] : []),
 })
 
 export const Posts: CollectionConfig = {
