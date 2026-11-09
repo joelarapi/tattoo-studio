@@ -1,15 +1,40 @@
 /**
- * `pnpm seed`: fills an empty database with placeholder content so every page renders.
+ * `pnpm seed`: fills an empty database with starting content so every page renders.
  *
  * Safe to run again: it only creates what is missing (matched by slug, title, email or file name)
  * and only fills globals that are still empty. It never deletes or overwrites anything.
+ * Documents are created one at a time: orderable lists take their order from creation order.
  */
 import config from '@payload-config'
 import { type CollectionSlug, type DataFromCollectionSlug, getPayload, type Where } from 'payload'
 
-import { artists, categories, faqs, legalPages, portfolio, posts, styles } from './content'
-import { homepage, navigation, siteSettings } from './globals'
+import {
+  artists,
+  categories,
+  faqs,
+  homepageFilms,
+  homepagePieces,
+  legalPages,
+  portfolio,
+  posts,
+  STUDIO_NAME,
+  styles,
+} from './content'
+import {
+  aboutPage,
+  contactPage,
+  type GlobalRefs,
+  homepage,
+  journalPage,
+  navigation,
+  portfolioPage,
+  siteSettings,
+  visitingPage,
+} from './globals'
+import type { PageGlobalSlug } from '@/lib/routes'
+
 import { type PlaceholderKind, placeholderImage } from './images'
+import { photoFile, posterFile, studioFile, videoFile } from './studio-media'
 
 // Hooks skip cache revalidation: there's no Next.js server to tell.
 const context = { disableRevalidate: true }
@@ -70,23 +95,59 @@ async function image(kind: PlaceholderKind, seed: number, alt: string): Promise<
   return doc.id
 }
 
+/**
+ * One of the studio's photos or films (studio-media.ts), matched by file name so reruns don't
+ * download it again. Null when it can't be downloaded; the caller picks a fallback.
+ */
+async function studioMedia(name: string, alt: string): Promise<number | null> {
+  const { docs } = await payload.find({
+    collection: 'media',
+    where: { filename: { equals: name } },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+  })
+  if (docs[0]) {
+    counts.existing++
+    return docs[0].id
+  }
+  const file = await studioFile(name)
+  if (!file) {
+    payload.logger.warn(`Couldn't download ${name} from the design review.`)
+    return null
+  }
+  counts.created++
+  const doc = await payload.create({
+    collection: 'media',
+    data: { alt },
+    file,
+    context: { ...context },
+  })
+  return doc.id
+}
+
+/** Fills a global only while it is still empty, so CMS edits are never overwritten. */
+async function fillGlobal<T>(
+  slug: Parameters<typeof payload.updateGlobal>[0]['slug'],
+  isEmpty: boolean,
+  data: T,
+) {
+  if (!isEmpty) return
+  await payload.updateGlobal({ slug, data: data as never, context })
+  payload.logger.info(`Filled ${slug}`)
+}
+
 async function main() {
   await seedAdmin()
 
   payload.logger.info('Seeding placeholder images (the first run takes a minute)…')
   const og = await image('og', 1, 'studio share image with drafting circles')
-  const stats = await Promise.all(
-    ['studio interior', 'artist at work', 'healed tattoo close-up', 'the resident artists'].map(
-      (alt, index) => image('stat', index + 1, alt),
-    ),
-  )
 
   const styleDocs = []
-  for (const [index, style] of styles.entries()) {
-    const heroImage = await image('style', index + 1, `${style.name} tattoo`)
+  for (const style of styles) {
     styleDocs.push(
       await ensure('styles', bySlug(style.slug), () =>
-        payload.create({ collection: 'styles', data: { ...style, heroImage }, context }),
+        payload.create({ collection: 'styles', data: style, context }),
       ),
     )
   }
@@ -97,36 +158,61 @@ async function main() {
     const portrait = await image('portrait', index + 1, `portrait of ${artist.name}`)
     artistDocs.push(
       await ensure('artists', bySlug(artist.slug), () =>
+        payload.create({ collection: 'artists', data: { ...artist, portrait }, context }),
+      ),
+    )
+  }
+  const artistID = lookup(artistDocs)
+
+  payload.logger.info('Seeding the studio’s portfolio (downloads about 50 MB on the first run)…')
+  const pieceDocs = []
+  const firstPhotos = new Map<string, number>()
+  for (const [index, item] of portfolio.entries()) {
+    const alt = `${item.title} on the ${item.placement.toLowerCase()}`
+    const photos: number[] = []
+    for (let number = 1; number <= item.photos; number++) {
+      const photo = await studioMedia(photoFile(item.slug, number), alt)
+      photos.push(photo ?? (await image('portfolio', index + 1, alt.toLowerCase())))
+    }
+    const video = item.video ? await studioMedia(videoFile(item.slug), `${item.title} video`) : null
+    const videoPoster = video
+      ? await studioMedia(posterFile(item.slug), `${item.title}, a still from the video`)
+      : null
+    // A piece needs a photo or a video.
+    if (!photos.length && !video) photos.push(await image('portfolio', index + 1, alt))
+    if (photos[0]) firstPhotos.set(item.slug, photos[0])
+
+    pieceDocs.push(
+      await ensure('portfolio-items', bySlug(item.slug), () =>
         payload.create({
-          collection: 'artists',
+          collection: 'portfolio-items',
           data: {
-            ...artist,
-            portrait,
-            specialities: artist.specialities.map(styleID),
-            featured: true,
+            title: item.title,
+            slug: item.slug,
+            summary: item.summary,
+            style: styleID(item.style),
+            placement: item.placement,
+            images: photos,
+            video,
+            videoPoster,
+            artist: artistID('tisi'),
+            // The studio supplied these for publication; confirm consent per piece before launch.
+            clientConsent: true,
+            meta: {
+              title: `${item.title} by Tisi in Albania | ${STUDIO_NAME}`,
+              description: `${item.summary} By Tisi at ${STUDIO_NAME}, Fier, Albania.`,
+            },
           },
           context,
         }),
       ),
     )
   }
-  const artistID = lookup(artistDocs)
-
-  for (const [index, item] of portfolio.entries()) {
-    const picture = await image('portfolio', index + 1, `${item.title.toLowerCase()} tattoo`)
-    await ensure('portfolio-items', { title: { equals: item.title } }, () =>
-      payload.create({
-        collection: 'portfolio-items',
-        data: {
-          ...item,
-          artist: artistID(item.artist),
-          style: styleID(item.style),
-          images: [picture],
-          clientConsent: true,
-        },
-        context,
-      }),
-    )
+  const pieceID = lookup(pieceDocs)
+  const photoOf = (slug: string) => {
+    const id = firstPhotos.get(slug)
+    if (!id) throw new Error(`No photo for "${slug}"`)
+    return id
   }
 
   const categoryDocs = []
@@ -139,30 +225,33 @@ async function main() {
   }
   const categoryID = lookup(categoryDocs)
 
+  const postDocs = []
   for (const [index, post] of posts.entries()) {
     const cover = await image('cover', index + 1, `cover for "${post.title}"`)
-    await ensure('posts', bySlug(post.slug), () =>
-      payload.create({
-        collection: 'posts',
-        data: {
-          title: post.title,
-          slug: post.slug,
-          excerpt: post.excerpt,
-          cover,
-          content: post.content(artistID),
-          author: artistID(post.author),
-          categories: [categoryID(post.category)],
-          publishedAt: post.publishedAt,
-          _status: 'published',
-        },
-        context,
-      }),
+    postDocs.push(
+      await ensure('posts', bySlug(post.slug), () =>
+        payload.create({
+          collection: 'posts',
+          data: {
+            title: post.title,
+            slug: post.slug,
+            excerpt: post.excerpt,
+            cover,
+            content: post.content,
+            author: artistID('tisi'),
+            categories: [categoryID(post.category)],
+            publishedAt: post.publishedAt,
+            _status: 'published',
+          },
+          context,
+        }),
+      ),
     )
   }
 
   for (const faq of faqs) {
     await ensure('faqs', { question: { equals: faq.question } }, () =>
-      payload.create({ collection: 'faqs', data: { ...faq, showOnHomepage: true }, context }),
+      payload.create({ collection: 'faqs', data: faq, context }),
     )
   }
 
@@ -172,20 +261,46 @@ async function main() {
     )
   }
 
+  const refs: GlobalRefs = {
+    og,
+    heroImages: [
+      photoOf('grim-reaper-full-back-tattoo'),
+      photoOf('archangel-mary-full-sleeve-tattoo'),
+    ],
+    artistImage: photoOf('archangel-mary-full-sleeve-tattoo'),
+    backgrounds: {
+      about: photoOf('archangel-mary-full-sleeve-tattoo'),
+      portfolio: photoOf('lion-cub-family-sleeve-tattoo'),
+      visiting: photoOf('compass-map-quill-tattoo'),
+      journal: photoOf('clock-compass-map-tattoo'),
+    },
+    homepagePieces: homepagePieces.map(pieceID),
+    homepageFilms: homepageFilms.map(pieceID),
+    artist: artistID('tisi'),
+    featuredPost: lookup(postDocs)('tattoo-consultation'),
+  }
+
   // Globals: fill only while still empty, so edits made in the CMS are never overwritten.
-  const media = { og, stats }
-  if (!(await payload.findGlobal({ slug: 'site-settings', depth: 0 })).studioName) {
-    await payload.updateGlobal({ slug: 'site-settings', data: siteSettings(media), context })
-    payload.logger.info('Filled Studio details')
-  }
-  if (!(await payload.findGlobal({ slug: 'navigation', depth: 0 })).header?.links?.length) {
-    await payload.updateGlobal({ slug: 'navigation', data: navigation(), context })
-    payload.logger.info('Filled Menus')
-  }
-  if (!(await payload.findGlobal({ slug: 'homepage', depth: 0, draft: true })).hero?.heading) {
-    await payload.updateGlobal({ slug: 'homepage', data: homepage(media), context })
-    payload.logger.info('Filled and published Homepage')
-  }
+  const draft = { depth: 0, draft: true } as const
+  const isEmpty = async (slug: PageGlobalSlug) =>
+    !(await payload.findGlobal({ slug, ...draft })).hero?.heading?.text
+
+  await fillGlobal(
+    'site-settings',
+    !(await payload.findGlobal({ slug: 'site-settings', depth: 0 })).studioName,
+    siteSettings(refs),
+  )
+  await fillGlobal(
+    'navigation',
+    !(await payload.findGlobal({ slug: 'navigation', depth: 0 })).header?.links?.length,
+    navigation(),
+  )
+  await fillGlobal('homepage', await isEmpty('homepage'), homepage(refs))
+  await fillGlobal('about-page', await isEmpty('about-page'), aboutPage(refs))
+  await fillGlobal('portfolio-page', await isEmpty('portfolio-page'), portfolioPage(refs))
+  await fillGlobal('visiting-page', await isEmpty('visiting-page'), visitingPage(refs))
+  await fillGlobal('journal-page', await isEmpty('journal-page'), journalPage(refs))
+  await fillGlobal('contact-page', await isEmpty('contact-page'), contactPage())
 
   payload.logger.info(
     `Seed finished: ${counts.created} documents created, ${counts.existing} already existed.`,

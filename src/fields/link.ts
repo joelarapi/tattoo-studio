@@ -48,7 +48,7 @@ export function linkGroup({
             admin: {
               width: '50%',
               description:
-                'A page on this site like /journal, a section like #book, or a full web address.',
+                'A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.',
             },
           },
         ],

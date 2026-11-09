@@ -1,9 +1,10 @@
 import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
-import type { CollectionSlug, GlobalSlug } from 'payload'
+import type { CollectionSlug, GlobalSlug, Where } from 'payload'
 
 import { collectionTag, globalTag } from './cache-tags'
 import { getPayloadClient } from './payload'
+import type { FaqPage, PageGlobalSlug } from './routes'
 
 /*
  * CMS reads for the frontend. Published content is cached and tagged with every collection and
@@ -36,11 +37,29 @@ function cmsQuery<Args extends unknown[], T>(
     (await isDraft()) ? load(true, ...args) : cached(...args)
 }
 
-export const getHomepage = cmsQuery(
-  'homepage',
-  { globals: ['homepage'], collections: ['media'] },
-  async (draft) => (await getPayloadClient()).findGlobal({ slug: 'homepage', depth: 1, draft }),
-)
+/** Only published posts outside draft mode (the Local API skips access control). */
+const publishedOnly = (draft: boolean): Where => (draft ? {} : { _status: { equals: 'published' } })
+
+// Rich text can link to these, so readers of rich text are tagged with them too.
+const linkable: CollectionSlug[] = ['posts', 'portfolio-items', 'legal-pages']
+
+/* ---------- Globals ---------- */
+
+// Every page global has a share image (media) in its SEO tab.
+function pageGlobal<S extends PageGlobalSlug>(slug: S, collections: CollectionSlug[], depth = 1) {
+  return cmsQuery(
+    slug,
+    { globals: [slug], collections: ['media', ...collections] },
+    async (draft) => (await getPayloadClient()).findGlobal({ slug, depth, draft }),
+  )
+}
+
+export const getHomepage = pageGlobal('homepage', ['artists', 'portfolio-items', 'styles'], 2)
+export const getAboutPage = pageGlobal('about-page', ['artists'], 2)
+export const getPortfolioPage = pageGlobal('portfolio-page', linkable)
+export const getVisitingPage = pageGlobal('visiting-page', linkable)
+export const getJournalPage = pageGlobal('journal-page', ['posts'])
+export const getContactPage = pageGlobal('contact-page', linkable)
 
 export const getSiteSettings = cmsQuery(
   'site-settings',
@@ -53,111 +72,154 @@ export const getNavigation = cmsQuery('navigation', { globals: ['navigation'] },
   (await getPayloadClient()).findGlobal({ slug: 'navigation', depth: 0, draft }),
 )
 
-/** All styles in CMS order (menu, footer, booking form). */
-export const getStyles = cmsQuery(
-  'styles',
-  { collections: ['styles', 'media'] },
-  async (draft) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'styles',
-        sort: '_order',
-        depth: 0,
-        limit: 50,
-        pagination: false,
-        draft,
-      })
-    ).docs,
+/* ---------- Portfolio ---------- */
+
+/** Portfolio categories in CMS order (the filter buttons). */
+export const getStyles = cmsQuery('styles', { collections: ['styles'] }, async (draft) => {
+  const payload = await getPayloadClient()
+  const { docs } = await payload.find({
+    collection: 'styles',
+    sort: '_order',
+    depth: 0,
+    limit: 50,
+    pagination: false,
+    draft,
+  })
+  return docs
+})
+
+/** Every portfolio piece in CMS order, with category, images and artist. */
+export const getPortfolioItems = cmsQuery(
+  'portfolio-items',
+  { collections: ['portfolio-items', 'styles', 'media', 'artists'] },
+  async (draft) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'portfolio-items',
+      sort: '_order',
+      depth: 1,
+      limit: 200,
+      pagination: false,
+      draft,
+    })
+    return docs
+  },
 )
 
-export const getFeaturedStyles = cmsQuery(
-  'featured-styles',
-  { collections: ['styles'] },
-  async (draft) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'styles',
-        where: { featured: { equals: true } },
-        sort: '_order',
-        depth: 0,
-        limit: 4,
-        draft,
-      })
-    ).docs,
-)
+/* ---------- Journal ---------- */
 
-export const getArtists = cmsQuery(
-  'artists',
-  { collections: ['artists', 'styles', 'media'] },
-  async (draft) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'artists',
-        sort: '_order',
-        depth: 1,
-        limit: 50,
-        pagination: false,
-        draft,
-      })
-    ).docs,
-)
+const postListSelect = {
+  title: true,
+  slug: true,
+  excerpt: true,
+  cover: true,
+  categories: true,
+  publishedAt: true,
+  _status: true,
+} as const
 
-export const getFeaturedWork = cmsQuery(
-  'featured-work',
-  { collections: ['portfolio-items', 'artists', 'styles', 'media'] },
-  async (draft) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'portfolio-items',
-        where: { featured: { equals: true } },
-        sort: '_order',
-        depth: 1,
-        limit: 12,
-        draft,
-      })
-    ).docs,
-)
-
-export const getHomepageFaqs = cmsQuery(
-  'homepage-faqs',
-  { collections: ['faqs'] },
-  async (draft) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'faqs',
-        where: { showOnHomepage: { equals: true } },
-        sort: '_order',
-        depth: 0,
-        limit: 8,
-        draft,
-      })
-    ).docs,
+/** Every published post, newest first, without its body. */
+export const getPosts = cmsQuery(
+  'posts',
+  { collections: ['posts', 'categories', 'media'] },
+  async (draft) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'posts',
+      where: publishedOnly(draft),
+      sort: '-publishedAt',
+      select: postListSelect,
+      depth: 1,
+      limit: 200,
+      pagination: false,
+      draft,
+    })
+    return docs
+  },
 )
 
 export const getLatestPosts = cmsQuery(
   'latest-posts',
   { collections: ['posts', 'categories', 'media'] },
-  async (draft, limit: number) =>
-    (
-      await (
-        await getPayloadClient()
-      ).find({
-        collection: 'posts',
-        where: draft ? {} : { _status: { equals: 'published' } },
-        sort: '-publishedAt',
-        depth: 1,
-        limit,
-        draft,
-      })
-    ).docs,
+  async (draft, limit: number) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'posts',
+      where: publishedOnly(draft),
+      sort: '-publishedAt',
+      select: postListSelect,
+      depth: 1,
+      limit,
+      draft,
+    })
+    return docs
+  },
+)
+
+export const getPost = cmsQuery(
+  'post',
+  { collections: ['posts', 'categories', 'media', 'artists', ...linkable] },
+  async (draft, slug: string) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'posts',
+      where: { and: [{ slug: { equals: slug } }, publishedOnly(draft)] },
+      depth: 1,
+      limit: 1,
+      draft,
+    })
+    return docs[0] ?? null
+  },
+)
+
+/* ---------- FAQs and legal pages ---------- */
+
+export const getFaqs = cmsQuery(
+  'faqs',
+  { collections: ['faqs', ...linkable] },
+  async (draft, page: FaqPage) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'faqs',
+      where: { pages: { in: [page] } },
+      sort: '_order',
+      depth: 1,
+      limit: 20,
+      draft,
+    })
+    return docs
+  },
+)
+
+export const getLegalPageSlugs = cmsQuery(
+  'legal-page-slugs',
+  { collections: ['legal-pages'] },
+  async (draft) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'legal-pages',
+      select: { slug: true },
+      depth: 0,
+      limit: 50,
+      pagination: false,
+      draft,
+    })
+    return docs.map((doc) => doc.slug).filter((slug): slug is string => Boolean(slug))
+  },
+)
+
+export const getLegalPage = cmsQuery(
+  'legal-page',
+  { collections: linkable },
+  async (draft, slug: string) => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'legal-pages',
+      where: { slug: { equals: slug } },
+      depth: 1,
+      limit: 1,
+      draft,
+    })
+    return docs[0] ?? null
+  },
 )

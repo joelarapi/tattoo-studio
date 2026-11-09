@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation'
 import { type ReactNode, useEffect, useRef } from 'react'
 
 import { cn } from '@/lib/cn'
-import { getLenis } from '@/lib/motion/lenis'
 
 type DisclosureProps = {
   summary: ReactNode
@@ -12,8 +11,6 @@ type DisclosureProps = {
   summaryClassName?: string
   className?: string
   children: ReactNode
-  /** Full-screen panels (the mobile menu) also lock page scrolling while open. */
-  lockScroll?: boolean
 }
 
 /**
@@ -27,7 +24,6 @@ export function Disclosure({
   summaryClassName,
   className,
   children,
-  lockScroll = false,
 }: DisclosureProps) {
   const ref = useRef<HTMLDetailsElement>(null)
   const pathname = usePathname()
@@ -69,33 +65,16 @@ export function Disclosure({
     const onClick = (event: MouseEvent) => {
       if ((event.target as HTMLElement).closest('a[href]')) close(false)
     }
-    const onToggle = () => {
-      if (!lockScroll) return
-      const lenis = getLenis()
-      if (details.open) {
-        lenis?.stop()
-        document.documentElement.style.overflow = 'hidden'
-      } else {
-        lenis?.start()
-        document.documentElement.style.overflow = ''
-      }
-    }
 
     details.addEventListener('keydown', onKeyDown)
     details.addEventListener('click', onClick)
-    details.addEventListener('toggle', onToggle)
     document.addEventListener('pointerdown', onPointerDown)
     return () => {
       details.removeEventListener('keydown', onKeyDown)
       details.removeEventListener('click', onClick)
-      details.removeEventListener('toggle', onToggle)
       document.removeEventListener('pointerdown', onPointerDown)
-      if (lockScroll) {
-        getLenis()?.start()
-        document.documentElement.style.overflow = ''
-      }
     }
-  }, [lockScroll])
+  }, [])
 
   return (
     <details ref={ref} className={cn('group', className)}>

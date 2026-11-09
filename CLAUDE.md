@@ -5,52 +5,91 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 
 ## Project brief
 
-- Full build spec: `docs/BUILD_SPEC.md`. Follow its 8 phases in order. After each phase run `pnpm build` and `pnpm lint`, fix everything, and check in with the user before continuing.
+- Full build spec: `docs/BUILD_SPEC.md`. Its phases 6–8 (lead capture, SEO, QA) still apply. After each phase run `pnpm build` and `pnpm lint`, fix everything, and check in with the user before continuing.
+- **Design source:** `docs/design/`, the approved design (static HTML/CSS from the design review). It replaces the spec's look, homepage sections and route list (§2–4, §11). Its README lists what isn't built and what deliberately differs.
 - Content and accounts still needed from the studio: `docs/RESOURCES_NEEDED.md`.
-- This is a real tattoo studio in Tirana, but its real content comes later. Use realistic placeholder content, keep everything editable in the CMS, and never hard-code business facts.
+- The client is a real studio, **London InkTattoo in Fier, Albania**, with one artist, **Tisi** (18 years). Real content comes later. Keep everything editable in the CMS and never hard-code business facts: the name, city, artist and numbers live in the CMS and the seed only.
 - Ask before adding any dependency the spec doesn't list.
+
+## Branches and databases
+
+- `main` is production (Vercel deploys it). Other branches get preview deployments.
+- `redesign` is the new design. It uses the **original (production) Neon database**. On 9 Nov 2026 that database was emptied (`DROP SCHEMA public CASCADE`) and refilled by `pnpm seed` with the redesign's schema and content. The user approved this: the separate Neon branch `redesign` had been auto-deleted, and the live demo isn't on the real domain yet.
+- **Until `redesign` is merged into `main`, the live demo is broken:** `main` still runs the old design's code against the new schema. At switch-over: merge into `main`, redeploy, re-create the client's CMS user.
+- `design-v1` keeps the previous design (scroll-sequence animation, GSAP slider, text effects). **It has no database any more.** To run it, create a new Neon branch, empty its schema, point `.env` at it and run `pnpm seed` on `design-v1`.
+- **`.env` `DATABASE_URI` must match the checked-out git branch.** `pnpm dev`/`pnpm seed` push the schema, so running one branch's code against another branch's database drops that database's columns.
+- Before running anything that touches the database after switching, compare the host in `DATABASE_URI` (print a hash, never the string).
+- If two databases ever share the R2 bucket again, **never delete media documents** while both are in use: the storage plugin deletes the file from R2.
+- Schema-push prompts (renames, data loss) need an interactive terminal, so the agent's shell can't answer them. Ask the user to run `pnpm dev` and answer, or, on a disposable database, empty the schema and reseed.
 
 ## Decisions so far
 
-- **Database:** Neon Postgres. The connection string goes in `DATABASE_URI` (pooled string). No local Postgres or Docker on this machine.
+- **Database:** Neon Postgres, pooled connection string in `DATABASE_URI`. No local Postgres or Docker on this machine.
 - **Node:** pinned per project to 24.22.2 via `devEngines.runtime` in `package.json`, because Payload 3.92 needs ≥22.23.4 and the system Node is 22.19. Run everything through `pnpm` / `pnpm exec` / `pnpm dlx`, not plain `npx`. The pnpm "Unsupported engine" warning is harmless.
 - **Versions:** Payload 3.92.1, Next.js 16.3.3 (Payload's supported range is >=16.3.3 <17).
 - **Code location:** code lives under `src/` (Payload's layout), not the repo root shown in the spec's tree.
-- **Tailwind v4 tokens:** in `src/app/(frontend)/globals.css`. Spacing and container token names must not collide: `max-w-*` checks `--spacing-*` first, which is why the side gutter is `px-site-margin` and the max width is `max-w-site`.
-- **Accent buttons:** use `--color-on-accent` (black) for text. White on #FF4800 fails WCAG AA; the alternative is darkening the accent to about #D93D00. This is flagged to the user.
-- **GSAP:** only core plugins (ScrollTrigger, CustomEase "studio") are registered globally in `src/lib/motion/gsap.ts`. Other plugins are registered inside the components that use them.
-- **Slider:** GSAP Draggable + InertiaPlugin, not Embla.
-- **Placeholder frames:** the placeholder frame sequence is generated with sharp, not node-canvas. ffmpeg is installed only when real footage arrives (`winget install Gyan.FFmpeg`).
-- **Privacy page:** CMS-editable through the `legal-pages` collection (seeded with `privacy` and `cookies`). The `/privacy` and `/cookies` routes come in Phase 5.
+- **Routes:** one map in `src/lib/routes.ts` (`PAGE_GLOBALS`, `pathForDoc`, `ENQUIRY_ID`). Rich-text links, SEO URLs, revalidation and preview paths all use it. Pages: `/`, `/about`, `/portfolio`, `/portfolio/[slug]`, `/visiting-albania`, `/journal`, `/journal/[slug]`, `/contact`, and `/[...slug]` for legal pages.
+- **404s:** `(frontend)` and `(payload)` are separate root layouts, so there's no app-wide `not-found`. The `[...slug]` catch-all serves `/privacy` and `/cookies` and calls `notFound()` for everything else, so every 404 renders `(frontend)/not-found.tsx` inside the site layout. It checks one cached slug list, so junk URLs never hit the database.
+- **Page copy:** each page has a global in the admin group "Pages", built with `pageGlobal()` (`src/globals/pageGlobal.ts`): drafts with autosave, live preview, revalidation and the plugin's SEO tab. Field helpers: `styledHeading()` (white / grey / orange parts, rendered by `<StyledHeading>`), `cardList()`, `pageHero()` and `linkList()` in `src/fields/`. Section and card numbers ("01 / …") are added by the site, not typed.
+- **Shared copy:** the closing call to action (About, Portfolio, Journal, articles) and the 404 copy are in Studio details → Shared sections. The enquiry form's button and notes are in Pages → Contact → Form, also used on the homepage.
+- **Collections after the redesign:**
+  - `styles` are portfolio categories (the filter).
+  - `portfolio-items` have slugs, a summary, photos, an optional video with a cover (`videoPoster`), optional extra story and an SEO tab. A piece needs a photo or a video; without a photo, cards use the video cover. Each gets its own page; the text shared by those pages is in Pages → Portfolio → Piece pages.
+  - The homepage picks its pieces in Pages → Homepage → Portfolio: `work.pieces` (photo track; empty = the first 9) and `films.pieces` (film track; pieces with a video). Card numbers are positions in each list.
+  - FAQs pick their pages with `pages` (home / contact / visiting).
+  - `artists` has no pages of its own; Homepage and About pick an artist.
+- **Tailwind v4 tokens:** in `src/app/(frontend)/globals.css`, taken from the design.
+  - Breakpoints are mobile-first: `md` 681px, `lg` 1001px, `2xl` 1700px.
+  - Layout: `px-site` (6% / 5% / 7%, capped at 1450px wide) and `py-section`.
+  - Type: `text-display`, `text-hero`, `text-h2*`, `text-cta`, `text-h3`.
+  - Labels and links: `label*`, `tag`, `btn btn-accent|btn-outline`, `link-plain`, `link-text`.
+  - Surfaces and photos: `grid-bg`, `framed`, `photo`.
+  - Custom `@utility` classes come before single-property utilities in the CSS, so e.g. `mb-2.5` overrides `tag`'s margin. Form-row grids need `grid-cols-1` on mobile.
+- **Fonts:** Inter (next/font) for labels, buttons and nav. Headings and body use the system Arial/Helvetica, as in the design.
+- **Accent:** `#FF5100`. Text on it is black (`--color-on-accent`), the user's choice for WCAG AA; the design uses white (3.3:1). Small grey labels use `--color-faint` #8F8F8F, not the design's #666.
+- **Glyphs:** `✳` and `▶` are SVGs (`components/art/Glyphs.tsx`), because iOS draws them as emoji. Text arrows get VS15 (`↗︎`).
+- **Photos:** black and white and slightly darkened (`grayscale(1) brightness(.85)`) through the `photo` utility, unless Studio details → "Show photos in black and white" is off (`data-mono-photos` on `<html>`). `CmsImage` adds it by default. `photo={false}` is for logos, the piece lightbox and page-top backgrounds, which the design shows in colour. Videos are never filtered.
+- **Page-top photos:** `pageHero()` (and the Visiting hero) has an optional `background`. `HeroPhoto` (`ui/Blocks.tsx`) puts it behind the grid under a dark wash (`hero-photo` utility).
+- **Motion:** no GSAP or Lenis (they stay on `design-v1`). `PageMotion` (in the layout) handles all of it with IntersectionObservers:
+  - `data-reveal` fades content up once.
+  - `data-reveal-group` staggers siblings by (index % 3) × 65 ms.
+  - `data-stencil` SVG line art draws in.
+  - It sets `motion-ready` for the layout's `jsReadyScript`, and rescans on navigation and DOM changes (live preview).
+  - Never put `data-reveal` on hero/LCP content.
+  - Also: `HeroParallax` and `MobileCta` on the homepage only; native smooth scrolling with `data-scroll-behavior="smooth"`.
+- **Horizontal galleries:** `ScrollTrack`, a native scroll-snap row with prev/next buttons. Only the homepage photo track moves by itself:
+  - `colourCycle` shows one photo at a time in colour every 3.5 s and scrolls to it.
+  - It waits while the track is hovered, focused or off screen, and never runs with reduced motion.
+  - It stops for good on the first interaction. The design resumes after 6.5 s; stopping is the WCAG 2.2.2-safe choice.
+- **Enquiry form:** `EnquiryForm` is UI only until the lead-capture phase; submitting shows `pendingNotice`.
+  - Travel fields show with CSS `:has(#travelling:checked)`, so they work without JS.
+  - `?travel=1` and `?project=<slug>` are read with `useSyncExternalStore`, not `useSearchParams`, which would need a Suspense boundary on prerendered pages.
+  - `leads` fields already match the form.
+  - Uploads must go straight to the private R2 bucket in that phase (Vercel's 4.5 MB request limit).
 - **Email:** Resend (`@payloadcms/email-resend`), used only when `RESEND_API_KEY` is set. No SMTP.
 - **Post authors:** `posts.author` links to `artists` (for E-E-A-T). If it's empty, the studio gets the credit. CMS users are logins only.
 - **Leads export:** none for now (the user's choice). If it's wanted later, `@payloadcms/plugin-import-export` is the option, and it needs approval.
-- **Lead reference images:** a separate `lead-attachments` upload collection (only admins and editors can read it), stored in a private R2 bucket (`S3_PRIVATE_BUCKET`) rather than in `media`, because R2 public access is per bucket.
+- **Lead reference files:** a separate `lead-attachments` upload collection (photos and videos; only admins and editors can read it), stored in a private R2 bucket (`S3_PRIVATE_BUCKET`) rather than in `media`, because R2 public access is per bucket.
 - **Landing pages:** the `landing-pages` collection is built in Phase 6, together with `/lp/[slug]`.
-- **SEO fields:** collections place them by hand with `seoTab()` (`src/fields/seo.ts`). The homepage gets them from the plugin (`globals: ['homepage']`), because the plugin's generate endpoints need that. `meta.title` holds the full title, so render it with `title.absolute`.
-- **Caching:** tags are `collection:<slug>` and `global:<slug>` (`src/lib/cache-tags.ts`). Each fetcher tags every collection it reads, including populated relations and `media`. Hooks call `revalidateTag(tag, { expire: 0 })` (Next 16 requires the second argument). Outside a request they fall back to `POST /api/revalidate`.
+- **SEO fields:** collections place them by hand with `seoTab()` (`src/fields/seo.ts`). Page globals get them from the plugin (`globals: pageGlobalSlugs`), because the plugin's generate endpoints need that; the generate functions switch on `globalConfig?.slug ?? collectionConfig?.slug`. `meta.title` holds the full title: `pageMetadata()` (`src/lib/metadata.ts`) renders it with `title.absolute`, falling back to the title template.
+- **Caching:** tags are `collection:<slug>` and `global:<slug>` (`src/lib/cache-tags.ts`). Each fetcher tags every collection it reads, including populated relations, `media`, and the collections rich text can link to. Hooks call `revalidateTag(tag, { expire: 0 })` (Next 16 requires the second argument). Outside a request they fall back to `POST /api/revalidate`.
+- **Data caching:** `unstable_cache` with tags (`src/lib/data.ts`), not `'use cache'`, because that needs Cache Components, which would change every route including Payload's admin. In draft mode the cache is skipped and drafts are read. Outside draft mode post fetchers filter `_status: published` (the Local API skips access control).
 - **Scheduled publishing:** runs as Payload jobs. `autoRun` checks every minute, except on Vercel, where a cron in `vercel.json` calls the job runner with `CRON_SECRET`. The cron is daily (`0 6 * * *`) because Vercel Hobby fails deploys with anything more frequent. Switch to `* * * * *` on Pro.
 - **Demo hosting:** Vercel Hobby (the user's choice, for sharing a demo with the client; Netlify was considered and dropped). Functions are pinned to `fra1` in `vercel.json` because Neon is in `eu-central-1`. `NOINDEX=true` adds `X-Robots-Tag: noindex` (`next.config.ts`). Flagged to the user: Hobby terms are non-commercial only, so the launch needs Pro, the studio's own account, or a VPS.
-- **Storage schema:** both `s3Storage` plugins use `alwaysInsertFields: true`, so `prefix`/`_objectKey` columns exist with or without R2. Production never pushes the schema, so without this, turning on R2 would break every media query. `pnpm media:to-r2` (`scripts/media-to-r2.ts`) re-uploads local files into R2. Because the database is shared, local `.env` needs the `S3_*` vars too, once R2 is in use.
-- **Orderable lists:** artists, styles, portfolio and FAQs use `orderable: true` (sorted by `_order`) instead of a number field.
-- **Placeholder studio name:** "Linja Tattoo Studio", set in `site-settings` only.
-- **Sequence frames:** ffmpeg only decodes (24 fps, at most 180 frames, near-black crushed to black); sharp resizes and encodes (`scripts/sequence/encode.ts`). Mobile frames are a 960×1200 (4:5) centre crop rather than 16:9, so portrait phones stay sharp at DPR 1. The manifest has per-set counts and sizes, plus `fallbackExt` and `poster`.
-- **Sequence layout:** the steps are real HTML in rows sized to each step's quarter of the scroll. On desktop they scroll past on the left. On mobile they dock at the bottom (`position: sticky`), and with JS only the active step shows. No JS still works, because all the layout is CSS. Reduced motion is handled by CSS too (`motion-reduce:` gives a stacked list), so there's no layout shift.
-- **next/image in Next 16:** `priority` is deprecated. Use `loading="eager"` + `fetchPriority="high"` (or `preload`). `/sequences/**` is in `images.localPatterns`.
+- **Storage schema:** both `s3Storage` plugins use `alwaysInsertFields: true`, so `prefix`/`_objectKey` columns exist with or without R2. Production never pushes the schema, so without this, turning on R2 would break every media query. `pnpm media:to-r2` (`scripts/media-to-r2.ts`) re-uploads local files into R2. Local `.env` has the `S3_*` vars, so the seed uploads straight to R2.
+- **Orderable lists:** styles, portfolio, artists and FAQs use `orderable: true` (sorted by `_order`). The seed creates them one at a time, because `_order` follows creation order.
+- **next/image in Next 16:** `priority` is deprecated. Use `loading="eager"` + `fetchPriority="high"` (or `preload`), on one image per page at most.
 - **Favicon:** none yet (the 404 in the console). It comes with the logo in Phase 7.
-- **Data caching:** `unstable_cache` with tags (`src/lib/data.ts`), not `'use cache'`, because that needs Cache Components, which would change every route including Payload's admin. In draft mode the cache is skipped and drafts are read. Verified: a published edit appears on the static homepage within a second, and a draft save doesn't change it.
-- **LCP:** the hero H1 is painted immediately (`SplitReveal hideUntilPlayed={false}`) and flickers once JS loads. The process poster on the homepage isn't high priority, because it's below the fold.
-- **Nav:** the scrolled backdrop is its own layer, and the entrance animation is opacity only. A filter or transform on the header would trap the fixed mobile menu inside it.
-- **Tailwind:** custom `@utility` classes (`mono-label*`) come before single-property utilities in the CSS, so `text-label-sm` and `normal-case` override them. Grids that hold form rows need `grid-cols-1` on mobile, or an input's built-in width forces overflow (Lenis `overflow: clip` hides it from scrollWidth checks).
 
 ## Status
 
-- **Phase 1 (scaffold): done.** Tokens, fonts, MotionProvider (GSAP + Lenis), and the Button / Eyebrow / Container primitives. `/` is a temporary design-system preview.
-- **Phase 2 (CMS model + seed): done.** 11 collections and 3 globals, roles, the SEO plugin, drafts, autosave and scheduling, live preview (`/api/preview`), revalidation hooks, an idempotent `pnpm seed` and access tests (`pnpm test:int`). Neon is seeded. The frontend pages aren't wired to the CMS yet (Phases 4 and 5).
-- **Phase 3 (ScrollSequence): done.** Frame scripts, placeholder sequence (`public/sequences/placeholder`, 7 MB, committed), `<ScrollSequence>`, `<SplitReveal>`, and the test route `/dev/sequence` (**remove before launch**). Real footage can arrive at any time; swapping it needs no code changes (README → Process animation).
-- **Phase 4 (homepage sections 1–13): done.** All sections are wired to the CMS through `src/lib/data.ts`, with nav, footer, line art and motion. The booking and newsletter forms show a notice until Phase 6 (and a decision on the newsletter). `/dev/design` (the Phase 1 preview) and `/dev/sequence` are test pages to **remove before launch**.
-- **Phase 5 (journal, artist and style pages): next.** Wait for the user's go-ahead. Until then, links to those pages and to /privacy and /cookies 404, and Next's prefetches log console errors.
-- **Open for later:** the spec gives the footer newsletter no backend; decide in Phase 4 or 6. `.env` uses `sslmode=require`. `verify-full` behaves the same and silences pg's warning.
+- **Phases 1–4** (scaffold, CMS, scroll sequence, homepage) are done and preserved on `design-v1`.
+- **Redesign: in progress on `redesign`.** Covers all pages from `docs/design/`, the reworked CMS model (page globals, portfolio pages, FAQ pages, lead fields), seed content for London InkTattoo, and the removal of GSAP, Lenis and the scroll sequence. It replaces the old Phase 5 (journal, artist and style pages).
+- **Studio portfolio** (design revision "real work"): 30 real pieces, with 32 photos and 11 films.
+  - `pnpm seed` downloads them from the design review (`src/seed/studio-media.ts`) straight into the media library (R2), so the clients' tattoos are never in git. If a download fails, it falls back to a placeholder.
+  - The seed ticks `clientConsent` on the studio's behalf. Written consent for each piece is still to be confirmed (`docs/RESOURCES_NEEDED.md`).
+- **Next:** Phase 6 (lead capture: sending the enquiry form, Turnstile, Resend, UTM, consent), then 7 (SEO: sitemap, robots, LocalBusiness JSON-LD, favicon) and 8 (QA).
+- **Open for later:** the footer has no newsletter in the new design (dropped). `.env` uses `sslmode=require`; `verify-full` behaves the same and silences pg's warning.
 - **Secrets:** they go in `.env` only. The user once pasted the DB string into `.env.example` (which is committed); it was caught before any push. Before every commit, check that `.env.example` contains only placeholders.
 
 <!-- BEGIN:nextjs-agent-rules -->

@@ -7,29 +7,14 @@ import {
 } from '@payloadcms/richtext-lexical/react'
 
 import { cn } from '@/lib/cn'
-
-/** Where an internal link in rich text points, by the linked document's collection. */
-export function hrefForDoc(relationTo: string, slug: string | null | undefined): string {
-  switch (relationTo) {
-    case 'posts':
-      return `/journal/${slug ?? ''}`
-    case 'artists':
-      return `/artists/${slug ?? ''}`
-    case 'styles':
-      return `/styles/${slug ?? ''}`
-    case 'legal-pages':
-      return `/${slug ?? ''}`
-    default:
-      return '/'
-  }
-}
+import { pathForDoc } from '@/lib/routes'
 
 const links = LinkJSXConverter({
   internalDocToHref: ({ linkNode }) => {
     const doc = linkNode.fields.doc
     if (!doc) return '/'
     const slug = typeof doc.value === 'object' ? (doc.value as { slug?: string }).slug : null
-    return hrefForDoc(doc.relationTo, slug)
+    return pathForDoc(doc.relationTo, slug)
   },
 })
 

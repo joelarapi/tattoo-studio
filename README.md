@@ -1,8 +1,8 @@
-# Tattoo studio website
+# London InkTattoo website
 
-Next.js 16 (App Router) + Payload CMS 3 + Postgres (Neon). The full brief is in [docs/BUILD_SPEC.md](docs/BUILD_SPEC.md), and the content and accounts still needed from the studio are listed in [docs/RESOURCES_NEEDED.md](docs/RESOURCES_NEEDED.md).
+Next.js 16 (App Router) + Payload CMS 3 + Postgres (Neon), for London InkTattoo in Fier, Albania. The approved design is in [docs/design/](docs/design/), the original brief in [docs/BUILD_SPEC.md](docs/BUILD_SPEC.md), and the content and accounts still needed from the studio in [docs/RESOURCES_NEEDED.md](docs/RESOURCES_NEEDED.md).
 
-> Work in progress: Phases 1–4 are done (scaffold, CMS, scroll animation, homepage). The journal, artist and style pages come next. Until then, links to them 404.
+> Work in progress. All pages are built; the enquiry form doesn't send yet (lead-capture phase). The previous design, with the scroll animation, is kept on the `design-v1` branch.
 
 ## Developer setup
 
@@ -10,125 +10,112 @@ Next.js 16 (App Router) + Payload CMS 3 + Postgres (Neon). The full brief is in 
 
 1. `pnpm install`
 2. Copy `.env.example` to `.env` and fill in at least `DATABASE_URI` (Neon **pooled** connection string), `PAYLOAD_SECRET`, `PREVIEW_SECRET`, `REVALIDATE_SECRET` and `SEED_ADMIN_EMAIL` / `SEED_ADMIN_PASSWORD`.
-3. `pnpm seed` creates the tables (in development Payload pushes the schema automatically), the admin user and placeholder content.
+3. `pnpm seed` creates the tables (in development Payload pushes the schema automatically), the admin user and the starting content.
 4. `pnpm dev`, then open http://localhost:3000 (site) and http://localhost:3000/admin (CMS).
 
-| Script                                 | What it does                                         |
-| -------------------------------------- | ---------------------------------------------------- |
-| `pnpm dev`                             | Dev server                                           |
-| `pnpm build && pnpm start`             | Production build and server                          |
-| `pnpm lint`                            | ESLint                                               |
-| `pnpm format`                          | Prettier (with Tailwind class sorting)               |
-| `pnpm generate:types`                  | Regenerate `src/payload-types.ts`                    |
-| `pnpm generate:importmap`              | Regenerate the admin import map                      |
-| `pnpm seed`                            | Add placeholder content (safe to rerun)              |
-| `pnpm media:to-r2`                     | Copy locally stored uploads into R2 (safe to rerun)  |
-| `pnpm test:int`                        | Access-control integration tests                     |
-| `pnpm sequence:placeholder`            | Regenerate the placeholder process animation         |
-| `pnpm sequence:extract <video> <name>` | Turn a video into a process animation (needs ffmpeg) |
+**One database per CMS schema.** `redesign` (soon `main`) and the old `design-v1` have different CMS schemas. The production Neon database now holds the redesign's. To run `design-v1`, give it its own Neon branch with an empty schema and run `pnpm seed` there. When you switch git branches, switch `DATABASE_URI` in `.env` too: `pnpm dev` and `pnpm seed` push the current code's schema and would drop the other schema's columns.
+
+| Script                     | What it does                                        |
+| -------------------------- | --------------------------------------------------- |
+| `pnpm dev`                 | Dev server                                          |
+| `pnpm build && pnpm start` | Production build and server                         |
+| `pnpm lint`                | ESLint                                              |
+| `pnpm format`              | Prettier (with Tailwind class sorting)              |
+| `pnpm generate:types`      | Regenerate `src/payload-types.ts`                   |
+| `pnpm generate:importmap`  | Regenerate the admin import map                     |
+| `pnpm seed`                | Add the starting content (safe to rerun)            |
+| `pnpm media:to-r2`         | Copy locally stored uploads into R2 (safe to rerun) |
+| `pnpm test:int`            | Access-control integration tests                    |
+| `pnpm test:e2e`            | Page, 404, form and no-JS checks (Playwright)       |
 
 Always use `pnpm exec` / `pnpm dlx` rather than plain `npx`, so commands run on the pinned Node.
 
 ## Deploying to Vercel
 
-1. **Media must be in R2 first.** Vercel has no persistent disk and `/media` isn't in git. Create the two R2 buckets, put the `S3_*` variables in your local `.env` as well, then run `pnpm media:to-r2`. Running it also adds any missing storage columns to the database (dev schema push), which production can't do by itself.
+1. **Media must be in R2 first.** Vercel has no persistent disk and `/media` isn't in git. Create the two R2 buckets, put the `S3_*` variables in your local `.env` as well, then run `pnpm media:to-r2` (or seed with them set). Running it also adds any missing storage columns to the database (dev schema push), which production can't do by itself.
 2. Import the GitHub repo in Vercel. The framework (Next.js) and pnpm are detected automatically. Under Settings → Build and Deployment, check that the Node.js version is 24.x.
 3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Set `NOINDEX=true` for a demo.
 4. Functions run in `fra1` (Frankfurt, `vercel.json`), next to the Neon database in `eu-central-1`.
 5. Add the production URL to the R2 bucket's CORS rule (`PUT`, `GET`), next to `http://localhost:3000`.
+6. Preview deployments of other branches use the Preview variables. A branch with its own database (like `design-v1`) needs its own `DATABASE_URI` and `NEXT_PUBLIC_SITE_URL`, scoped to that branch.
 
-Local and deployed sites share the same database until launch. Schema changes reach it through `pnpm dev`, so redeploy after changing collections.
+Schema changes reach a database through `pnpm dev` or `pnpm seed`, so run one against it before deploying code that changes collections.
+
+## Pages
+
+| Route                  | Content from (CMS)                                 |
+| ---------------------- | -------------------------------------------------- |
+| `/`                    | Pages → Homepage, plus portfolio, FAQs and journal |
+| `/about`               | Pages → About, plus the chosen artist's bio        |
+| `/portfolio`           | Pages → Portfolio, plus Studio → Portfolio         |
+| `/portfolio/[slug]`    | the piece, plus Pages → Portfolio → Piece pages    |
+| `/visiting-albania`    | Pages → Visiting Albania, plus FAQs                |
+| `/journal`             | Pages → Journal, plus Content → Journal posts      |
+| `/journal/[slug]`      | the post                                           |
+| `/contact`             | Pages → Contact, plus Studio details and FAQs      |
+| `/privacy`, `/cookies` | Settings → Legal pages (served by `[...slug]`)     |
+
+Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`).
 
 ## Design system
 
-- Tokens live in `src/app/(frontend)/globals.css` (`@theme`). The accent is `--color-accent` and changes everywhere from that one line.
-- Text on the accent uses `--color-on-accent` (black by default, for WCAG contrast).
-- Layout utilities: `px-site-margin`, `max-w-site`, `py-section`, `py-section-lg`, `gap-gutter`, `h-nav`; labels: `mono-label`, `mono-label-sm`.
-- Primitives in `src/components/ui/`: `Button`, `Eyebrow`, `Container`, `SectionHeading`, `CornerTicks`, `GridLines`, `CmsImage` (CMS uploads with alt text and focal point), `Icon` (the line icons editors pick in the CMS) and `Logo`.
-- Motion helpers in `src/components/motion/`:
-  - `SplitReveal`: headings flicker in, paragraphs unscramble.
-  - `LineArt`: SVG that draws itself in.
-  - `DrawLines`: grid hairlines that draw in.
-  - `DashedBeam`: beams of light travelling along line art (pure CSS).
-  - `FadeReveals`: a single page-wide listener that fades in any element marked `data-reveal data-fade`.
-- Pre-animation states use `data-reveal` and are only applied once JS has loaded (`html.js-ready`) and only when motion is allowed, so text is never hidden without JS.
-- Line art is original SVG in `src/components/art/`. The navigation stays free of line art.
-- Motion: `MotionProvider` (GSAP core + Lenis) in `src/components/motion/`. Heavier GSAP plugins are registered only inside the components that use them.
-
-## Homepage
-
-`src/app/(frontend)/page.tsx` renders the sections in `src/components/home/` in this order:
-
-1. Hero
-2. Process (scroll animation)
-3. Featured work slider
-4. Styles grid
-5. Studio in numbers
-6. Statement
-7. Artists
-8. Standards
-9. Journal
-10. FAQ (with FAQPage structured data)
-11. Booking form
-
-The nav and footer are in `src/components/layout/`. Every text comes from the CMS, and the data functions are in `src/lib/data.ts`.
-
-- **Section anchors** for CMS links: `#process #work #styles #numbers #studio #artists #standards #journal #faq #book`.
-- **Menus and the FAQ** use `<details>`, so they work without JS. Script adds Escape, outside-click, arrow keys and scroll locking.
-- **The slider** is a native, swipeable scroll-snap row without JS. With JS it becomes a GSAP Draggable slider with autoplay; a pause button is shown, and autoplay is off for reduced motion.
-- **Not connected yet:** the booking form submits in Phase 6, and the newsletter form has no backend yet (to be decided). For now, both show a notice instead of sending anything.
-
-## Process animation (scroll sequence)
-
-The "process" section plays a short clip frame by frame as you scroll (`src/components/scroll-sequence/`). It uses still frames instead of a `<video>`, because frames scrub reliably on iOS Safari and Firefox. Test it at `/dev/sequence` (a test page that must be removed before launch).
-
-**Footage brief:** 6–10 seconds, at least 1080p, rendered or shot on a **pure black background**, subject centred, with **no text** in the video (the step text is real HTML on top, for SEO and accessibility). Ideally it shows four moments: consultation → design → stencil and ink → healed result. Keep the subject inside the middle 45% of the width, because phones show a centre crop.
-
-**Swapping in new footage:**
-
-1. Install ffmpeg once (Windows: `winget install Gyan.FFmpeg`, macOS: `brew install ffmpeg`).
-2. Run `pnpm sequence:extract path/to/clip.mp4 process-v1`. This writes `public/sequences/process-v1/`:
-   - desktop frames, 1920 wide, at 24 fps (up to 180 frames)
-   - mobile frames, every 2nd frame, 960×1200 centre crop
-   - each frame as AVIF with a WebP fallback, plus `poster.avif` and `manifest.json`
-
-   It also turns near-black pixels pure black so the edges disappear into the page.
-
-3. In the CMS, set Homepage → Process → "sequence" to `process-v1` (admins only), then publish.
-
-`pnpm sequence:placeholder` regenerates the placeholder (numbered frames with an expanding ring) that's used until real footage exists.
-
-**How it behaves:**
-
-- **Loading:** frames start loading when the section is about one screen away: frame 1, then every 8th, 4th and 2nd frame, then the rest, six at a time. Until a frame arrives, the nearest loaded one is shown.
-- **Before frames arrive:** the poster is a normal image (the LCP element). The canvas fades in over it once frames decode.
-- **Save-Data, reduced motion, no JavaScript:**
-  - With **Save-Data** on, no frames load and the poster stays.
-  - With **reduced motion**, there's no scrubbing: just the poster and the four steps as a plain list.
-  - **Without JavaScript**, the poster and all step text are visible.
+- Tokens live in `src/app/(frontend)/globals.css` (`@theme`). The accent is `--color-accent` (#FF5100) and changes everywhere from that one line. Text on the accent uses `--color-on-accent` (black, for WCAG contrast).
+- Breakpoints follow the design: `md` from 681px, `lg` from 1001px, `2xl` from 1700px.
+- **Layout and type utilities:**
+  - Layout: `px-site` and `py-section`.
+  - Headings: `text-display`, `text-hero`, `text-h2`, `text-h2-lg`, `text-h2-sm`, `text-cta`, `text-h3`.
+  - Labels: `label`, `label-sm`, `label-xs`, `tag`.
+  - Buttons and links: `btn btn-accent`, `btn btn-outline`, `link-plain`, `link-text`.
+  - Surfaces: `grid-bg`, `framed`.
+  - `photo`: black-and-white photos, unless switched off in Studio details.
+- **Primitives in `src/components/ui/`:**
+  - `StyledHeading`: the three-tone CMS headings.
+  - `Action`: CMS buttons and links.
+  - `Tag`, `Lines` / `Paragraphs` (plain CMS text with its line breaks).
+  - `Blocks`: `SectionHead`, `PageHero`, `EndCta`, `NumberedCards`, `Notice`, `NeedleDivider`.
+  - `ScrollTrack`: sideways galleries with prev/next buttons.
+  - `Lightbox`, `CmsImage`, `SocialIcon`.
+- **Line art** is original SVG in `src/components/art/`: stencils that draw themselves in, flash icons, and glyphs drawn as SVG because iOS turns `✳` and `▶` into emoji.
+- **Motion** (`src/components/motion/`) is plain CSS transitions started by IntersectionObservers, with no animation library:
+  - `PageMotion` reveals anything marked `data-reveal` and draws `data-stencil` art.
+  - `HeroParallax` and `MobileCta` run on the homepage only.
+  - Hidden states only apply once JS has loaded (`html.js-ready`) and when motion is allowed, so nothing is hidden without JS.
+- Menus and FAQs use `<details>`, and the enquiry form's travel fields show with CSS, so they work without JS.
 
 ## CMS (Payload)
 
-- Config: `src/payload.config.ts`. Collections are in `src/collections/`, globals in `src/globals/`, access rules in `src/access/` and shared fields in `src/fields/`.
-- **Roles:** `admin` can do everything. `editor` can manage all content and read booking requests, but can't change or delete them, manage users or change tracking IDs. The first account created at `/admin` becomes an admin.
-- **Drafts and scheduling:** journal posts and the homepage have drafts and autosave, and posts can also be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET`. It runs once a day (06:00 UTC) because Vercel Hobby rejects anything more frequent. On Pro, change the schedule to `* * * * *`.
-- **Live preview:** `/api/preview` needs `PREVIEW_SECRET` and a logged-in CMS session, then turns on Next.js draft mode. `/api/exit-preview` turns it off. While in draft mode, pages mount `src/components/LivePreviewListener.tsx`.
-- **Revalidation:** every collection and global calls `src/hooks/revalidate.ts` after published changes. Data fetchers must tag their caches with the tag of **every** collection they read (`src/lib/cache-tags.ts`). Code running outside a request (the job runner) revalidates through `POST /api/revalidate` with `REVALIDATE_SECRET`.
-- **Media storage:** local disk in development: `/media`, plus `/media-private` for booking reference images. In production, set the `S3_*` variables for Cloudflare R2. `S3_BUCKET` is public: set `S3_PUBLIC_URL` to its r2.dev or custom-domain URL. `S3_PRIVATE_BUCKET` must **not** be public. Uploads go straight from the browser to R2, so the public bucket needs a CORS rule that allows `PUT` from the site's origin. The storage plugin's columns (`prefix`, `_objectKey`) exist whether or not R2 is on (`alwaysInsertFields`), so the schema doesn't change between environments. `pnpm media:to-r2` copies files already uploaded to local disk into R2.
+- Config: `src/payload.config.ts`. Collections are in `src/collections/`, globals in `src/globals/`, access rules in `src/access/` and shared fields in `src/fields/`. Routes are mapped in `src/lib/routes.ts`.
+- **Roles:** `admin` can do everything. `editor` can manage all content and read enquiries, but can't change or delete them, manage users or change tracking IDs. The first account created at `/admin` becomes an admin.
+- **Drafts and scheduling:** journal posts and all page globals have drafts and autosave, and posts can also be scheduled. Scheduled publishes run as Payload jobs. On a Node server, Payload checks for them every minute. On Vercel, `vercel.json` has a cron that calls `/api/payload-jobs/run` with `CRON_SECRET`. It runs once a day (06:00 UTC) because Vercel Hobby rejects anything more frequent. On Pro, change the schedule to `* * * * *`.
+- **Live preview:** `/api/preview` needs `PREVIEW_SECRET` and a logged-in CMS session, then turns on Next.js draft mode. `/api/exit-preview` turns it off. While in draft mode, the layout mounts `src/components/LivePreviewListener.tsx`.
+- **Revalidation:** every collection and global calls `src/hooks/revalidate.ts` after published changes. Data fetchers (`src/lib/data.ts`) must tag their caches with the tag of **every** collection they read (`src/lib/cache-tags.ts`). Code running outside a request (the job runner) revalidates through `POST /api/revalidate` with `REVALIDATE_SECRET`.
+- **Media storage:** local disk in development (`/media`, plus `/media-private` for enquiry reference files), or Cloudflare R2 when the `S3_*` variables are set.
+  - `S3_BUCKET` is public: set `S3_PUBLIC_URL` to its r2.dev or custom-domain URL.
+  - `S3_PRIVATE_BUCKET` must **not** be public.
+  - Uploads go straight from the browser to R2, so the public bucket needs a CORS rule that allows `PUT` from the site's origin.
+  - The storage plugin's columns (`prefix`, `_objectKey`) exist whether or not R2 is on (`alwaysInsertFields`), so the schema doesn't change between environments.
+  - `pnpm media:to-r2` copies files already uploaded to local disk into R2.
 - **Email:** Resend, when `RESEND_API_KEY` is set. `EMAIL_FROM_ADDRESS` must be on a domain verified in Resend. Without a key, emails are printed to the console.
-- **Schema changes:** development uses Payload's automatic schema push. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`) on a separate Neon branch.
+- **Schema changes:** development uses Payload's automatic schema push. When a change renames or removes fields, the push asks for confirmation in the terminal. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`).
 
 ## For editors: where things live in the CMS
 
-Log in at `/admin`. The menu on the left has four groups:
+Log in at `/admin`. The menu on the left has five groups:
 
-- **Content:** journal posts, journal categories, images and videos, and the homepage (every piece of text on it, section by section).
-- **Studio:** artists, tattoo styles, portfolio and FAQs. To change the order they appear on the site, drag rows in the list.
-- **Leads:** booking requests from the website form, showing which ad campaign each one came from, and the reference images clients attached.
-- **Settings:** legal pages (privacy and cookies), CMS users, studio details (name, address, opening hours, social links and default Google text) and menus.
+- **Content:** journal posts, journal categories, and images and videos.
+- **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. Each FAQ chooses the pages it appears on (Homepage, Contact, Visiting Albania). A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
+- **Leads:** tattoo enquiries from the website form (once it's connected), and the photos and videos clients attach.
+- **Settings:** legal pages (privacy and cookies), CMS users, studio details and menus. Studio details covers the name, address, opening hours, social links, the black-and-white photo switch, the closing call to action shared by several pages, and the "page not found" text.
+- **Pages:** the text of every page, section by section: Homepage, About, Portfolio, Visiting Albania, Journal and Contact.
 
-Journal posts and the homepage save a draft automatically while you type. Nothing changes on the website until you press **Publish**. To publish on a later date, use the arrow next to Publish. The eye icon at the top opens a live preview next to the form, and you can switch between Mobile and Desktop above the preview.
+Headings have three boxes, **White**, **Grey** and **Orange**, shown in that order, each on a new line. Section numbers like "01 /" are added automatically.
 
-Every post, artist and style has an **SEO** tab. Click "Auto-generate" to fill in the Google title and description, then adjust them. The preview shows roughly how the page will look in Google.
+The homepage galleries show the pieces chosen in **Pages → Homepage → Portfolio**: **Photos** and **Films**, each in the order you drag them into. The pages About, Portfolio, Visiting Albania and Journal can each have a **Background photo** at the top (Hero tab); it's shown darkened behind the heading.
 
-Everything there now is placeholder text and images. Replace it with the real details before launch, especially what Google shows: the address, phone number, opening hours and the numbers on the homepage.
+Pages and journal posts save a draft automatically while you type. Nothing changes on the website until you press **Publish**. To publish a post on a later date, use the arrow next to Publish. The eye icon at the top opens a live preview next to the form, and you can switch between Mobile and Desktop above the preview.
+
+Portfolio pieces and journal posts each have their own page. The address comes from the slug, which is made from the title. **Lock the slug** (the lock icon) once a piece is published, so renaming it later doesn't change its address.
+
+Every page, post and portfolio piece has an **SEO** tab. Click "Auto-generate" to fill in the Google title and description, then adjust them. The preview shows roughly how the page will look in Google.
+
+Everything there now is starting text and placeholder images. Replace it with the real details before launch, especially what Google shows: the address, phone number, opening hours and the portfolio.

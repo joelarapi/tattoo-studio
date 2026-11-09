@@ -109,11 +109,21 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     homepage: Homepage;
+    'about-page': AboutPage;
+    'portfolio-page': PortfolioPage;
+    'visiting-page': VisitingPage;
+    'journal-page': JournalPage;
+    'contact-page': ContactPage;
     'site-settings': SiteSetting;
     navigation: Navigation;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
+    'about-page': AboutPageSelect<false> | AboutPageSelect<true>;
+    'portfolio-page': PortfolioPageSelect<false> | PortfolioPageSelect<true>;
+    'visiting-page': VisitingPageSelect<false> | VisitingPageSelect<true>;
+    'journal-page': JournalPageSelect<false> | JournalPageSelect<true>;
+    'contact-page': ContactPageSelect<false> | ContactPageSelect<true>;
     'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
     navigation: NavigationSelect<false> | NavigationSelect<true>;
   };
@@ -281,7 +291,7 @@ export interface Media {
   };
 }
 /**
- * Resident artists. Drag rows to change the order they appear on the site.
+ * The studio’s artists: portrait and bio. The homepage and About page show the artist chosen there; journal posts can name one as author.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "artists".
@@ -295,7 +305,7 @@ export interface Artist {
    */
   portrait: number | Media;
   /**
-   * 3–5 sentences, written in the third person.
+   * A few short paragraphs. Shown on the About page.
    */
   bio?: {
     root: {
@@ -312,10 +322,6 @@ export interface Artist {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * The styles this artist is known for.
-   */
-  specialities?: (number | Style)[] | null;
   instagram?: string | null;
   yearsOfExperience?: number | null;
   meta?: {
@@ -331,92 +337,11 @@ export interface Artist {
    */
   generateSlug?: boolean | null;
   slug: string;
-  /**
-   * The homepage shows up to 4 artists.
-   */
-  featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * The styles the studio offers. They appear in the menu, the homepage grid and the booking form. Drag rows to reorder.
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "styles".
- */
-export interface Style {
-  id: number;
-  _order?: string | null;
-  /**
-   * e.g. Fine line
-   */
-  name: string;
-  /**
-   * One or two sentences for the homepage grid. Max 160.
-   */
-  shortDescription: string;
-  /**
-   * The style's own page: how the studio approaches it.
-   */
-  longDescription?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  /**
-   * The small line drawing shown next to the title.
-   */
-  icon:
-    | 'fine-line'
-    | 'blackwork'
-    | 'realism'
-    | 'traditional'
-    | 'lettering'
-    | 'cover-up'
-    | 'geometric'
-    | 'dotwork'
-    | 'needle'
-    | 'ink'
-    | 'certificate'
-    | 'aftercare'
-    | 'shield'
-    | 'compass';
-  /**
-   * Large image at the top of the style page.
-   */
-  heroImage?: (number | null) | Media;
-  meta?: {
-    title?: string | null;
-    description?: string | null;
-    /**
-     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
-     */
-    image?: (number | null) | Media;
-  };
-  /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
-   */
-  generateSlug?: boolean | null;
-  slug: string;
-  /**
-   * The "What we tattoo" grid shows 4 styles. Tick exactly 4.
-   */
-  featured?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Topics for journal posts, e.g. Aftercare or Styles. Each gets its own page.
+ * Topics for journal posts, e.g. Planning or Aftercare. Shown as a label on each article.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
@@ -430,14 +355,35 @@ export interface Category {
   generateSlug?: boolean | null;
   slug: string;
   /**
-   * Shown on the category page and used for Google. Max 160 characters.
+   * Optional. For editors; not shown on the site yet. Max 160 characters.
    */
   description?: string | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Finished tattoos. Tick "Featured" to show a piece in the homepage slider. Drag rows to reorder.
+ * Categories for portfolio pieces, e.g. Graphic or Botanical. They become the portfolio filter buttons. Drag rows to reorder.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "styles".
+ */
+export interface Style {
+  id: number;
+  _order?: string | null;
+  /**
+   * e.g. Botanical
+   */
+  name: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Finished tattoos. Each piece gets its own page. Drag rows to reorder. The homepage shows the pieces chosen in Pages → Homepage → Portfolio.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "portfolio-items".
@@ -446,28 +392,68 @@ export interface PortfolioItem {
   id: number;
   _order?: string | null;
   /**
-   * Short and descriptive, e.g. "Peony half-sleeve".
+   * Short and descriptive, e.g. "Botanical arm tattoo". It is the page title.
    */
   title: string;
-  artist: number | Artist;
+  /**
+   * Two or three sentences. Shown on the portfolio card and at the top of the piece’s page.
+   */
+  summary: string;
+  /**
+   * Used by the portfolio filter.
+   */
   style: number | Style;
   /**
-   * The first image is the one shown on cards. Drag to reorder.
+   * Where on the body, e.g. "Forearm".
    */
-  images: (number | Media)[];
+  placement?: string | null;
   /**
-   * A silent loop of a few seconds, MP4 or WebM, max 8 MB. Plays instead of the image on the homepage.
+   * The first photo is the one shown on cards. Drag to reorder.
+   */
+  images?: (number | Media)[] | null;
+  /**
+   * MP4 or WebM, max 8 MB. Shown on the piece’s page.
    */
   video?: (number | null) | Media;
   /**
-   * Where on the body, e.g. "Forearm" or "Upper back".
+   * A still from the video, portrait format. Shown before it plays and on the homepage film cards.
    */
-  placement?: string | null;
-  clientConsent: boolean;
+  videoPoster?: (number | null) | Media;
   /**
-   * Show in the homepage slider.
+   * Optional while the studio has one artist.
    */
-  featured?: boolean | null;
+  artist?: (number | null) | Artist;
+  /**
+   * Replaces the shared heading ("Look closer.") for this piece.
+   */
+  detailsHeading?: string | null;
+  /**
+   * Extra paragraphs after the summary, each with an optional title.
+   */
+  story?:
+    | {
+        /**
+         * e.g. "The placement."
+         */
+        title?: string | null;
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  clientConsent: boolean;
   updatedAt: string;
   createdAt: string;
 }
@@ -503,14 +489,14 @@ export interface Faq {
     [k: string]: unknown;
   };
   /**
-   * The homepage shows 5–8 questions.
+   * The pages this question appears on. Aim for 4–8 per page.
    */
-  showOnHomepage?: boolean | null;
+  pages?: ('home' | 'contact' | 'visiting')[] | null;
   updatedAt: string;
   createdAt: string;
 }
 /**
- * Every consultation request from the website, newest first. Filter by status, style or ad campaign.
+ * Every enquiry from the website, newest first. Filter by status, travel or ad campaign.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads".
@@ -521,15 +507,28 @@ export interface Lead {
    * Track follow-up. Only admins can change this.
    */
   status: 'new' | 'contacted' | 'booked' | 'closed';
-  name: string;
+  name?: string | null;
+  firstName: string;
+  surname: string;
   phone: string;
   email?: string | null;
-  style?: (number | null) | Style;
-  preferredArtist?: (number | null) | Artist;
-  size?: ('small' | 'medium' | 'large' | 'xl' | 'unsure') | null;
-  placement?: string | null;
-  description?: string | null;
-  referenceImage?: (number | null) | LeadAttachment;
+  placement: string;
+  preferredTiming?: string | null;
+  description: string;
+  /**
+   * The portfolio piece they came from, if any.
+   */
+  project?: (number | null) | PortfolioItem;
+  references?: (number | LeadAttachment)[] | null;
+  /**
+   * Filled in when they are travelling to Albania from abroad.
+   */
+  travel?: {
+    travelling?: boolean | null;
+    from?: string | null;
+    dates?: string | null;
+    help?: string | null;
+  };
   marketingConsent?: boolean | null;
   /**
    * Where the visit came from, captured automatically from ad links (Google Ads, Meta).
@@ -552,7 +551,7 @@ export interface Lead {
   createdAt: string;
 }
 /**
- * Images clients attached to booking requests. Private: never shown on the site.
+ * Photos and videos clients attached to enquiries. Private: never shown on the site.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lead-attachments".
@@ -962,7 +961,6 @@ export interface ArtistsSelect<T extends boolean = true> {
   name?: T;
   portrait?: T;
   bio?: T;
-  specialities?: T;
   instagram?: T;
   yearsOfExperience?: T;
   meta?:
@@ -974,7 +972,6 @@ export interface ArtistsSelect<T extends boolean = true> {
       };
   generateSlug?: T;
   slug?: T;
-  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -985,20 +982,8 @@ export interface ArtistsSelect<T extends boolean = true> {
 export interface StylesSelect<T extends boolean = true> {
   _order?: T;
   name?: T;
-  shortDescription?: T;
-  longDescription?: T;
-  icon?: T;
-  heroImage?: T;
-  meta?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-        image?: T;
-      };
   generateSlug?: T;
   slug?: T;
-  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1009,13 +994,31 @@ export interface StylesSelect<T extends boolean = true> {
 export interface PortfolioItemsSelect<T extends boolean = true> {
   _order?: T;
   title?: T;
-  artist?: T;
+  summary?: T;
   style?: T;
+  placement?: T;
   images?: T;
   video?: T;
-  placement?: T;
+  videoPoster?: T;
+  artist?: T;
+  detailsHeading?: T;
+  story?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        id?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  generateSlug?: T;
+  slug?: T;
   clientConsent?: T;
-  featured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1027,7 +1030,7 @@ export interface FaqsSelect<T extends boolean = true> {
   _order?: T;
   question?: T;
   answer?: T;
-  showOnHomepage?: T;
+  pages?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1038,14 +1041,23 @@ export interface FaqsSelect<T extends boolean = true> {
 export interface LeadsSelect<T extends boolean = true> {
   status?: T;
   name?: T;
+  firstName?: T;
+  surname?: T;
   phone?: T;
   email?: T;
-  style?: T;
-  preferredArtist?: T;
-  size?: T;
   placement?: T;
+  preferredTiming?: T;
   description?: T;
-  referenceImage?: T;
+  project?: T;
+  references?: T;
+  travel?:
+    | T
+    | {
+        travelling?: T;
+        from?: T;
+        dates?: T;
+        help?: T;
+      };
   marketingConsent?: T;
   attribution?:
     | T
@@ -1214,250 +1226,1270 @@ export interface Homepage {
   id: number;
   hero: {
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Small label next to the orange dot, e.g. the studio name and country.
      */
-    eyebrow?: string | null;
-    eyebrowLink: {
-      /**
-       * The text on the button. Keep it short.
-       */
-      label: string;
-      /**
-       * A page on this site like /journal, a section like #book, or a full web address.
-       */
-      href: string;
+    label: string;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
     };
     /**
-     * The main headline (the page’s H1). Short and memorable; Google reads it first.
-     */
-    heading: string;
-    /**
-     * One or two sentences under the headline.
+     * The first paragraph under the title.
      */
     intro: string;
-    cta: {
+    /**
+     * A shorter, quieter line under the intro. Optional.
+     */
+    supporting?: string | null;
+    primaryCta: {
       /**
        * The text on the button. Keep it short.
        */
       label: string;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
       href: string;
     };
-    /**
-     * The small hint at the bottom of the hero.
-     */
-    scrollLabel?: string | null;
-    /**
-     * Replaces the first frame of the process animation, shown while it loads. Black background, 16:9.
-     */
-    poster?: (number | null) | Media;
-  };
-  /**
-   * Four steps that scroll past while the animation plays.
-   */
-  process: {
-    /**
-     * Section heading, e.g. "From idea to healed".
-     */
-    heading: string;
-    /**
-     * Technical: the animation’s folder name. Set by the developer when new footage arrives.
-     */
-    sequence?: string | null;
-    /**
-     * Exactly four steps; they’re numbered 01–04 automatically.
-     */
-    steps: {
+    secondaryLink?: {
       /**
-       * Optional small label, e.g. "Week 1".
+       * The text on the button. Keep it short.
        */
       label?: string | null;
-      heading: string;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+    /**
+     * e.g. 18
+     */
+    factValue?: string | null;
+    /**
+     * e.g. "Years of tattoo experience".
+     */
+    factLabel?: string | null;
+    /**
+     * Short; Enter for a line break.
+     */
+    secondFact?: string | null;
+    /**
+     * Portrait format (3:4) works best.
+     */
+    primaryImage: number | Media;
+    /**
+     * Small caption on the large image. Optional.
+     */
+    primaryCaption?: string | null;
+    /**
+     * Overlaps the large one. Portrait or square.
+     */
+    secondaryImage: number | Media;
+    /**
+     * Small caption on the small image. Optional.
+     */
+    secondaryCaption?: string | null;
+    imagesLink?: string | null;
+    /**
+     * Tiny text under the images, e.g. "Art. Identity. Expression."
+     */
+    artNote?: string | null;
+  };
+  /**
+   * Short phrases in the band under the hero, separated by asterisks.
+   */
+  strip?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  work: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
       text: string;
-      id?: string | null;
-    }[];
-  };
-  /**
-   * Shows portfolio pieces marked "Featured".
-   */
-  featuredWork: {
+      soft?: string | null;
+      accent?: string | null;
+    };
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Next to the heading. Enter for a line break.
      */
-    eyebrow?: string | null;
-    heading: string;
     intro?: string | null;
-  };
-  /**
-   * Shows the 4 styles marked "Show on homepage".
-   */
-  styles: {
-    /**
-     * e.g. "What we tattoo"
-     */
-    heading: string;
-    button: {
+    button?: {
       /**
        * The text on the button. Keep it short.
        */
-      label: string;
+      label?: string | null;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
-      href: string;
+      href?: string | null;
     };
+    /**
+     * Tiny line above the photos and under the films, e.g. "Original work by Tisi".
+     */
+    creditLine?: string | null;
+    /**
+     * Small label above the photos, e.g. "Photos · scroll at your own pace".
+     */
+    trackLabel?: string | null;
+    /**
+     * The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.
+     */
+    pieces?: (number | PortfolioItem)[] | null;
   };
-  numbers: {
+  /**
+   * A second gallery under the photos.
+   */
+  films?: {
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Small label above the films.
      */
-    eyebrow?: string | null;
-    heading: string;
+    trackLabel?: string | null;
     /**
-     * Real figures only. The seeded numbers are placeholders: replace them before launch.
+     * Top of each card, e.g. "Tisi / film".
      */
-    stats?:
-      | {
-          /**
-           * e.g. 4.9
-           */
-          value: number;
-          /**
-           * Optional, e.g. "+" or "★".
-           */
-          unit?: string | null;
-          /**
-           * The rest of the sentence, e.g. "average Google rating".
-           */
-          text: string;
-          image?: (number | null) | Media;
-          id?: string | null;
-        }[]
-      | null;
+    itemLabel?: string | null;
+    /**
+     * Link at the bottom of each card.
+     */
+    watchLabel?: string | null;
+    /**
+     * Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to hide the films.
+     */
+    pieces?: (number | PortfolioItem)[] | null;
   };
-  statement: {
+  meetArtist: {
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Small orange label above the heading. A few words.
      */
-    eyebrow?: string | null;
-    headingLine1: string;
-    headingLine2?: string | null;
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * The artist whose portrait is shown.
+     */
+    artist: number | Artist;
+    /**
+     * Optional. Replaces the artist portrait here.
+     */
+    image?: (number | null) | Media;
+    /**
+     * Small note on the image, e.g. "Original work by Tisi". Optional.
+     */
+    imageNote?: string | null;
+    /**
+     * A short introduction. Leave an empty line between paragraphs.
+     */
     text?: string | null;
-    secondaryButton: {
+    button?: {
       /**
        * The text on the button. Keep it short.
        */
-      label: string;
+      label?: string | null;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
-      href: string;
+      href?: string | null;
     };
-    primaryButton: {
+    /**
+     * Small text next to the asterisk. Optional.
+     */
+    signoff?: string | null;
+  };
+  visit: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    button?: {
       /**
        * The text on the button. Keep it short.
        */
-      label: string;
+      label?: string | null;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
-      href: string;
+      href?: string | null;
     };
-  };
-  /**
-   * Shows artists marked "Show on homepage".
-   */
-  artists: {
-    /**
-     * Small uppercase label above the heading. Keep it to a few words.
-     */
-    eyebrow?: string | null;
-    heading: string;
-    /**
-     * A second sentence, shown in grey after the heading.
-     */
-    headingMuted?: string | null;
-  };
-  standards: {
-    /**
-     * Small uppercase label above the heading. Keep it to a few words.
-     */
-    eyebrow?: string | null;
-    heading: string;
-    /**
-     * Four promises. Only publish what is true for the studio.
-     */
-    items?:
+    steps?:
       | {
-          /**
-           * The small line drawing shown next to the title.
-           */
-          icon:
-            | 'fine-line'
-            | 'blackwork'
-            | 'realism'
-            | 'traditional'
-            | 'lettering'
-            | 'cover-up'
-            | 'geometric'
-            | 'dotwork'
-            | 'needle'
-            | 'ink'
-            | 'certificate'
-            | 'aftercare'
-            | 'shield'
-            | 'compass';
           title: string;
           text: string;
           id?: string | null;
         }[]
       | null;
+    link?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+  };
+  plan: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Next to the heading. Enter for a line break.
+     */
+    intro?: string | null;
+    cards?:
+      | {
+          label?: string | null;
+          icon: 'sketch' | 'machine' | 'ink';
+          title: string;
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    priceNote?: {
+      /**
+       * Bold start of the note, e.g. a question.
+       */
+      title?: string | null;
+      text?: string | null;
+      link?: {
+        /**
+         * The text on the button. Keep it short.
+         */
+        label?: string | null;
+        /**
+         * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+         */
+        href?: string | null;
+      };
+    };
   };
   /**
-   * Shows the three newest published posts.
+   * The form itself (button, notes) is edited in Pages → Contact.
    */
+  enquiry: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    intro?: string | null;
+    /**
+     * Under the studio name and city, e.g. "Tattoo artist: Tisi · 18 years of experience."
+     */
+    detailText?: string | null;
+    contactLink?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+  };
+  /**
+   * Shows the FAQs set to appear on the homepage (Studio → FAQs).
+   */
+  faq: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+  };
   journal: {
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Small orange label above the heading. A few words.
      */
-    eyebrow?: string | null;
-    heading: string;
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    link?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+  };
+  finalCta: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
     button: {
       /**
        * The text on the button. Keep it short.
        */
       label: string;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
       href: string;
     };
   };
   /**
-   * Shows FAQs marked "Show on homepage".
+   * The orange bar pinned to the bottom of the screen on phones.
    */
-  faq: {
+  mobileCta: {
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * The text on the button. Keep it short.
      */
-    eyebrow?: string | null;
-    heading: string;
+    label: string;
+    /**
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+     */
+    href: string;
   };
-  booking: {
+  meta?: {
+    title?: string | null;
+    description?: string | null;
     /**
-     * Small uppercase label above the heading. Keep it to a few words.
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
      */
-    eyebrow?: string | null;
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The About page: the artist, the work and the studio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page".
+ */
+export interface AboutPage {
+  id: number;
+  hero: {
     /**
-     * e.g. "Ready when you are"
+     * Small label in a box above the title.
+     */
+    tag?: string | null;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Under the title. Enter for a line break.
+     */
+    intro?: string | null;
+    /**
+     * Link down to the artist, e.g. "Get to know Tisi".
+     */
+    scrollLabel?: string | null;
+    /**
+     * Tiny line at the bottom, e.g. "01 / About us".
+     */
+    indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
+  };
+  /**
+   * The text comes from the artist’s bio.
+   */
+  meetArtist: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Their portrait and bio (Studio → Artists) are shown here.
+     */
+    artist: number | Artist;
+    /**
+     * Optional. Replaces the artist portrait on this page.
+     */
+    image?: (number | null) | Media;
+    button?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+    /**
+     * Small note under the button. Optional.
+     */
+    note?: string | null;
+  };
+  focus: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Next to the heading. Enter for a line break.
+     */
+    intro?: string | null;
+    items?:
+      | {
+          /**
+           * Small label after the number, e.g. "Your idea".
+           */
+          label?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text: string;
+          link?: {
+            /**
+             * The text on the button. Keep it short.
+             */
+            label?: string | null;
+            /**
+             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+             */
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  values: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Three cards, each with its own small graphic.
+     */
+    cards?:
+      | {
+          /**
+           * Small label after the number, e.g. "Your idea".
+           */
+          label?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  studio: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    link?: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label?: string | null;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href?: string | null;
+    };
+    /**
+     * Small note at the end. Optional.
+     */
+    note?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The portfolio page, plus the text shared by every piece’s own page. The pieces themselves are in Studio → Portfolio.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-page".
+ */
+export interface PortfolioPage {
+  id: number;
+  hero: {
+    /**
+     * Small label in a box above the title.
+     */
+    tag?: string | null;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Under the title. Enter for a line break.
+     */
+    intro?: string | null;
+    /**
+     * Tiny line at the bottom, e.g. "01 / About us".
+     */
+    indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
+  };
+  intro: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * You can link to other pages, e.g. the contact page.
+     */
+    text?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+  };
+  filter: {
+    /**
+     * The first filter button, e.g. "All work".
+     */
+    allLabel: string;
+    /**
+     * After the number of pieces, e.g. "pieces".
+     */
+    countLabel?: string | null;
+  };
+  detail: {
+    /**
+     * Small label above the title, e.g. "Tisi / London InkTattoo".
+     */
+    label?: string | null;
+    /**
+     * Under each photo; it opens the photo in colour.
+     */
+    photoLabel?: string | null;
+    /**
+     * Under the video, after the piece’s title.
+     */
+    videoCaption?: string | null;
+    /**
+     * Heading next to the photos, e.g. "Look closer." A piece can replace it.
+     */
+    storyHeading?: string | null;
+    /**
+     * After the piece’s summary. Optional.
+     */
+    storyNote?: string | null;
+    direction?: {
+      title?: string | null;
+      /**
+       * Leave an empty line between paragraphs.
+       */
+      text?: string | null;
+    };
+    /**
+     * The orange button to the enquiry form.
+     */
+    ctaLabel: string;
+    travel: {
+      /**
+       * Small orange label above the heading. A few words.
+       */
+      tag?: string | null;
+      /**
+       * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+       */
+      heading: {
+        text: string;
+        soft?: string | null;
+        accent?: string | null;
+      };
+      /**
+       * Leave an empty line between paragraphs.
+       */
+      text?: string | null;
+      /**
+       * Up to two buttons.
+       */
+      links?:
+        | {
+            label: string;
+            href: string;
+            id?: string | null;
+          }[]
+        | null;
+    };
+    suggestions: {
+      /**
+       * Small orange label above the heading. A few words.
+       */
+      tag?: string | null;
+      /**
+       * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+       */
+      heading: {
+        text: string;
+        soft?: string | null;
+        accent?: string | null;
+      };
+      button?: {
+        /**
+         * The text on the button. Keep it short.
+         */
+        label?: string | null;
+        /**
+         * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+         */
+        href?: string | null;
+      };
+      /**
+       * Link text on each card, e.g. "View this piece".
+       */
+      cardLink?: string | null;
+    };
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The travel guide for visitors coming to Albania for a tattoo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "visiting-page".
+ */
+export interface VisitingPage {
+  id: number;
+  hero: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    intro?: string | null;
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href: string;
+    };
+    /**
+     * Small print under the button. Optional.
+     */
+    note?: string | null;
+    route?: {
+      /**
+       * Small label at the top of the box.
+       */
+      title?: string | null;
+      stops?:
+        | {
+            /**
+             * e.g. "Arrive"
+             */
+            label?: string | null;
+            title: string;
+            text?: string | null;
+            id?: string | null;
+          }[]
+        | null;
+      /**
+       * Small label at the bottom of the box.
+       */
+      footnote?: string | null;
+    };
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
+  };
+  plan: {
+    /**
+     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
+     */
+    navLabel?: string | null;
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Next to the heading. Enter for a line break.
+     */
+    intro?: string | null;
+    cards?:
+      | {
+          /**
+           * Small label after the number, e.g. "Your idea".
+           */
+          label?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text: string;
+          link?: {
+            /**
+             * The text on the button. Keep it short.
+             */
+            label?: string | null;
+            /**
+             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+             */
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+  };
+  stay: {
+    /**
+     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
+     */
+    navLabel?: string | null;
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Next to the heading. Enter for a line break.
+     */
+    intro?: string | null;
+    cards?:
+      | {
+          symbol: 'home' | 'arrow';
+          /**
+           * Small orange label.
+           */
+          tag?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text?: string | null;
+          /**
+           * One item per line.
+           */
+          bullets?: string | null;
+          button?: {
+            /**
+             * The text on the button. Keep it short.
+             */
+            label?: string | null;
+            /**
+             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+             */
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * The boxed note under the cards. Optional.
+     */
+    notice?: string | null;
+    arrival?: {
+      title?: string | null;
+      text?: {
+        root: {
+          type: string;
+          children: {
+            type: any;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      } | null;
+    };
+  };
+  explore: {
+    /**
+     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
+     */
+    navLabel?: string | null;
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Next to the heading. Enter for a line break.
+     */
+    intro?: string | null;
+    destinations?:
+      | {
+          motif: 'columns' | 'windows' | 'waves';
+          /**
+           * Small orange label.
+           */
+          tag?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text?: string | null;
+          link?: {
+            /**
+             * The text on the button. Keep it short.
+             */
+            label?: string | null;
+            /**
+             * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+             */
+            href?: string | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * Small print under the places. Optional.
+     */
+    note?: string | null;
+    slow?: {
+      /**
+       * Small orange label above the heading. A few words.
+       */
+      tag?: string | null;
+      title?: string | null;
+      /**
+       * Leave an empty line between paragraphs.
+       */
+      text?: string | null;
+    };
+  };
+  itinerary: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    items?:
+      | {
+          /**
+           * e.g. "Before you travel"
+           */
+          label?: string | null;
+          title: string;
+          text?: string | null;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Shows the FAQs set to appear on Visiting Albania (Studio → FAQs).
+   */
+  questions: {
+    /**
+     * The jump link to this section at the top of the page, e.g. "Plan your visit". Leave empty to leave it out.
+     */
+    navLabel?: string | null;
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+  };
+  endCta: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href: string;
+    };
+    /**
+     * Small print under the button. Optional.
+     */
+    note?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The journal page and the labels on every article. The articles are in Content → Journal posts.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "journal-page".
+ */
+export interface JournalPage {
+  id: number;
+  hero: {
+    /**
+     * Small label in a box above the title.
+     */
+    tag?: string | null;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Under the title. Enter for a line break.
+     */
+    intro?: string | null;
+    /**
+     * Tiny line at the bottom, e.g. "01 / About us".
+     */
+    indexLabel?: string | null;
+    /**
+     * Optional. Shown in colour, darkened, behind the heading.
+     */
+    background?: (number | null) | Media;
+  };
+  featured: {
+    /**
+     * Small label above the featured article.
+     */
+    tag?: string | null;
+    /**
+     * Leave empty to feature the latest article.
+     */
+    post?: (number | null) | Post;
+    /**
+     * Small label on the featured card, e.g. "Featured guide".
+     */
+    label?: string | null;
+    /**
+     * e.g. "Read the guide"
+     */
+    buttonLabel: string;
+  };
+  list: {
+    /**
+     * e.g. "From the journal."
      */
     heading: string;
+    /**
+     * Label above the search box.
+     */
+    searchLabel?: string | null;
+    /**
+     * Grey text inside the search box.
+     */
+    searchPlaceholder?: string | null;
+    /**
+     * Shown when a search finds nothing.
+     */
+    emptyText: string;
+    /**
+     * Link text on each card, e.g. "Read article".
+     */
+    readLabel: string;
+  };
+  article: {
+    /**
+     * Above the list of sections, e.g. "In this guide".
+     */
+    tocLabel?: string | null;
+    /**
+     * Small link at the top, e.g. "All articles".
+     */
+    backLabel: string;
+    /**
+     * Button at the end, e.g. "Back to the journal".
+     */
+    backButtonLabel?: string | null;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Shown when the page is shared on WhatsApp, Facebook etc. Leave empty to use the main image.
+     */
+    image?: (number | null) | Media;
+  };
+  _status?: ('draft' | 'published') | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * The contact page and the enquiry form (the form also appears on the homepage). Address, phone and hours are in Settings → Studio details.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page".
+ */
+export interface ContactPage {
+  id: number;
+  hero: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * The page title (H1). White, then grey, then orange.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
     intro?: string | null;
+    /**
+     * Label above the address, e.g. "The studio".
+     */
+    studioLabel?: string | null;
+    /**
+     * Label above phone and email, e.g. "Direct contact".
+     */
+    directLabel?: string | null;
+    /**
+     * The boxed note under the details. Optional.
+     */
+    notice?: string | null;
+  };
+  /**
+   * Used on this page and on the homepage. Field labels are part of the design.
+   */
+  form: {
+    /**
+     * The button, e.g. "Send your tattoo idea".
+     */
     submitLabel: string;
     /**
-     * Short note under the form. Link to the privacy policy.
+     * Small text under the button. Optional.
+     */
+    helperText?: string | null;
+    /**
+     * Short note with a link to the privacy policy.
      */
     privacyNote?: {
       root: {
@@ -1474,12 +2506,63 @@ export interface Homepage {
       };
       [k: string]: unknown;
     } | null;
-    successHeading: string;
-    successMessage?: string | null;
     /**
-     * Turn on if your ad campaigns count conversions by page visit.
+     * Shown when someone presses the button while sending is not connected yet.
      */
-    redirectToThankYou?: boolean | null;
+    pendingNotice: string;
+    /**
+     * Shown after a successful enquiry (once sending is connected).
+     */
+    successHeading?: string | null;
+    /**
+     * Under the success heading.
+     */
+    successMessage?: string | null;
+  };
+  next: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    cards?:
+      | {
+          /**
+           * Small label after the number, e.g. "Your idea".
+           */
+          label?: string | null;
+          title: string;
+          /**
+           * Leave an empty line between paragraphs.
+           */
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+  };
+  /**
+   * Shows the FAQs set to appear on Contact (Studio → FAQs).
+   */
+  faq: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
   };
   meta?: {
     title?: string | null;
@@ -1503,19 +2586,26 @@ export interface SiteSetting {
   id: number;
   studioName: string;
   /**
-   * Optional. Leave empty to use the built-in wordmark (recommended).
+   * Optional. Leave empty to use the built-in wordmark, made from the studio name (first word on top).
    */
   logo?: (number | null) | Media;
   /**
-   * Short paragraph next to the logo in the footer.
+   * Short line under the city in the footer.
    */
   brandParagraph?: string | null;
+  /**
+   * The design shows every photo in black and white. Untick to show them in colour.
+   */
+  monochromePhotos?: boolean | null;
   /**
    * For Google, e.g. "€€" or "From €80".
    */
   priceRange?: string | null;
   address: {
-    street: string;
+    /**
+     * Leave empty until the address is confirmed.
+     */
+    street?: string | null;
     city: string;
     postcode?: string | null;
     country: string;
@@ -1552,6 +2642,64 @@ export interface SiteSetting {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The last section of About, Portfolio, the journal and every article.
+   */
+  endCta: {
+    /**
+     * Small orange label above the heading. A few words.
+     */
+    tag?: string | null;
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href: string;
+    };
+    /**
+     * Small print under the button. Optional.
+     */
+    note?: string | null;
+  };
+  /**
+   * Shown when a link leads nowhere.
+   */
+  notFound: {
+    /**
+     * Up to three parts, shown in this order: white, grey, orange. Each part starts on a new line; press Enter for more line breaks.
+     */
+    heading: {
+      text: string;
+      soft?: string | null;
+      accent?: string | null;
+    };
+    /**
+     * Leave an empty line between paragraphs.
+     */
+    text?: string | null;
+    button: {
+      /**
+       * The text on the button. Keep it short.
+       */
+      label: string;
+      /**
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
+       */
+      href: string;
+    };
+  };
   seo: {
     /**
      * How page titles look in Google. %s is replaced by the page title, e.g. "%s | Studio Name".
@@ -1583,13 +2731,12 @@ export interface Navigation {
   id: number;
   header: {
     /**
-     * Shown left to right. Keep labels to one word where possible.
+     * Shown left to right. Keep labels short.
      */
     links?:
       | {
-          type?: ('link' | 'styles') | null;
           label: string;
-          href?: string | null;
+          href: string;
           id?: string | null;
         }[]
       | null;
@@ -1602,39 +2749,22 @@ export interface Navigation {
        */
       label: string;
       /**
-       * A page on this site like /journal, a section like #book, or a full web address.
+       * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
        */
       href: string;
     };
   };
-  footer: {
+  footer?: {
     /**
-     * Link columns. The newsletter and contact columns are added automatically.
+     * The footer’s list of pages.
      */
-    columns?:
+    links?:
       | {
-          title: string;
-          type: 'links' | 'styles';
-          links?:
-            | {
-                label: string;
-                href: string;
-                id?: string | null;
-              }[]
-            | null;
+          label: string;
+          href: string;
           id?: string | null;
         }[]
       | null;
-    newsletter: {
-      title: string;
-      text?: string | null;
-      buttonLabel: string;
-      /**
-       * Text next to the consent checkbox.
-       */
-      consentLabel: string;
-    };
-    contactTitle: string;
     /**
      * e.g. "© {year} Studio Name". {year} becomes the current year.
      */
@@ -1661,118 +2791,177 @@ export interface HomepageSelect<T extends boolean = true> {
   hero?:
     | T
     | {
-        eyebrow?: T;
-        eyebrowLink?:
+        label?: T;
+        heading?:
           | T
           | {
-              label?: T;
-              href?: T;
-            };
-        heading?: T;
-        intro?: T;
-        cta?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        scrollLabel?: T;
-        poster?: T;
-      };
-  process?:
-    | T
-    | {
-        heading?: T;
-        sequence?: T;
-        steps?:
-          | T
-          | {
-              label?: T;
-              heading?: T;
               text?: T;
-              id?: T;
+              soft?: T;
+              accent?: T;
             };
-      };
-  featuredWork?:
-    | T
-    | {
-        eyebrow?: T;
-        heading?: T;
         intro?: T;
+        supporting?: T;
+        primaryCta?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        secondaryLink?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        factValue?: T;
+        factLabel?: T;
+        secondFact?: T;
+        primaryImage?: T;
+        primaryCaption?: T;
+        secondaryImage?: T;
+        secondaryCaption?: T;
+        imagesLink?: T;
+        artNote?: T;
       };
-  styles?:
+  strip?:
     | T
     | {
-        heading?: T;
+        text?: T;
+        id?: T;
+      };
+  work?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
         button?:
           | T
           | {
               label?: T;
               href?: T;
             };
+        creditLine?: T;
+        trackLabel?: T;
+        pieces?: T;
       };
-  numbers?:
+  films?:
     | T
     | {
-        eyebrow?: T;
-        heading?: T;
-        stats?:
+        trackLabel?: T;
+        itemLabel?: T;
+        watchLabel?: T;
+        pieces?: T;
+      };
+  meetArtist?:
+    | T
+    | {
+        tag?: T;
+        heading?:
           | T
           | {
-              value?: T;
-              unit?: T;
               text?: T;
-              image?: T;
+              soft?: T;
+              accent?: T;
+            };
+        artist?: T;
+        image?: T;
+        imageNote?: T;
+        text?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        signoff?: T;
+      };
+  visit?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        steps?:
+          | T
+          | {
+              title?: T;
+              text?: T;
               id?: T;
             };
-      };
-  statement?:
-    | T
-    | {
-        eyebrow?: T;
-        headingLine1?: T;
-        headingLine2?: T;
-        text?: T;
-        secondaryButton?:
-          | T
-          | {
-              label?: T;
-              href?: T;
-            };
-        primaryButton?:
+        link?:
           | T
           | {
               label?: T;
               href?: T;
             };
       };
-  artists?:
+  plan?:
     | T
     | {
-        eyebrow?: T;
-        heading?: T;
-        headingMuted?: T;
-      };
-  standards?:
-    | T
-    | {
-        eyebrow?: T;
-        heading?: T;
-        items?:
+        tag?: T;
+        heading?:
           | T
           | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        cards?:
+          | T
+          | {
+              label?: T;
               icon?: T;
               title?: T;
               text?: T;
               id?: T;
             };
+        priceNote?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+            };
       };
-  journal?:
+  enquiry?:
     | T
     | {
-        eyebrow?: T;
-        heading?: T;
-        button?:
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        detailText?: T;
+        contactLink?:
           | T
           | {
               label?: T;
@@ -1782,20 +2971,622 @@ export interface HomepageSelect<T extends boolean = true> {
   faq?:
     | T
     | {
-        eyebrow?: T;
-        heading?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
       };
-  booking?:
+  journal?:
     | T
     | {
-        eyebrow?: T;
-        heading?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  finalCta?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
+  mobileCta?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about-page_select".
+ */
+export interface AboutPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
         intro?: T;
+        scrollLabel?: T;
+        indexLabel?: T;
+        background?: T;
+      };
+  meetArtist?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        artist?: T;
+        image?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        note?: T;
+      };
+  focus?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              text?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+      };
+  values?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        cards?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  studio?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+        link?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        note?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "portfolio-page_select".
+ */
+export interface PortfolioPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        indexLabel?: T;
+        background?: T;
+      };
+  intro?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+      };
+  filter?:
+    | T
+    | {
+        allLabel?: T;
+        countLabel?: T;
+      };
+  detail?:
+    | T
+    | {
+        label?: T;
+        photoLabel?: T;
+        videoCaption?: T;
+        storyHeading?: T;
+        storyNote?: T;
+        direction?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+            };
+        ctaLabel?: T;
+        travel?:
+          | T
+          | {
+              tag?: T;
+              heading?:
+                | T
+                | {
+                    text?: T;
+                    soft?: T;
+                    accent?: T;
+                  };
+              text?: T;
+              links?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                    id?: T;
+                  };
+            };
+        suggestions?:
+          | T
+          | {
+              tag?: T;
+              heading?:
+                | T
+                | {
+                    text?: T;
+                    soft?: T;
+                    accent?: T;
+                  };
+              button?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              cardLink?: T;
+            };
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "visiting-page_select".
+ */
+export interface VisitingPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        note?: T;
+        route?:
+          | T
+          | {
+              title?: T;
+              stops?:
+                | T
+                | {
+                    label?: T;
+                    title?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              footnote?: T;
+            };
+        background?: T;
+      };
+  plan?:
+    | T
+    | {
+        navLabel?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        cards?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              text?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+      };
+  stay?:
+    | T
+    | {
+        navLabel?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        cards?:
+          | T
+          | {
+              symbol?: T;
+              tag?: T;
+              title?: T;
+              text?: T;
+              bullets?: T;
+              button?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+        notice?: T;
+        arrival?:
+          | T
+          | {
+              title?: T;
+              text?: T;
+            };
+      };
+  explore?:
+    | T
+    | {
+        navLabel?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        destinations?:
+          | T
+          | {
+              motif?: T;
+              tag?: T;
+              title?: T;
+              text?: T;
+              link?:
+                | T
+                | {
+                    label?: T;
+                    href?: T;
+                  };
+              id?: T;
+            };
+        note?: T;
+        slow?:
+          | T
+          | {
+              tag?: T;
+              title?: T;
+              text?: T;
+            };
+      };
+  itinerary?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+        items?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  questions?:
+    | T
+    | {
+        navLabel?: T;
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+      };
+  endCta?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        note?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "journal-page_select".
+ */
+export interface JournalPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        indexLabel?: T;
+        background?: T;
+      };
+  featured?:
+    | T
+    | {
+        tag?: T;
+        post?: T;
+        label?: T;
+        buttonLabel?: T;
+      };
+  list?:
+    | T
+    | {
+        heading?: T;
+        searchLabel?: T;
+        searchPlaceholder?: T;
+        emptyText?: T;
+        readLabel?: T;
+      };
+  article?:
+    | T
+    | {
+        tocLabel?: T;
+        backLabel?: T;
+        backButtonLabel?: T;
+      };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  _status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contact-page_select".
+ */
+export interface ContactPageSelect<T extends boolean = true> {
+  hero?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        intro?: T;
+        studioLabel?: T;
+        directLabel?: T;
+        notice?: T;
+      };
+  form?:
+    | T
+    | {
         submitLabel?: T;
+        helperText?: T;
         privacyNote?: T;
+        pendingNotice?: T;
         successHeading?: T;
         successMessage?: T;
-        redirectToThankYou?: T;
+      };
+  next?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        cards?:
+          | T
+          | {
+              label?: T;
+              title?: T;
+              text?: T;
+              id?: T;
+            };
+      };
+  faq?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
       };
   meta?:
     | T
@@ -1817,6 +3608,7 @@ export interface SiteSettingsSelect<T extends boolean = true> {
   studioName?: T;
   logo?: T;
   brandParagraph?: T;
+  monochromePhotos?: T;
   priceRange?: T;
   address?:
     | T
@@ -1851,6 +3643,43 @@ export interface SiteSettingsSelect<T extends boolean = true> {
         url?: T;
         id?: T;
       };
+  endCta?:
+    | T
+    | {
+        tag?: T;
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+        note?: T;
+      };
+  notFound?:
+    | T
+    | {
+        heading?:
+          | T
+          | {
+              text?: T;
+              soft?: T;
+              accent?: T;
+            };
+        text?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              href?: T;
+            };
+      };
   seo?:
     | T
     | {
@@ -1879,7 +3708,6 @@ export interface NavigationSelect<T extends boolean = true> {
         links?:
           | T
           | {
-              type?: T;
               label?: T;
               href?: T;
               id?: T;
@@ -1894,29 +3722,13 @@ export interface NavigationSelect<T extends boolean = true> {
   footer?:
     | T
     | {
-        columns?:
+        links?:
           | T
           | {
-              title?: T;
-              type?: T;
-              links?:
-                | T
-                | {
-                    label?: T;
-                    href?: T;
-                    id?: T;
-                  };
+              label?: T;
+              href?: T;
               id?: T;
             };
-        newsletter?:
-          | T
-          | {
-              title?: T;
-              text?: T;
-              buttonLabel?: T;
-              consentLabel?: T;
-            };
-        contactTitle?: T;
         legalLine?: T;
         legalLinks?:
           | T
@@ -1979,23 +3791,13 @@ export interface CallToActionBlock {
      */
     label: string;
     /**
-     * A page on this site like /journal, a section like #book, or a full web address.
+     * A page on this site like /portfolio, a section like #tattoo-enquiry, or a full web address.
      */
     href: string;
   };
   id?: string | null;
   blockName?: string | null;
   blockType: 'cta';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "ArtistCardBlock".
- */
-export interface ArtistCardBlock {
-  artist: number | Artist;
-  id?: string | null;
-  blockName?: string | null;
-  blockType: 'artistCard';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

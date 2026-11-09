@@ -3,10 +3,11 @@ import { slugField, type CollectionConfig } from 'payload'
 import { anyone, isAdminOrEditor } from '@/access'
 import { basicEditor } from '@/fields/richText'
 import { revalidateCollection } from '@/hooks/revalidate'
+import { pathForDoc } from '@/lib/routes'
 
 const { afterChange, afterDelete } = revalidateCollection({
   collection: 'legal-pages',
-  paths: (doc) => (doc.slug ? [`/${doc.slug}`] : []),
+  paths: (doc) => (doc.slug ? [pathForDoc('legal-pages', doc.slug)] : []),
 })
 
 export const LegalPages: CollectionConfig = {

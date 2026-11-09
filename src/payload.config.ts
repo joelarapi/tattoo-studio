@@ -19,9 +19,14 @@ import { Posts } from './collections/Posts'
 import { Styles } from './collections/Styles'
 import { Users } from './collections/Users'
 import { basicEditor } from './fields/richText'
+import { AboutPage } from './globals/AboutPage'
+import { ContactPage } from './globals/ContactPage'
 import { Homepage } from './globals/Homepage'
+import { JournalPage } from './globals/JournalPage'
 import { Navigation } from './globals/Navigation'
+import { PortfolioPage } from './globals/PortfolioPage'
 import { SiteSettings } from './globals/SiteSettings'
+import { VisitingPage } from './globals/VisitingPage'
 import { bearerToken, matchesSecret } from './lib/secrets'
 import { seo } from './plugins/seo'
 
@@ -56,7 +61,7 @@ export default buildConfig({
       ],
     },
   },
-  // Sidebar order: Content, Studio, Leads, Settings.
+  // Sidebar order: Content, Studio, Leads, Settings, then Pages (globals).
   collections: [
     Posts,
     Categories,
@@ -70,7 +75,16 @@ export default buildConfig({
     LegalPages,
     Users,
   ],
-  globals: [Homepage, SiteSettings, Navigation],
+  globals: [
+    Homepage,
+    AboutPage,
+    PortfolioPage,
+    VisitingPage,
+    JournalPage,
+    ContactPage,
+    SiteSettings,
+    Navigation,
+  ],
   editor: basicEditor,
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -125,7 +139,7 @@ export default buildConfig({
           : { prefix: 'media' },
       },
     }),
-    // Private bucket: client reference images, only readable through Payload's access control.
+    // Private bucket: client reference files, only readable through Payload's access control.
     s3Storage({
       enabled: Boolean(process.env.S3_PRIVATE_BUCKET),
       alwaysInsertFields: true,

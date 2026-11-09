@@ -1,316 +1,294 @@
-import type { Field, GlobalConfig, GroupField } from 'payload'
+import type { ArrayField } from 'payload'
 
-import { adminFieldAccess, isAdminOrEditor, publishedOrLoggedIn } from '@/access'
-import { iconField } from '@/fields/icon'
-import { linkGroup } from '@/fields/link'
-import { basicEditor } from '@/fields/richText'
-import { revalidateGlobal } from '@/hooks/revalidate'
-import { generatePreviewPath } from '@/lib/preview'
+import { image, optionalLink, paragraphs, section, tagField, text } from '@/fields/content'
+import { styledHeading } from '@/fields/heading'
+import { linkGroup, validateHref } from '@/fields/link'
 
-/** One homepage section's copy, shown as a titled box in the admin. */
-const section = (
-  name: string,
-  label: string,
-  fields: Field[],
-  description?: string,
-): GroupField => ({
-  name,
-  label,
-  type: 'group',
-  admin: { description },
-  fields,
-})
+import { pageGlobal } from './pageGlobal'
 
-const eyebrow: Field = {
-  name: 'eyebrow',
-  type: 'text',
-  admin: { description: 'Small uppercase label above the heading. Keep it to a few words.' },
+const steps: ArrayField = {
+  name: 'steps',
+  type: 'array',
+  maxRows: 3,
+  labels: { singular: 'Step', plural: 'Steps' },
+  admin: { components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' } },
+  fields: [
+    { name: 'title', type: 'text', required: true },
+    { name: 'text', type: 'textarea', required: true },
+  ],
 }
 
-const heading = (description?: string): Field => ({
-  name: 'heading',
-  type: 'text',
-  required: true,
-  admin: { description },
-})
-
 /*
- * Every homepage text, in page order. The SEO tab is added by the SEO plugin (src/plugins/seo.ts),
- * which is why the first field is the tabs field.
+ * Every homepage text, in page order. Section numbers ("01 / …") are added by the site in the
+ * order the sections appear.
  */
-export const Homepage: GlobalConfig = {
+export const Homepage = pageGlobal({
   slug: 'homepage',
-  admin: {
-    group: 'Content',
-    description:
-      'All homepage text, section by section. Changes autosave as a draft; press Publish to put them live.',
-    livePreview: { url: () => generatePreviewPath('/') },
-    preview: () => generatePreviewPath('/'),
-  },
-  access: {
-    read: publishedOrLoggedIn,
-    update: isAdminOrEditor,
-  },
-  versions: {
-    drafts: { autosave: { interval: 375 } },
-    max: 50,
-  },
-  hooks: { afterChange: [revalidateGlobal({ global: 'homepage', paths: ['/'] })] },
-  fields: [
+  label: 'Homepage',
+  description:
+    'All homepage text, section by section. Changes autosave as a draft; press Publish to put them live.',
+  tabs: [
     {
-      type: 'tabs',
-      tabs: [
-        {
-          label: 'Hero',
-          fields: [
-            section('hero', 'Hero (top of the page)', [
-              eyebrow,
-              linkGroup({ name: 'eyebrowLink', label: 'Link next to the label' }),
-              heading(
-                'The main headline (the page’s H1). Short and memorable; Google reads it first.',
-              ),
+      label: 'Hero',
+      fields: [
+        section('hero', 'Hero', [
+          text(
+            'label',
+            'Small label next to the orange dot, e.g. the studio name and country.',
+            true,
+          ),
+          styledHeading({ description: 'The page title (H1). White, then grey, then orange.' }),
+          paragraphs('intro', 'The first paragraph under the title.', true),
+          paragraphs('supporting', 'A shorter, quieter line under the intro. Optional.'),
+          linkGroup({ name: 'primaryCta', label: 'Orange button' }),
+          optionalLink('secondaryLink', 'Text link next to the button'),
+          {
+            type: 'row',
+            fields: [
               {
-                name: 'intro',
-                type: 'textarea',
-                required: true,
-                admin: { description: 'One or two sentences under the headline.' },
-              },
-              linkGroup({ name: 'cta', label: 'Main button' }),
-              {
-                name: 'scrollLabel',
+                name: 'factValue',
+                label: 'Big number',
                 type: 'text',
-                defaultValue: 'Scroll to begin',
-                admin: { description: 'The small hint at the bottom of the hero.' },
+                admin: { width: '20%', description: 'e.g. 18' },
               },
               {
-                name: 'poster',
-                label: 'Process animation still (optional)',
-                type: 'upload',
-                relationTo: 'media',
-                filterOptions: { mimeType: { contains: 'image' } },
-                admin: {
-                  description:
-                    'Replaces the first frame of the process animation, shown while it loads. Black background, 16:9.',
-                },
+                name: 'factLabel',
+                label: 'Next to the number',
+                type: 'text',
+                admin: { width: '40%', description: 'e.g. "Years of tattoo experience".' },
               },
-            ]),
-          ],
-        },
+              {
+                name: 'secondFact',
+                label: 'Second fact',
+                type: 'textarea',
+                admin: { width: '40%', rows: 2, description: 'Short; Enter for a line break.' },
+              },
+            ],
+          },
+          image('primaryImage', 'Large image', 'Portrait format (3:4) works best.'),
+          text('primaryCaption', 'Small caption on the large image. Optional.'),
+          image('secondaryImage', 'Small image', 'Overlaps the large one. Portrait or square.'),
+          text('secondaryCaption', 'Small caption on the small image. Optional.'),
+          {
+            name: 'imagesLink',
+            label: 'Images link to',
+            type: 'text',
+            defaultValue: '/portfolio',
+            validate: validateHref,
+          },
+          text('artNote', 'Tiny text under the images, e.g. "Art. Identity. Expression."'),
+        ]),
         {
-          label: 'Process',
-          fields: [
-            section(
-              'process',
-              'The process (scroll animation)',
-              [
-                heading('Section heading, e.g. "From idea to healed".'),
-                {
-                  name: 'sequence',
-                  type: 'text',
-                  defaultValue: 'placeholder',
-                  access: { update: adminFieldAccess },
-                  admin: {
-                    description:
-                      'Technical: the animation’s folder name. Set by the developer when new footage arrives.',
-                  },
-                },
-                {
-                  name: 'steps',
-                  type: 'array',
-                  minRows: 4,
-                  maxRows: 4,
-                  required: true,
-                  labels: { singular: 'Step', plural: 'Steps' },
-                  admin: {
-                    description: 'Exactly four steps; they’re numbered 01–04 automatically.',
-                    initCollapsed: true,
-                    components: { RowLabel: '/components/admin/RowLabel#HeadingRowLabel' },
-                  },
-                  fields: [
-                    {
-                      name: 'label',
-                      type: 'text',
-                      admin: { description: 'Optional small label, e.g. "Week 1".' },
-                    },
-                    { name: 'heading', type: 'text', required: true },
-                    { name: 'text', type: 'textarea', required: true },
-                  ],
-                },
-              ],
-              'Four steps that scroll past while the animation plays.',
-            ),
-          ],
-        },
-        {
-          label: 'Work & styles',
-          fields: [
-            section(
-              'featuredWork',
-              'Featured work slider',
-              [eyebrow, heading(), { name: 'intro', type: 'textarea' }],
-              'Shows portfolio pieces marked "Featured".',
-            ),
-            section(
-              'styles',
-              'Styles grid',
-              [heading('e.g. "What we tattoo"'), linkGroup({ name: 'button', label: 'Button' })],
-              'Shows the 4 styles marked "Show on homepage".',
-            ),
-          ],
-        },
-        {
-          label: 'Numbers & statement',
-          fields: [
-            section('numbers', 'Studio in numbers', [
-              eyebrow,
-              heading(),
-              {
-                name: 'stats',
-                type: 'array',
-                minRows: 1,
-                maxRows: 6,
-                labels: { singular: 'Stat', plural: 'Stats' },
-                admin: {
-                  description:
-                    'Real figures only. The seeded numbers are placeholders: replace them before launch.',
-                  initCollapsed: true,
-                  components: { RowLabel: '/components/admin/RowLabel#StatRowLabel' },
-                },
-                fields: [
-                  {
-                    type: 'row',
-                    fields: [
-                      {
-                        name: 'value',
-                        type: 'number',
-                        required: true,
-                        admin: { width: '33%', description: 'e.g. 4.9' },
-                      },
-                      {
-                        name: 'unit',
-                        type: 'text',
-                        admin: { width: '33%', description: 'Optional, e.g. "+" or "★".' },
-                      },
-                    ],
-                  },
-                  {
-                    name: 'text',
-                    type: 'text',
-                    required: true,
-                    admin: {
-                      description: 'The rest of the sentence, e.g. "average Google rating".',
-                    },
-                  },
-                  {
-                    name: 'image',
-                    type: 'upload',
-                    relationTo: 'media',
-                    filterOptions: { mimeType: { contains: 'image' } },
-                  },
-                ],
-              },
-            ]),
-            section('statement', 'Statement', [
-              eyebrow,
-              {
-                type: 'row',
-                fields: [
-                  { name: 'headingLine1', type: 'text', required: true, admin: { width: '50%' } },
-                  { name: 'headingLine2', type: 'text', admin: { width: '50%' } },
-                ],
-              },
-              { name: 'text', type: 'textarea' },
-              linkGroup({ name: 'secondaryButton', label: 'Dark button' }),
-              linkGroup({ name: 'primaryButton', label: 'Orange button' }),
-            ]),
-          ],
-        },
-        {
-          label: 'Artists & standards',
-          fields: [
-            section(
-              'artists',
-              'Meet the artists',
-              [
-                eyebrow,
-                heading(),
-                {
-                  name: 'headingMuted',
-                  type: 'text',
-                  admin: { description: 'A second sentence, shown in grey after the heading.' },
-                },
-              ],
-              'Shows artists marked "Show on homepage".',
-            ),
-            section('standards', 'Our standards', [
-              eyebrow,
-              heading(),
-              {
-                name: 'items',
-                type: 'array',
-                minRows: 4,
-                maxRows: 4,
-                labels: { singular: 'Standard', plural: 'Standards' },
-                admin: {
-                  description: 'Four promises. Only publish what is true for the studio.',
-                  initCollapsed: true,
-                  components: { RowLabel: '/components/admin/RowLabel#TitleRowLabel' },
-                },
-                fields: [
-                  iconField(),
-                  { name: 'title', type: 'text', required: true },
-                  { name: 'text', type: 'textarea', required: true },
-                ],
-              },
-            ]),
-          ],
-        },
-        {
-          label: 'Journal & FAQ',
-          fields: [
-            section(
-              'journal',
-              'Latest from the journal',
-              [eyebrow, heading(), linkGroup({ name: 'button', label: 'Button' })],
-              'Shows the three newest published posts.',
-            ),
-            section('faq', 'FAQ', [eyebrow, heading()], 'Shows FAQs marked "Show on homepage".'),
-          ],
-        },
-        {
-          label: 'Booking',
-          fields: [
-            section('booking', 'Booking form', [
-              eyebrow,
-              heading('e.g. "Ready when you are"'),
-              { name: 'intro', type: 'textarea' },
-              { name: 'submitLabel', type: 'text', required: true, defaultValue: 'Send request' },
-              {
-                name: 'privacyNote',
-                type: 'richText',
-                editor: basicEditor,
-                admin: { description: 'Short note under the form. Link to the privacy policy.' },
-              },
-              {
-                type: 'row',
-                fields: [
-                  { name: 'successHeading', type: 'text', required: true, admin: { width: '50%' } },
-                  { name: 'successMessage', type: 'textarea', admin: { width: '50%' } },
-                ],
-              },
-              {
-                name: 'redirectToThankYou',
-                label: 'Send people to the /thank-you page after they submit',
-                type: 'checkbox',
-                defaultValue: false,
-                admin: {
-                  description: 'Turn on if your ad campaigns count conversions by page visit.',
-                },
-              },
-            ]),
-          ],
+          name: 'strip',
+          label: 'Text strip',
+          type: 'array',
+          maxRows: 6,
+          labels: { singular: 'Phrase', plural: 'Phrases' },
+          admin: {
+            description: 'Short phrases in the band under the hero, separated by asterisks.',
+            components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' },
+          },
+          fields: [{ name: 'text', type: 'text', required: true }],
         },
       ],
     },
+    {
+      label: 'Portfolio',
+      fields: [
+        section('work', 'Portfolio', [
+          tagField(),
+          styledHeading(),
+          paragraphs('intro', 'Next to the heading. Enter for a line break.'),
+          optionalLink('button', 'Button'),
+          text(
+            'creditLine',
+            'Tiny line above the photos and under the films, e.g. "Original work by Tisi".',
+          ),
+          text(
+            'trackLabel',
+            'Small label above the photos, e.g. "Photos · scroll at your own pace".',
+          ),
+          {
+            name: 'pieces',
+            label: 'Photos',
+            type: 'relationship',
+            relationTo: 'portfolio-items',
+            hasMany: true,
+            maxRows: 12,
+            admin: {
+              description:
+                'The pieces in the photo gallery, in this order. Leave empty to show the first 9 of the portfolio.',
+            },
+          },
+        ]),
+        section(
+          'films',
+          'Films',
+          [
+            text('trackLabel', 'Small label above the films.'),
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'itemLabel',
+                  type: 'text',
+                  admin: { width: '50%', description: 'Top of each card, e.g. "Tisi / film".' },
+                },
+                {
+                  name: 'watchLabel',
+                  type: 'text',
+                  defaultValue: 'Watch the tattoo video',
+                  admin: { width: '50%', description: 'Link at the bottom of each card.' },
+                },
+              ],
+            },
+            {
+              name: 'pieces',
+              label: 'Films',
+              type: 'relationship',
+              relationTo: 'portfolio-items',
+              hasMany: true,
+              maxRows: 12,
+              filterOptions: { video: { exists: true } },
+              admin: {
+                description:
+                  'Pieces with a video, in this order. Each card shows the video cover and opens the piece’s page. Leave empty to hide the films.',
+              },
+            },
+          ],
+          'A second gallery under the photos.',
+        ),
+      ],
+    },
+    {
+      label: 'Artist',
+      fields: [
+        section('meetArtist', 'Meet the artist', [
+          tagField(),
+          styledHeading(),
+          {
+            name: 'artist',
+            type: 'relationship',
+            relationTo: 'artists',
+            required: true,
+            admin: { description: 'The artist whose portrait is shown.' },
+          },
+          image('image', 'Image', 'Optional. Replaces the artist portrait here.', false),
+          text('imageNote', 'Small note on the image, e.g. "Original work by Tisi". Optional.'),
+          paragraphs('text', 'A short introduction. Leave an empty line between paragraphs.'),
+          optionalLink('button', 'Button'),
+          paragraphs('signoff', 'Small text next to the asterisk. Optional.'),
+        ]),
+      ],
+    },
+    {
+      label: 'Visiting',
+      fields: [
+        section('visit', 'Visiting Albania', [
+          tagField(),
+          styledHeading(),
+          paragraphs('text'),
+          optionalLink('button', 'Orange button'),
+          steps,
+          optionalLink('link', 'Link under the steps'),
+        ]),
+      ],
+    },
+    {
+      label: 'Plan',
+      fields: [
+        section('plan', 'From idea to appointment', [
+          tagField(),
+          styledHeading(),
+          paragraphs('intro', 'Next to the heading. Enter for a line break.'),
+          {
+            name: 'cards',
+            type: 'array',
+            maxRows: 3,
+            labels: { singular: 'Card', plural: 'Cards' },
+            admin: { components: { RowLabel: '/components/admin/RowLabel#ItemRowLabel' } },
+            fields: [
+              {
+                type: 'row',
+                fields: [
+                  { name: 'label', type: 'text', admin: { width: '40%' } },
+                  {
+                    name: 'icon',
+                    type: 'select',
+                    required: true,
+                    defaultValue: 'sketch',
+                    admin: { width: '20%' },
+                    options: [
+                      { label: 'Sketch', value: 'sketch' },
+                      { label: 'Machine', value: 'machine' },
+                      { label: 'Ink', value: 'ink' },
+                    ],
+                  },
+                  { name: 'title', type: 'text', required: true, admin: { width: '40%' } },
+                ],
+              },
+              { name: 'text', type: 'textarea', required: true },
+            ],
+          },
+          {
+            name: 'priceNote',
+            label: 'Price note',
+            type: 'group',
+            fields: [
+              text('title', 'Bold start of the note, e.g. a question.'),
+              { name: 'text', type: 'textarea' },
+              optionalLink('link', 'Link'),
+            ],
+          },
+        ]),
+      ],
+    },
+    {
+      label: 'Enquiry',
+      fields: [
+        section(
+          'enquiry',
+          'Enquiry form',
+          [
+            tagField(),
+            styledHeading(),
+            paragraphs('intro'),
+            paragraphs(
+              'detailText',
+              'Under the studio name and city, e.g. "Tattoo artist: Tisi · 18 years of experience."',
+            ),
+            optionalLink('contactLink', 'Link under the details'),
+          ],
+          'The form itself (button, notes) is edited in Pages → Contact.',
+        ),
+      ],
+    },
+    {
+      label: 'FAQ & journal',
+      fields: [
+        section(
+          'faq',
+          'FAQ',
+          [tagField(), styledHeading()],
+          'Shows the FAQs set to appear on the homepage (Studio → FAQs).',
+        ),
+        section('journal', 'Journal', [tagField(), styledHeading(), optionalLink('link', 'Link')]),
+      ],
+    },
+    {
+      label: 'Closing',
+      fields: [
+        section('finalCta', 'Closing call to action', [
+          tagField(),
+          styledHeading(),
+          linkGroup({ name: 'button', label: 'Orange button' }),
+        ]),
+        linkGroup({
+          name: 'mobileCta',
+          label: 'Mobile button',
+          description: 'The orange bar pinned to the bottom of the screen on phones.',
+        }),
+      ],
+    },
   ],
-}
+})
