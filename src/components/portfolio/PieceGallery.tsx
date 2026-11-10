@@ -40,8 +40,9 @@ export function PieceGallery({ photos, label }: { photos: Media[]; label?: strin
           }}
           className="block w-full cursor-zoom-in border border-line-strong bg-panel"
         >
-          <CmsImage
+            <CmsImage
             media={media}
+            photo={false}
             sizes="(min-width: 681px) 55vw, 90vw"
             loading={index === 0 ? 'eager' : 'lazy'}
             fetchPriority={index === 0 ? 'high' : undefined}
