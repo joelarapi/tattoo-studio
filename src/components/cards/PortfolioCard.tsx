@@ -39,6 +39,7 @@ export function PortfolioCard({
       >
         <CmsImage
           media={cover}
+          photo={false}
           fill
           sizes="(min-width: 681px) 33vw, 86vw"
           draggable={false}
