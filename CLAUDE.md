@@ -15,7 +15,8 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 
 - `main` is production (Vercel deploys it). Other branches get preview deployments.
 - The production Neon database holds the page builder's schema and content: on 9 Nov 2026 it was emptied (`DROP SCHEMA public CASCADE`) and refilled by `pnpm seed` twice, for the redesign and then for the page builder, with the user's approval. `redesign` was merged into `main` (PR #1) the same day, and the live demo runs the new design.
-- `page-builder` is the page builder (plan and progress: `docs/PAGE_BUILDER.md`; read it first when working on it). On 9 Nov 2026 the production database was emptied and reseeded from this branch (the user's choice), so **until `page-builder` is merged into `main`, the live site is broken**.
+- `page-builder` (the page builder; plan and notes: `docs/PAGE_BUILDER.md`) was merged into `main` (PR #3) on 9 Nov 2026, the day the production database was reseeded from it. The live site runs the page builder.
+- **Collaborator:** `Endri-prifti` has write access and works with OpenAI Codex. The ChatGPT Codex Connector GitHub app is installed for this repo (11 Nov 2026). On 10 Nov they pushed straight to `main` (photos in colour, below). **`AGENTS.md` is what Codex reads**: it repeats the key rules from this file. Keep the two in step when a rule changes.
 - `design-v1` keeps the previous design (scroll-sequence animation, GSAP slider, text effects). **It has no database any more.** To run it, create a new Neon branch, empty its schema, point `.env` at it and run `pnpm seed` on `design-v1`.
 - **`.env` `DATABASE_URI` must match the checked-out git branch.** `pnpm dev`/`pnpm seed` push the schema, so running one branch's code against another branch's database drops that database's columns.
 - Before running anything that touches the database after switching, compare the host in `DATABASE_URI` (print a hash, never the string).
@@ -61,7 +62,7 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **Fonts:** Inter (next/font) for labels, buttons and nav. Headings and body use the system Arial/Helvetica, as in the design.
 - **Accent:** `#FF5100`. Text on it is black (`--color-on-accent`), the user's choice for WCAG AA; the design uses white (3.3:1). Small grey labels use `--color-faint` #8F8F8F, not the design's #666.
 - **Glyphs:** `✳` and `▶` are SVGs (`components/art/Glyphs.tsx`), because iOS draws them as emoji. Text arrows get VS15 (`↗︎`).
-- **Photos:** black and white and slightly darkened (`grayscale(1) brightness(.85)`) through the `photo` utility, unless Studio details → "Show photos in black and white" is off (`data-mono-photos` on `<html>`). `CmsImage` adds it by default. `photo={false}` is for logos, the piece lightbox and page-top backgrounds, which the design shows in colour. Videos are never filtered.
+- **Photos:** black and white and slightly darkened (`grayscale(1) brightness(.85)`) through the `photo` utility, unless Studio details → "Show photos in black and white" is off (`data-mono-photos` on `<html>`). `CmsImage` adds it by default. `photo={false}` is for logos, the piece lightbox and page-top backgrounds, which the design shows in colour. Since 10 Nov 2026 (Endri's change) portfolio cards (`PortfolioCard`) and the photos on piece pages (`PieceGallery`) are in colour too. Videos are never filtered.
 - **Page-top photos:** `pageHero()` (and the Visiting hero) has an optional `background`. `HeroPhoto` (`ui/Blocks.tsx`) puts it behind the grid under a dark wash (`hero-photo` utility).
 - **Motion:** no GSAP or Lenis (they stay on `design-v1`). `PageMotion` (in the layout) handles all of it with IntersectionObservers:
   - `data-reveal` fades content up once.
@@ -107,7 +108,8 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **Studio portfolio** (design revision "real work"): 30 real pieces, with 32 photos and 11 films.
   - `pnpm seed` downloads them from the design review (`src/seed/studio-media.ts`) straight into the media library (R2), so the clients' tattoos are never in git. If a download fails, it falls back to a placeholder.
   - The seed ticks `clientConsent` on the studio's behalf. Written consent for each piece is still to be confirmed (`docs/RESOURCES_NEEDED.md`).
-- **Next: the page builder** on `page-builder`, following `docs/PAGE_BUILDER.md`. The user wants pages heavily customisable, so the owner can change them later without code. After it: Phase 6 (lead capture: sending the enquiry form, Turnstile, Resend, UTM, consent; landing pages probably reuse the builder, D10), then 7 (SEO: sitemap, robots, LocalBusiness JSON-LD, favicon) and 8 (QA).
+- **Page builder: done and live** (merged 9 Nov 2026, PR #3). The owner can build and change pages without code (`docs/PAGE_BUILDER.md`). Not yet checked by hand: dragging sections with live preview in the admin.
+- **Next:** Phase 6 (lead capture: sending the enquiry form, Turnstile, Resend, UTM, consent; landing pages probably reuse the builder, D10), then 7 (SEO: sitemap, robots, LocalBusiness JSON-LD, favicon) and 8 (QA).
 - **Open for later:** the footer has no newsletter in the new design (dropped). `.env` uses `sslmode=require`; `verify-full` behaves the same and silences pg's warning.
 - **Secrets:** they go in `.env` only. The user once pasted the DB string into `.env.example` (which is committed); it was caught before any push. Before every commit, check that `.env.example` contains only placeholders.
 

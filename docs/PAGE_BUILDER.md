@@ -1,6 +1,6 @@
 # Page builder: plan and working notes
 
-This is the reference for building the page builder, and its memory. **If a session runs out of context, read this file first.** Then run `git log --oneline main..page-builder` and continue from the first unticked step under [Progress](#progress). Tick steps and add to the log as you go, so this file always says where the work stands.
+**Done and live:** merged into `main` (PR #3) on 9 Nov 2026. This file stays as the reference for how the page builder works and why it was built this way. What's still open is under step 10 in [Progress](#progress).
 
 Branch: `page-builder`, made from `main` at `a39c426` on 9 Nov 2026.
 
@@ -32,7 +32,7 @@ The studio owner, and ChatGPT through the MCP endpoint, can build and change pag
 - [x] Plan written (this file). 9 Nov 2026.
 - [x] **0. Prep**
   - [x] Branch `page-builder`
-  - [x] D1: the user switched to **the production database** (9 Nov 2026). They emptied it in the Neon SQL editor and I seeded it with this branch. **Until `page-builder` is merged, the live site (`main`) is broken**: its code expects the old page globals.
+  - [x] D1: the user switched to **the production database** (9 Nov 2026). They emptied it in the Neon SQL editor and I seeded it with this branch. The live site was broken until the merge the same day, because the old code expected the old page globals.
   - [x] CLAUDE.md points to this file
 - [x] **1. Foundations** (code)
   - [x] `src/blocks/`: `settings.ts` (section settings), `BlockSection.tsx`, `types.ts`, `registry.tsx`, `RenderBlocks.tsx`, `PageView.tsx`, `validate.ts`, `summary.ts`, `populated.ts`
@@ -67,10 +67,12 @@ The studio owner, and ChatGPT through the MCP endpoint, can build and change pag
   - Screenshots compared with the live site.
   - MCP: `tools/list` showed only the ticked tools; `findPages` returned the homepage's sections; `updatePages` saved a draft.
   - Not checked by hand yet: dragging sections with live preview in the admin. The e2e tests cover reordering through the API and the section headers.
-- [ ] **10. Release:**
-  - merge into `main` and reseed the production database
-  - re-create the CMS users and AI access keys
-  - check the live site
+- [ ] **10. Release**
+  - [x] production database reseeded (before the merge, see step 0); merged into `main` (PR #3, 9 Nov 2026)
+  - [x] live site checked (11 Nov 2026): every seeded page answers except `/privacy` (below), and the homepage renders its sections
+  - [ ] re-create the AI access keys (the old ones went with the old database); not confirmed yet
+  - [ ] **`/privacy` is a 404 on the live site** (found 11 Nov 2026). The public API lists only 7 pages; Privacy is missing, so it was deleted or unpublished in the CMS after the seed (every page was edited on 10 Nov). The footer and the enquiry form's privacy note link to it. Restore or republish it in the admin.
+  - [ ] by hand: drag sections with live preview in the admin
 
 ### Log
 
@@ -86,6 +88,8 @@ Newest last. One line per working session: what was done and what's next.
   - the divider had no `data-block`
 
   Thumbnails generated. All checks pass (see step 9). Nothing committed: the user asks for commits. Next: the user commits; then merge into `main` and recreate the AI key (step 10). Production already holds the new data.
+- 9 Nov 2026: committed (`1c9e0a1`) and merged into `main` by the user (PR #3).
+- 11 Nov 2026: docs brought up to date with the merge; `AGENTS.md` added for Codex. Live check found `/privacy` missing (step 10).
 
 ---
 
