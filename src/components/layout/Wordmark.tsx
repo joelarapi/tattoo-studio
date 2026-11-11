@@ -30,7 +30,7 @@ export function Wordmark({
         <span
           className={cn(
             'block max-w-full',
-            size === 'header' ? 'w-[200px] lg:w-[280px]' : 'w-[180px] lg:w-[220px]',
+            size === 'header' ? 'w-[160px] lg:w-[200px]' : 'w-[180px] lg:w-[220px]',
             paddedLogo && 'relative aspect-[856/296] overflow-hidden',
           )}
         >

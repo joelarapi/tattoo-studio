@@ -22,7 +22,7 @@ export function Header({
     <header className="relative z-30 flex items-center justify-between gap-5 px-[6%] py-6 md:px-[4%] md:py-[25px] lg:py-7">
       <Wordmark settings={settings} size="header" />
 
-      <nav aria-label="Main" className="hidden min-[1200px]:block">
+      <nav aria-label="Main" className="hidden lg:block">
         <NavLinks
           links={links}
           cta={cta}
@@ -33,7 +33,7 @@ export function Header({
       </nav>
 
       <Disclosure
-        className="min-[1200px]:hidden"
+        className="lg:hidden"
         summary={
           <>
             <span className="group-open:hidden">Menu ＋</span>
