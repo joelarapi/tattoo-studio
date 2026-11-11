@@ -67,7 +67,15 @@ export function WorkShowcase({ block, data, ctx }: BlockProps<'workShowcase', Da
         </ScrollTrack>
       )}
       {films.length > 0 && (
-        <ScrollTrack label={block.films?.trackLabel} ariaLabel="Tattoo films">
+        <ScrollTrack
+          label={
+            !block.films?.trackLabel ||
+            block.films.trackLabel.trim().toLowerCase() === 'films · scroll at your own pace'
+              ? 'Tattoo ideas in motion'
+              : block.films.trackLabel
+          }
+          ariaLabel="Tattoo ideas in motion"
+        >
           {films.map((item) => (
             <FilmCard
               key={item.id}

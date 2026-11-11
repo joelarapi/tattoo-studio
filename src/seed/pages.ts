@@ -75,9 +75,9 @@ export const homePage = (refs: PageRefs): PageSeed => ({
       pieces: refs.homepagePieces,
       colourCycle: true,
       films: {
-        trackLabel: 'Films · scroll at your own pace',
+        trackLabel: 'Tattoo ideas in motion',
         itemLabel: 'Tisi / film',
-        watchLabel: 'Watch the tattoo video',
+        watchLabel: 'View tattoo details',
         pieces: refs.homepageFilms,
       },
       settings: { anchor: 'work', background: 'plain' },
