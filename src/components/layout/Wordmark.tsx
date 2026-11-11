@@ -12,9 +12,11 @@ import type { SiteSetting } from '@/payload-types'
 export function Wordmark({
   settings,
   className,
+  size = 'standard',
 }: {
   settings: Pick<SiteSetting, 'studioName' | 'logo'>
   className?: string
+  size?: 'standard' | 'header'
 }) {
   const [first, ...rest] = settings.studioName.trim().split(/\s+/)
   const logo = typeof settings.logo === 'object' ? settings.logo : null
@@ -27,7 +29,8 @@ export function Wordmark({
       {logo ? (
         <span
           className={cn(
-            'block w-[180px] max-w-full lg:w-[220px]',
+            'block max-w-full',
+            size === 'header' ? 'w-[200px] lg:w-[280px]' : 'w-[180px] lg:w-[220px]',
             paddedLogo && 'relative aspect-[856/296] overflow-hidden',
           )}
         >
