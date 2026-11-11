@@ -27,9 +27,11 @@ const nextConfig: NextConfig = {
         ]
       : [],
   },
-  // NOINDEX=true on demo / staging deploys keeps search engines away from placeholder content.
+  // The public production site is indexable, even if the old demo NOINDEX flag remains set.
+  // Keep previews and explicitly flagged non-production environments out of search results.
   headers: async () =>
-    process.env.NOINDEX === 'true'
+    process.env.VERCEL_ENV !== 'production' &&
+    (process.env.VERCEL_ENV === 'preview' || process.env.NOINDEX === 'true')
       ? [{ source: '/:path*', headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] }]
       : [],
   webpack: (webpackConfig) => {

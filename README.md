@@ -34,7 +34,7 @@ Always use `pnpm exec` / `pnpm dlx` rather than plain `npx`, so commands run on 
 
 1. **Media must be in R2 first.** Vercel has no persistent disk and `/media` isn't in git. Create the two R2 buckets, put the `S3_*` variables in your local `.env` as well, then run `pnpm media:to-r2` (or seed with them set). Running it also adds any missing storage columns to the database (dev schema push), which production can't do by itself.
 2. Import the GitHub repo in Vercel. The framework (Next.js) and pnpm are detected automatically. Under Settings → Build and Deployment, check that the Node.js version is 24.x.
-3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Set `NOINDEX=true` for a demo.
+3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Production is indexable. Vercel previews always use noindex; `NOINDEX=true` only affects non-production environments.
 4. Functions run in `fra1` (Frankfurt, `vercel.json`), next to the Neon database in `eu-central-1`.
 5. Add the production URL to the R2 bucket's CORS rule (`PUT`, `GET`), next to `http://localhost:3000`.
 6. Preview deployments of other branches use the Preview variables. A branch with its own database (like `design-v1`) needs its own `DATABASE_URI` and `NEXT_PUBLIC_SITE_URL`, scoped to that branch.
