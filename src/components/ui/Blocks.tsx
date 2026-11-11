@@ -42,7 +42,7 @@ export function Notice({ children, className }: { children: ReactNode; className
       )}
     >
       <Asterisk className="mt-1 shrink-0 text-[20px]" />
-      <div className="max-w-[850px] text-[11px] leading-[1.7]">{children}</div>
+      <div className="max-w-[850px] text-[14px] leading-[1.7]">{children}</div>
     </div>
   )
 }
@@ -86,7 +86,7 @@ export function SectionHead({
       {(intro || action) && (
         <div className="mt-6 md:mt-0 md:shrink-0">
           {intro && (
-            <p className="text-[13px]">
+            <p className="text-[16px]">
               <Lines text={intro} />
             </p>
           )}
@@ -152,12 +152,12 @@ export function EndCta({
         <Tag className="mb-5">{cta.tag}</Tag>
         <StyledHeading as={as} value={cta.heading} className="text-cta" />
       </div>
-      <Paragraphs text={cta.text} className="mx-auto mt-[23px] max-w-[640px] text-[14px]" />
+      <Paragraphs text={cta.text} className="mx-auto mt-[23px] max-w-[640px] text-[16px]" />
       <div data-reveal className="mt-[30px]">
         <Action link={cta.button} />
       </div>
       {cta.note && (
-        <p className="mt-[23px] text-[10px] md:text-[11px]">
+        <p className="mt-[23px] text-[16px] md:text-[16px]">
           <Lines text={cta.note} />
         </p>
       )}
@@ -203,7 +203,7 @@ export function NumberedCards({
           data-reveal
           className="relative overflow-hidden rounded-md bg-panel p-[25px] lg:p-7"
         >
-          <span className="font-label text-[13px] text-faint">
+          <span className="font-label text-[14px] text-faint">
             {String(index + 1).padStart(2, '0')}
             {card.label && ` / ${card.label.toUpperCase()}`}
           </span>
@@ -218,7 +218,7 @@ export function NumberedCards({
           </h3>
           <Paragraphs
             text={card.text}
-            className="mt-[15px] text-[14px] leading-[1.8] md:text-[13px]"
+            className="mt-[15px] text-[16px] leading-[1.8] md:text-[16px]"
           />
           {card.link?.href && (
             <div className="mt-[25px]">

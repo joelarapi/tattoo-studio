@@ -18,7 +18,7 @@ export function Steps({ block, ctx }: BlockProps<'steps'>) {
         <div data-reveal>
           <Tag number={ctx.number}>{block.tag}</Tag>
           <StyledHeading as={ctx.headingAs} value={block.heading} className="text-h2" />
-          <Paragraphs text={block.text} className="mt-[23px] max-w-[450px] text-[13px]" />
+          <Paragraphs text={block.text} className="mt-[23px] max-w-[450px] text-[16px]" />
           <Action link={block.button} className="mt-[30px]" />
         </div>
         <div>
@@ -29,7 +29,7 @@ export function Steps({ block, ctx }: BlockProps<'steps'>) {
                 <h3 className="mt-2.5 text-[25px] leading-[1.25] tracking-[-0.7px]">
                   {step.title}
                 </h3>
-                {step.text && <p className="mt-[13px] text-[13px] text-[#aaa]">{step.text}</p>}
+                {step.text && <p className="mt-[13px] text-[16px] text-[#aaa]">{step.text}</p>}
               </li>
             ))}
           </ol>
@@ -51,20 +51,20 @@ export function Steps({ block, ctx }: BlockProps<'steps'>) {
           value={block.heading}
           className="text-[42px] leading-[1.13] tracking-[-1.5px] md:text-h2-lg"
         />
-        <Paragraphs text={block.text} className="mt-[23px] max-w-[400px] text-[14px]" />
+        <Paragraphs text={block.text} className="mt-[23px] max-w-[400px] text-[16px]" />
         <Action link={block.button} className="mt-[30px]" />
       </div>
       <div data-reveal>
         {steps.map((step, index) => (
           <article key={step.id} className="flex gap-[25px] border-t border-line-strong py-[25px]">
-            <span className="mt-[5px] font-label text-[11px] text-accent">
+            <span className="mt-[5px] font-label text-[14px] text-accent">
               {String(index + 1).padStart(2, '0')}
             </span>
             <div>
               {step.label && <span className="label-sm text-[#999]">{step.label}</span>}
               <h3 className="text-h3">{step.title}</h3>
               {step.text && (
-                <p className="mt-3 text-[13px] leading-[1.85] md:text-[12px]">{step.text}</p>
+                <p className="mt-3 text-[16px] leading-[1.85] md:text-[16px]">{step.text}</p>
               )}
             </div>
           </article>

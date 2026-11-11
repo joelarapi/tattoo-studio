@@ -27,7 +27,7 @@ function CreditLine({ text, className }: { text?: string | null; className?: str
   return (
     <p
       className={cn(
-        'max-w-[900px] font-label text-[8px] leading-[1.9] text-faint uppercase md:text-[9px] md:leading-[1.8]',
+        'max-w-[900px] font-label text-[16px] leading-[1.9] text-faint uppercase md:text-[16px] md:leading-[1.8]',
         className,
       )}
     >

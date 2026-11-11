@@ -50,7 +50,7 @@ export function PortfolioGrid({
                 aria-pressed={pressed}
                 onClick={() => setActive(filter.slug)}
                 className={cn(
-                  'cursor-pointer rounded-sm border px-3 py-2.5 font-label text-[9px] uppercase transition-colors md:px-[15px] md:py-[11px] md:text-[10px]',
+                  'cursor-pointer rounded-sm border px-3 py-2.5 font-label text-[14px] uppercase transition-colors md:px-[15px] md:py-[11px] md:text-[14px]',
                   pressed
                     ? 'border-accent bg-accent text-on-accent'
                     : 'border-line bg-panel-2 text-[#aaa] hover:text-text',
@@ -63,7 +63,7 @@ export function PortfolioGrid({
         </div>
         <span
           aria-live="polite"
-          className="font-label text-[9px] whitespace-nowrap text-faint uppercase"
+          className="font-label text-[14px] whitespace-nowrap text-faint uppercase"
         >
           {String(shown.length).padStart(2, '0')}
           {countLabel && ` / ${countLabel}`}

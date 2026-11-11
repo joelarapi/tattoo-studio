@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { platformLabels, SocialIcon } from '@/components/ui/SocialIcon'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 import type { Navigation, SiteSetting } from '@/payload-types'
 
 import { Wordmark } from './Wordmark'
@@ -22,14 +22,14 @@ export function Footer({
     <footer className="grid grid-cols-2 gap-[30px] px-site pt-[45px] pb-[25px] in-[body:has([data-mobile-cta])]:pb-[100px] md:grid-cols-3 md:pt-[55px] md:pb-7 md:in-[body:has([data-mobile-cta])]:pb-7">
       <Wordmark settings={settings} />
       <div>
-        {location && <span className="label-sm text-text md:text-[10px]">{location}</span>}
+        {location && <span className="label-sm text-text md:text-[14px]">{location}</span>}
         {settings.brandParagraph && (
-          <p className="mt-[5px] text-[12px]">{settings.brandParagraph}</p>
+          <p className="mt-[5px] text-[16px]">{settings.brandParagraph}</p>
         )}
       </div>
 
       {!!footer?.links?.length && (
-        <ul className="col-span-2 flex flex-wrap gap-[22px] font-label text-[10px] md:col-span-1 md:flex-col md:gap-[9px] md:text-[11px]">
+        <ul className="col-span-2 flex flex-wrap gap-[22px] font-label text-[14px] md:col-span-1 md:flex-col md:gap-[9px] md:text-[14px]">
           {footer.links.map((link) => (
             <li key={link.id}>
               <Link href={link.href} className="transition-colors hover:text-accent">
@@ -40,25 +40,13 @@ export function Footer({
         </ul>
       )}
 
-      {!!settings.socialLinks?.length && (
-        <ul className="col-span-full flex items-center gap-3">
-          {settings.socialLinks.map((social) => (
-            <li key={social.id}>
-              <a
-                href={social.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${settings.studioName} on ${platformLabels[social.platform]}`}
-                className="grid size-[42px] place-items-center rounded-[5px] border border-[#3b3b3b] bg-panel text-[#deddd8] transition-colors hover:border-accent hover:text-accent"
-              >
-                <SocialIcon platform={social.platform} />
-              </a>
-            </li>
-          ))}
-        </ul>
-      )}
+      <SocialLinks
+        studioName={settings.studioName}
+        links={settings.socialLinks}
+        className="col-span-full"
+      />
 
-      <div className="col-span-full mt-3 flex flex-col gap-3 border-t border-line pt-5 text-[9px] text-faint md:flex-row md:items-center md:justify-between">
+      <div className="col-span-full mt-3 flex flex-col gap-3 border-t border-line pt-5 text-[14px] text-faint md:flex-row md:items-center md:justify-between">
         <p>
           {(footer?.legalLine || `© {year} ${settings.studioName}`).replace('{year}', String(year))}
         </p>

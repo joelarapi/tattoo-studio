@@ -66,7 +66,7 @@ const converters: JSXConverters = {
 }
 
 const articleBody = [
-  'text-[14px] leading-[1.9] md:text-[15px]',
+  'text-[16px] leading-[1.9]',
   '[&_h2]:mt-10 [&_h2]:scroll-mt-5 [&_h2]:text-[31px] [&_h2]:leading-[1.13] [&_h2]:tracking-[-1px] md:[&_h2]:text-[32px]',
   '[&_h3]:mt-8 [&_h3]:text-h3 [&_h4]:mt-6 [&_h4]:text-[18px]',
   '[&_p]:mt-[23px] [&_ul]:mt-[23px] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-[23px] [&_ol]:list-decimal [&_ol]:pl-5',
@@ -119,7 +119,7 @@ export default async function ArticlePage({ params }: Props) {
           {post.title}
         </h1>
         {post.excerpt && (
-          <p className="mt-[23px] max-w-[700px] text-[15px] md:text-[18px]">{post.excerpt}</p>
+          <p className="mt-[23px] max-w-[700px] text-[16px] md:text-[18px]">{post.excerpt}</p>
         )}
       </section>
 
@@ -128,7 +128,7 @@ export default async function ArticlePage({ params }: Props) {
           {contents.length > 0 && (
             <nav aria-label={labels.tocLabel ?? 'Contents'} className="md:sticky md:top-8">
               {labels.tocLabel && <span className="tag">{labels.tocLabel}</span>}
-              <ol className="flex flex-col gap-2.5 text-[11px]">
+              <ol className="flex flex-col gap-2.5 text-[14px]">
                 {contents.map((item) => (
                   <li key={item.id}>
                     <a href={`#${item.id}`} className="hover:text-text">
@@ -139,7 +139,7 @@ export default async function ArticlePage({ params }: Props) {
               </ol>
             </nav>
           )}
-          {author && <p className="mt-6 text-[11px]">{author.name}</p>}
+          {author && <p className="mt-6 text-[16px]">{author.name}</p>}
         </aside>
 
         <article>

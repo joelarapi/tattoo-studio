@@ -25,28 +25,28 @@ export function HomeHero({ block: hero }: BlockProps<'homeHero'>) {
     >
       <HeroParallax target={HERO_ID} />
       <div>
-        <span className="mb-[23px] flex items-center gap-2.5 font-label text-[8px] tracking-[1px] text-text uppercase md:mb-[26px] md:text-[10px] md:tracking-[1.3px]">
+        <span className="mb-[23px] flex items-center gap-2.5 font-label text-[14px] tracking-[1px] text-text uppercase md:mb-[26px] md:text-[14px] md:tracking-[1.3px]">
           <i className="size-[7px] rounded-full bg-accent shadow-[0_0_20px_#ff510080]" />
           {hero.label}
         </span>
         <StyledHeading as="h1" value={hero.heading} className="text-hero" />
         <Paragraphs
           text={hero.intro}
-          className="mt-[22px] max-w-[520px] text-[14px] leading-[1.8] md:mt-[26px] md:text-[16px] md:leading-[1.65]"
+          className="mt-[22px] max-w-[520px] text-[16px] leading-[1.8] md:mt-[26px] md:text-[16px] md:leading-[1.65]"
         />
         <Paragraphs
           text={hero.supporting}
-          className="mt-4 max-w-[520px] text-[12px] leading-[1.85] text-[#999] md:text-[13px]"
+          className="mt-4 max-w-[520px] text-[16px] leading-[1.85] text-[#999] md:text-[16px]"
         />
         <div className="mt-[25px] flex flex-wrap items-center gap-[22px] md:mt-[30px] lg:gap-[25px]">
           <Action
             link={hero.primaryCta}
-            className="max-md:px-[17px] max-md:py-[15px] max-md:text-[10px]"
+            className="max-md:px-[17px] max-md:py-[15px] max-md:text-[14px]"
           />
           <Action link={hero.secondaryLink} variant="plain" arrow="down" />
         </div>
         {(hero.factValue || hero.secondFact) && (
-          <div className="mt-[30px] flex items-center gap-[25px] font-label text-[8px] leading-[1.6] text-[#999] uppercase md:mt-8 md:gap-5 md:text-[9px] lg:mt-[45px] lg:gap-[30px]">
+          <div className="mt-[30px] flex items-center gap-[25px] font-label text-[14px] leading-[1.6] text-[#999] uppercase md:mt-8 md:gap-5 md:text-[14px] lg:mt-[45px] lg:gap-[30px]">
             {hero.factValue && (
               <span className="flex max-w-[150px] items-center gap-3 md:max-w-[190px]">
                 <b className="font-sans text-[39px] leading-none font-normal tracking-[-2px] text-[#eee] md:text-[45px]">
@@ -73,6 +73,7 @@ export function HomeHero({ block: hero }: BlockProps<'homeHero'>) {
           <span className="relative block size-full">
             <CmsImage
               media={hero.primaryImage}
+              photo={false}
               fill
               sizes="(min-width: 681px) 45vw, 90vw"
               loading="eager"
@@ -93,13 +94,14 @@ export function HomeHero({ block: hero }: BlockProps<'homeHero'>) {
           <span className="relative block size-full">
             <CmsImage
               media={hero.secondaryImage}
+              photo={false}
               fill
               sizes="(min-width: 681px) 25vw, 45vw"
               className="object-cover"
             />
           </span>
           {hero.secondaryCaption && (
-            <span className="absolute right-3 bottom-[17px] left-3.5 bg-[#0009] p-[7px] font-label text-[7px] leading-[1.5] uppercase">
+            <span className="absolute right-3 bottom-[17px] left-3.5 bg-[#0009] p-[7px] font-label text-[14px] leading-[1.5] uppercase">
               {hero.secondaryCaption}
             </span>
           )}

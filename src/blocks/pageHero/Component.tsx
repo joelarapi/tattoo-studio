@@ -20,7 +20,7 @@ function JumpBar({ links }: { links: BlockContext['jumpLinks'] }) {
         <a
           key={link.id}
           href={`#${link.id}`}
-          className="font-label text-[8px] text-text uppercase hover:text-accent md:text-[9px]"
+          className="font-label text-[14px] text-text uppercase hover:text-accent md:text-[14px]"
         >
           {link.label} ↓&#xFE0E;
         </a>
@@ -41,20 +41,20 @@ function Centred({ hero }: { hero: PageHeroBlock }) {
     >
       <HeroPhoto media={hero.background} />
       {hero.tag && (
-        <span className="mb-6 rounded-[5px] border border-line bg-panel-2 px-3 py-2 label-xs text-accent md:px-4 md:py-2.5 md:text-[10px]">
+        <span className="mb-6 rounded-[5px] border border-line bg-panel-2 px-3 py-2 label-xs text-accent md:px-4 md:py-2.5 md:text-[14px]">
           {hero.tag}
         </span>
       )}
       <StyledHeading as="h1" value={hero.heading} className="text-display" />
       {hero.intro && (
-        <p className="mt-[23px] text-[14px] md:text-[17px]">
+        <p className="mt-[23px] text-[16px] md:text-[17px]">
           <Lines text={hero.intro} />
         </p>
       )}
       <Action link={hero.button} className="mt-[30px]" />
       <Paragraphs
         text={hero.note}
-        className="mt-[23px] max-w-[540px] text-[10px] leading-[1.85] text-[#969696]"
+        className="mt-[23px] max-w-[540px] text-[16px] leading-[1.85] text-[#969696]"
       />
       {hero.jumpLink?.href && hero.jumpLink.label && (
         <a href={hero.jumpLink.href} className="mt-[35px] block label">
@@ -86,11 +86,11 @@ function Split({ hero }: { hero: PageHeroBlock }) {
           value={hero.heading}
           className="text-[49px] leading-[1.06] tracking-[-2.5px] md:text-[clamp(48px,5.5vw,84px)] md:tracking-[-3.5px]"
         />
-        <Paragraphs text={hero.intro} className="mt-[23px] max-w-[540px] text-[15px]" />
+        <Paragraphs text={hero.intro} className="mt-[23px] max-w-[540px] text-[16px]" />
         <Action link={hero.button} className="mt-[30px]" />
         <Paragraphs
           text={hero.note}
-          className="mt-[23px] max-w-[540px] text-[10px] leading-[1.85] text-[#969696]"
+          className="mt-[23px] max-w-[540px] text-[16px] leading-[1.85] text-[#969696]"
         />
         {hero.jumpLink?.href && hero.jumpLink.label && (
           <a href={hero.jumpLink.href} className="mt-[35px] block label">
@@ -117,14 +117,14 @@ function Split({ hero }: { hero: PageHeroBlock }) {
                 )}
                 <i className="relative z-[1] mt-1.5 size-[17px] shrink-0 rounded-full border border-accent bg-panel shadow-[0_0_0_6px_#ff51000b]" />
                 <div>
-                  <span className="font-label text-[9px] tracking-[1px] text-accent uppercase">
+                  <span className="font-label text-[14px] tracking-[1px] text-accent uppercase">
                     {String(index + 1).padStart(2, '0')}
                     {stop.label && ` / ${stop.label}`}
                   </span>
                   <b className="mt-2 block text-[30px] leading-[1.2] font-normal tracking-[-1.5px] text-text lg:text-[36px]">
                     {stop.title}
                   </b>
-                  {stop.text && <p className="mt-2.5 text-[11px]">{stop.text}</p>}
+                  {stop.text && <p className="mt-2.5 text-[16px]">{stop.text}</p>}
                 </div>
               </li>
             ))}

@@ -20,7 +20,7 @@
   --color-accent: #ff5100; /* SINGLE accent: change it here and everything follows */
   --color-accent-hover: #d94400;
   /*
-   * Text drawn ON the accent. White on #FF5100 is only 3.3:1 (fails WCAG AA for the 11px button
+   * Text drawn ON the accent. White on #FF5100 is only 3.3:1 (fails WCAG AA for the 14px button
    * labels); black is 6.4:1, and 4.8:1 on the hover colour.
    */
   --color-on-accent: #000000;
@@ -36,6 +36,9 @@
   --radius-sm: 4px;
   --radius-md: 6px;
   --ease-out-soft: cubic-bezier(0.2, 0.65, 0.3, 1);
+  /* Small labels remain readable even when a component uses Tailwind's named sizes. */
+  --text-xs: 0.875rem;
+  --text-xs--line-height: 1.5;
 }
 
 /*
@@ -77,7 +80,7 @@
   body {
     min-height: 100svh;
     font-family: var(--font-sans);
-    font-size: 15px;
+    font-size: 16px;
     line-height: 1.65;
     color: var(--color-muted);
     background-color: var(--color-bg);
@@ -95,6 +98,13 @@
   li,
   dd {
     text-wrap: pretty;
+    font-size: 1rem;
+  }
+
+  small,
+  sub,
+  sup {
+    font-size: 0.875rem;
   }
 
   ::selection {
@@ -213,7 +223,7 @@
 /* Small uppercase Inter labels: nav, tags, buttons, captions. */
 @utility label {
   font-family: var(--font-label);
-  font-size: 10px;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -221,7 +231,7 @@
 
 @utility label-sm {
   font-family: var(--font-label);
-  font-size: 9px;
+  font-size: 14px;
   line-height: 1.6;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -229,7 +239,7 @@
 
 @utility label-xs {
   font-family: var(--font-label);
-  font-size: 8px;
+  font-size: 14px;
   line-height: 1.6;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -240,13 +250,13 @@
   display: block;
   margin-bottom: 24px;
   font-family: var(--font-label);
-  font-size: 9px;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--color-accent);
   @media (width >= 681px) {
-    font-size: 10px;
+    font-size: 14px;
   }
 }
 
@@ -257,7 +267,7 @@
   padding: 16px 22px;
   border-radius: 5px;
   font-family: var(--font-label);
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 0.3px;
   text-transform: uppercase;
@@ -290,7 +300,7 @@
   padding-bottom: 6px;
   border-bottom: 1px solid #666;
   font-family: var(--font-label);
-  font-size: 9px;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 0.4px;
   text-transform: uppercase;
@@ -300,7 +310,7 @@
     border-color: var(--color-accent);
   }
   @media (width >= 681px) {
-    font-size: 10px;
+    font-size: 14px;
   }
 }
 
@@ -310,7 +320,7 @@
   padding-bottom: 5px;
   border-bottom: 1px solid #777;
   font-family: var(--font-label);
-  font-size: 9px;
+  font-size: 14px;
   line-height: 1.5;
   letter-spacing: 0.4px;
   text-transform: uppercase;

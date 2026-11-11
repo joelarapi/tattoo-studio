@@ -40,7 +40,7 @@ export function PageCta({ block, data, ctx }: BlockProps<'pageCta', Data>) {
         </div>
         <Paragraphs
           text={block.text}
-          className="mt-[23px] max-w-[700px] text-[14px] leading-[1.9]"
+          className="mt-[23px] max-w-[700px] text-[16px] leading-[1.9]"
         />
         {!!block.links?.length && (
           <div className="mt-7 flex flex-wrap gap-[15px]">

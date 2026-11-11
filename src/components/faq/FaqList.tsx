@@ -23,7 +23,7 @@ export function FaqList({
     <div className={className}>
       {faqs.map((faq) => (
         <details key={faq.id} data-reveal className="group border-b border-line-strong">
-          <summary className="relative cursor-pointer py-[22px] pr-7 text-[13px] text-text md:text-[14px]">
+          <summary className="relative cursor-pointer py-[22px] pr-7 text-[14px] text-text md:text-[14px]">
             {faq.question}
             <span
               aria-hidden="true"
@@ -41,7 +41,7 @@ export function FaqList({
           <RichText
             data={faq.answer}
             className={cn(
-              'mb-[22px] text-[12px] leading-[1.85] md:text-[13px]',
+              'mb-[22px] text-[16px] leading-[1.85] md:text-[16px]',
               '[&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_p+p]:mt-3',
             )}
           />

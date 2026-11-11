@@ -53,7 +53,7 @@ export function JournalList({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={searchPlaceholder ?? undefined}
-            className="mt-2.5 block w-full rounded-sm border border-line-strong bg-[#131313] px-[15px] py-3 font-sans text-[12px] tracking-normal text-white normal-case md:w-[260px]"
+            className="mt-2.5 block w-full rounded-sm border border-line-strong bg-[#131313] px-[15px] py-3 font-sans text-[14px] tracking-normal text-white normal-case md:w-[260px]"
           />
         </label>
       </div>
@@ -77,7 +77,7 @@ export function JournalList({
                 {article.title}
               </h3>
               {article.excerpt && (
-                <p className="mt-[15px] text-[14px] md:text-[12px]">{article.excerpt}</p>
+                <p className="mt-[15px] text-[16px] md:text-[16px]">{article.excerpt}</p>
               )}
               <span className="mt-6 inline-block border-b border-[#555] pb-[7px] label-sm text-text">
                 {readLabel} ↗&#xFE0E;
@@ -86,7 +86,7 @@ export function JournalList({
           </article>
         ))}
       </div>
-      <p role="status" className="mt-6 text-[13px] empty:hidden">
+      <p role="status" className="mt-6 text-[16px] empty:hidden">
         {shown.length === 0 ? emptyText : ''}
       </p>
     </>

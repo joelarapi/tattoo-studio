@@ -56,7 +56,7 @@ export function PortfolioCard({
         <h3 className="text-[25px] leading-[1.13] tracking-[-1px] md:text-[21px] lg:text-[23px]">
           {item.title}
         </h3>
-        <span className="font-label text-[12px] text-faint lg:text-[16px]">
+        <span className="font-label text-[14px] text-faint lg:text-[16px]">
           {pieceNumber(position)}
         </span>
       </div>
@@ -65,7 +65,7 @@ export function PortfolioCard({
         {item.placement && <span>{item.placement}</span>}
       </p>
       {item.summary && (
-        <p className="mt-4 text-[13px] leading-[1.85] md:text-[12px]">{item.summary}</p>
+        <p className="mt-4 text-[16px] leading-[1.85] md:text-[16px]">{item.summary}</p>
       )}
     </Link>
   )

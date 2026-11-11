@@ -45,7 +45,7 @@ export function Gallery({ block, ctx }: BlockProps<'gallery'>) {
               />
             </div>
             {block.showCaptions && photo.alt && (
-              <figcaption className="mt-3 text-[12px] leading-[1.7] text-[#999]">
+              <figcaption className="mt-3 text-[14px] leading-[1.7] text-[#999]">
                 {photo.alt}
               </figcaption>
             )}
