@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const storyTitle = 'mt-[27px] text-[24px] leading-[1.25] tracking-[-0.7px]'
-const storyText = 'mt-[15px] text-[14px] leading-[1.9] md:text-[13px]'
+const storyText = 'mt-[15px] text-[16px] leading-[1.9]'
 
 const media = (value: number | Media | null | undefined) =>
   value && typeof value === 'object' ? value : null
@@ -67,7 +67,7 @@ export default async function PortfolioPiecePage({ params }: Props) {
     <main id="main">
       <div className="px-site pt-[35px] pb-[30px] md:pt-section md:pb-[45px]">
         <nav aria-label="Breadcrumb" className="mb-[35px] md:mb-12">
-          <ol className="flex flex-wrap gap-2 font-label text-[9px] leading-[1.7] text-[#999] md:gap-3 md:text-[10px]">
+          <ol className="flex flex-wrap gap-2 font-label text-[14px] leading-[1.7] text-[#999] md:gap-3 md:text-[14px]">
             <li>
               <Link href="/" className="hover:text-text">
                 {menuLabel('/', 'Home')}
@@ -89,7 +89,7 @@ export default async function PortfolioPiecePage({ params }: Props) {
         <h1 className="max-w-[1000px] text-[45px] leading-[1.1] tracking-[-2px] md:text-[clamp(45px,6vw,85px)] md:tracking-[-3px]">
           {item.title}.
         </h1>
-        <p className="mt-[23px] max-w-[800px] text-[14px] leading-[1.9] md:text-[16px]">
+        <p className="mt-[23px] max-w-[800px] text-[16px] leading-[1.9] md:text-[16px]">
           {item.summary}
         </p>
       </div>
@@ -110,7 +110,7 @@ export default async function PortfolioPiecePage({ params }: Props) {
                 <source src={video.url} type={video.mimeType ?? undefined} />
               </video>
               {detail.videoCaption && (
-                <figcaption className="mt-3 text-[12px] leading-[1.7] text-[#999]">
+                <figcaption className="mt-3 text-[14px] leading-[1.7] text-[#999]">
                   {item.title}. {detail.videoCaption}
                 </figcaption>
               )}

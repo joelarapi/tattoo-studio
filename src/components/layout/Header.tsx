@@ -22,25 +22,25 @@ export function Header({
     <header className="relative z-30 flex items-center justify-between gap-5 px-[6%] py-6 md:px-[4%] md:py-[25px] lg:py-7">
       <Wordmark settings={settings} />
 
-      <nav aria-label="Main" className="hidden md:block">
+      <nav aria-label="Main" className="hidden lg:block">
         <NavLinks
           links={links}
           cta={cta}
           className="flex items-center gap-[18px] rounded-md bg-panel py-2 pr-2 pl-[22px] lg:gap-[26px]"
-          linkClassName="font-label text-[9px] tracking-[0.3px] lg:text-[11px]"
-          ctaClassName="text-[9px] lg:text-[11px]"
+          linkClassName="font-label text-[14px] tracking-[0.3px] lg:text-[14px]"
+          ctaClassName="text-[14px] lg:text-[14px]"
         />
       </nav>
 
       <Disclosure
-        className="md:hidden"
+        className="lg:hidden"
         summary={
           <>
             <span className="group-open:hidden">Menu ＋</span>
             <span className="hidden group-open:inline">Close −</span>
           </>
         }
-        summaryClassName="block rounded-sm border border-line-strong bg-[#191919] px-[13px] py-2.5 font-label text-[10px] tracking-[0.3px] text-text uppercase"
+        summaryClassName="block rounded-sm border border-line-strong bg-[#191919] px-[13px] py-2.5 font-label text-[14px] tracking-[0.3px] text-text uppercase"
       >
         <nav
           aria-label="Main"
@@ -50,7 +50,7 @@ export function Header({
             links={links}
             cta={cta}
             className="flex flex-col gap-5"
-            linkClassName="font-label text-[12px] tracking-[0.3px]"
+            linkClassName="font-label text-[14px] tracking-[0.3px]"
             ctaClassName="text-center"
           />
         </nav>

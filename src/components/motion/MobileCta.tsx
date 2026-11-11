@@ -27,7 +27,7 @@ export function MobileCta({ label, href }: { label: string; href: string }) {
       href={href}
       data-mobile-cta
       className={cn(
-        'fixed inset-x-[6%] bottom-3 z-20 rounded-[5px] bg-accent p-3.5 text-center font-label text-[11px] tracking-[0.3px] text-on-accent uppercase shadow-[0_3px_25px_#0008] md:hidden',
+        'fixed inset-x-[6%] bottom-3 z-20 rounded-[5px] bg-accent p-3.5 text-center font-label text-[14px] tracking-[0.3px] text-on-accent uppercase shadow-[0_3px_25px_#0008] md:hidden',
         hidden && 'hidden',
       )}
     >

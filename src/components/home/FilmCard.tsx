@@ -36,7 +36,7 @@ export function FilmCard({
         />
       </span>
       {label && (
-        <span className="absolute top-[15px] left-[13px] z-[1] label-xs md:top-5 md:left-5 md:text-[9px]">
+        <span className="absolute top-[15px] left-[13px] z-[1] label-xs md:top-5 md:left-5 md:text-[14px]">
           {label}
         </span>
       )}

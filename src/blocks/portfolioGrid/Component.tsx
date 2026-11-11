@@ -45,7 +45,7 @@ export function PortfolioGrid({ block, data, ctx }: BlockProps<'portfolioGrid', 
           <div data-reveal>
             <RichText
               data={intro.text}
-              className="text-[13px] leading-[1.9] md:text-[14px] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_p+p]:mt-[18px]"
+              className="text-[16px] leading-[1.9] md:text-[16px] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_p+p]:mt-[18px]"
             />
           </div>
         </div>

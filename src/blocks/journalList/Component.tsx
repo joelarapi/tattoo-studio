@@ -49,7 +49,7 @@ export function JournalList({ block, data: posts, ctx }: BlockProps<'journalList
               <FeaturedHeading className="text-[39px] leading-[1.13] tracking-[-1.5px] md:text-[36px] lg:text-[46px] lg:tracking-[-2px]">
                 {featured.title}
               </FeaturedHeading>
-              {featured.excerpt && <p className="mt-[23px] text-[13px]">{featured.excerpt}</p>}
+              {featured.excerpt && <p className="mt-[23px] text-[16px]">{featured.excerpt}</p>}
               <span className="mt-7 btn btn-outline">{copy.buttonLabel} ↗&#xFE0E;</span>
             </div>
           </Link>

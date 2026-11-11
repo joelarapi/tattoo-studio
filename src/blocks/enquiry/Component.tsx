@@ -4,7 +4,7 @@ import { EnquiryForm } from '@/components/forms/EnquiryForm'
 import { RichText } from '@/components/RichText'
 import { Action } from '@/components/ui/Action'
 import { Notice } from '@/components/ui/Blocks'
-import { platformLabels } from '@/components/ui/SocialIcon'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 import { StyledHeading } from '@/components/ui/StyledHeading'
 import { Tag } from '@/components/ui/Tag'
 import { Lines, Paragraphs } from '@/components/ui/Text'
@@ -24,7 +24,8 @@ export async function loadEnquiry(): Promise<Data> {
   return { settings, projects: items.map(({ slug, title }) => ({ slug, title })) }
 }
 
-const linkClass = 'text-text underline decoration-[#666] underline-offset-4 hover:decoration-accent'
+const linkClass =
+  'text-text underline decoration-[#666] underline-offset-4 [overflow-wrap:anywhere] hover:decoration-accent'
 
 /** A labelled block of details under the enquiry copy ("The studio", "Direct contact"). */
 function ContactDetail({
@@ -40,7 +41,7 @@ function ContactDetail({
     <div className="mt-[25px] border-t border-line pt-[25px]">
       {label && <span className="tag mb-2.5">{label}</span>}
       {title && <h3 className="text-h3">{title}</h3>}
-      {children && <div className="mt-3 text-[12px] leading-[1.8]">{children}</div>}
+      {children && <div className="mt-3 text-[16px] leading-[1.8]">{children}</div>}
     </div>
   )
 }
@@ -114,14 +115,12 @@ function StudioDetails({
               {settings.email}
             </a>
           </li>
-          {settings.socialLinks?.map((social) => (
-            <li key={social.id}>
-              <a href={social.url} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                {platformLabels[social.platform]}
-              </a>
-            </li>
-          ))}
         </ul>
+        <SocialLinks
+          studioName={settings.studioName}
+          links={settings.socialLinks}
+          className="mt-4"
+        />
       </ContactDetail>
       {notice && (
         <Notice className="mt-[30px]">
@@ -150,7 +149,7 @@ export function Enquiry({ block, data, ctx }: BlockProps<'enquiry', Data>) {
           value={block.heading}
           className="text-[49px] leading-[1.13] tracking-[-1.5px] md:text-[clamp(42px,4.7vw,70px)] md:tracking-[-2.4px]"
         />
-        <Paragraphs text={block.intro} className="mt-[23px] text-[14px]" />
+        <Paragraphs text={block.intro} className="mt-[23px] text-[16px]" />
         {block.side === 'details' ? (
           <StudioDetails
             settings={settings}

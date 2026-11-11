@@ -14,7 +14,7 @@ const bodyClass =
 function Note({ text }: { text?: string | null }) {
   if (!text) return null
   return (
-    <p className="mt-7 border-l border-[#514136] pl-3.5 text-[10px] leading-[1.8] text-[#929292]">
+    <p className="mt-7 border-l border-[#514136] pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
       <Lines text={text} />
     </p>
   )
@@ -36,7 +36,7 @@ export function TextSection({ block, ctx }: BlockProps<'text'>) {
           )}
           <RichText
             data={block.body}
-            className="mt-10 text-[14px] leading-[1.9] md:text-[15px] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_ol]:mt-[23px] [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mt-[23px] [&_ul]:mt-[23px] [&_ul]:list-disc [&_ul]:pl-5"
+            className="mt-10 text-[16px] leading-[1.9] md:text-[16px] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_ol]:mt-[23px] [&_ol]:list-decimal [&_ol]:pl-5 [&_p]:mt-[23px] [&_ul]:mt-[23px] [&_ul]:list-disc [&_ul]:pl-5"
           />
         </div>
       </BlockSection>

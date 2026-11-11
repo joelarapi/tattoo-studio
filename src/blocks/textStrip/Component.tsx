@@ -13,7 +13,7 @@ export function TextStrip({ block }: BlockProps<'textStrip'>) {
     >
       {block.phrases.map((item) => (
         <span key={item.id} className="contents">
-          <span className="font-label text-[10px] tracking-[1px] text-text uppercase md:text-[12px]">
+          <span className="font-label text-[14px] tracking-[1px] text-text uppercase md:text-[14px]">
             {item.text}
           </span>
           <Asterisk className="shrink-0 text-[16px] md:text-[20px]" />

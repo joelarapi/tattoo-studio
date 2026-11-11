@@ -67,14 +67,14 @@ function PanelCards({ cards, columns }: { cards: Card[]; columns: string }) {
           data-reveal
           className="rounded-[5px] border border-[#2b2b2b] bg-[#141414] p-[27px] md:p-[35px]"
         >
-          <span className="font-label text-[10px] text-[#c8784b] uppercase">
+          <span className="font-label text-[14px] text-[#c8784b] uppercase">
             {String(index + 1).padStart(2, '0')}
             {card.label && ` / ${card.label}`}
           </span>
           <h3 className="mt-7 text-[28px] leading-[1.2] tracking-[-1px] md:text-[30px]">
             <Lines text={card.title} />
           </h3>
-          <Paragraphs text={card.text} className="mt-[23px] text-[13px] leading-[1.9]" />
+          <Paragraphs text={card.text} className="mt-[23px] text-[16px] leading-[1.9]" />
           <Action link={card.link} variant="text" className="mt-[25px]" />
         </article>
       ))}
@@ -96,9 +96,9 @@ function FeatureCards({ cards, columns }: { cards: Card[]; columns: string }) {
           <h3 className="text-[28px] leading-[1.2] tracking-[-1px] lg:text-[32px]">
             <Lines text={card.title} />
           </h3>
-          <Paragraphs text={card.text} className="mt-[23px] text-[14px]" />
+          <Paragraphs text={card.text} className="mt-[23px] text-[16px]" />
           {card.checklist && (
-            <ul className="mt-5 mb-[25px] list-disc pl-[18px] text-[12px] leading-[2] text-[#aaa]">
+            <ul className="mt-5 mb-[25px] list-disc pl-[18px] text-[14px] leading-[2] text-[#aaa]">
               {card.checklist
                 .split('\n')
                 .filter((line) => line.trim())
@@ -107,7 +107,7 @@ function FeatureCards({ cards, columns }: { cards: Card[]; columns: string }) {
                 ))}
             </ul>
           )}
-          <Action link={card.link} variant="outline" className="text-[9px]" />
+          <Action link={card.link} variant="outline" className="text-[14px]" />
         </article>
       ))}
     </div>
@@ -126,12 +126,12 @@ function PlaceCards({ cards, columns }: { cards: Card[]; columns: string }) {
           <div className="mb-[25px] grid h-[180px] place-items-center overflow-hidden bg-[linear-gradient(#ffffff05_1px,transparent_1px),linear-gradient(90deg,#ffffff05_1px,transparent_1px)] bg-size-[30px_30px] lg:h-[220px]">
             <DestinationMotif motif={card.motif ?? 'columns'} className="h-[120px] w-[160px]" />
           </div>
-          <Tag className="mb-3 text-[8px] md:text-[8px]">{card.tag}</Tag>
+          <Tag className="mb-3 text-[14px] md:text-[14px]">{card.tag}</Tag>
           <h3 className="text-[36px] leading-[1.15] tracking-[-1.2px]">
             <Lines text={card.title} />
           </h3>
-          <Paragraphs text={card.text} className="mt-[15px] text-[13px] leading-[1.85]" />
-          <Action link={card.link} variant="text" className="mt-[25px] text-[8px]" />
+          <Paragraphs text={card.text} className="mt-[15px] text-[16px] leading-[1.85]" />
+          <Action link={card.link} variant="text" className="mt-[25px] text-[14px]" />
         </article>
       ))}
     </div>
@@ -178,7 +178,7 @@ export function Cards({ block, ctx }: BlockProps<'cards'>) {
           className="mt-[25px] flex flex-wrap items-center gap-[15px] border border-line-strong p-[22px] md:flex-nowrap md:gap-[22px] md:p-6"
         >
           <Asterisk className="text-[28px]" />
-          <p className="flex-1 basis-[80%] text-[11px] leading-[1.8] md:basis-auto md:text-[12px]">
+          <p className="flex-1 basis-[80%] text-[16px] leading-[1.8] md:basis-auto md:text-[16px]">
             {note.title && <b className="font-normal text-[#ddd]">{note.title} </b>}
             {note.text}
           </p>
@@ -198,7 +198,7 @@ export function Cards({ block, ctx }: BlockProps<'cards'>) {
 
       <Paragraphs
         text={block.smallPrint}
-        className="mt-[23px] text-[10px] leading-[1.85] text-[#969696]"
+        className="mt-[23px] text-[16px] leading-[1.85] text-[#969696]"
       />
 
       {closingNote?.title &&
@@ -213,7 +213,7 @@ export function Cards({ block, ctx }: BlockProps<'cards'>) {
             </h3>
             <RichText
               data={closingNote.text}
-              className={cn(closingLinks, 'text-[14px] leading-[1.85]')}
+              className={cn(closingLinks, 'text-[16px] leading-[1.85]')}
             />
           </div>
         ) : (
@@ -223,7 +223,7 @@ export function Cards({ block, ctx }: BlockProps<'cards'>) {
             </h3>
             <RichText
               data={closingNote.text}
-              className={cn(closingLinks, 'text-[13px] leading-[1.9]')}
+              className={cn(closingLinks, 'text-[16px] leading-[1.9]')}
             />
           </div>
         ))}

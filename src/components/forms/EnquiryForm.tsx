@@ -29,8 +29,8 @@ type EnquiryFormProps = {
 }
 
 const input =
-  'mt-[9px] block w-full rounded-sm border border-[#383838] bg-[#181818] p-[13px] text-[12px] leading-[1.6] text-white placeholder:text-[#8a8a8a]'
-const label = 'mb-[23px] block text-[11px] text-[#ccc]'
+  'mt-[9px] block w-full rounded-sm border border-[#383838] bg-[#181818] p-[13px] text-[16px] leading-[1.6] text-white placeholder:text-[#8a8a8a]'
+const label = 'mb-[23px] block text-[14px] text-[#ccc]'
 const row = 'grid grid-cols-1 gap-x-5 lg:grid-cols-2'
 
 // The query string doesn't change while the form is on screen.
@@ -113,7 +113,7 @@ export function EnquiryForm({ copy, privacyNote, projects = [] }: EnquiryFormPro
       className="rounded-md border border-line bg-panel px-[18px] py-[22px] md:p-[22px] lg:p-[30px]"
     >
       {project && (
-        <p className="mb-[23px] border-l border-[#78523a] pl-[15px] text-[12px]">
+        <p className="mb-[23px] border-l border-[#78523a] pl-[15px] text-[16px]">
           About the piece: <span className="text-text">{project.title}</span>
           <input type="hidden" name="project" value={project.slug ?? ''} />
         </p>
@@ -165,7 +165,7 @@ export function EnquiryForm({ copy, privacyNote, projects = [] }: EnquiryFormPro
         />
       </div>
 
-      <label className="mb-[23px] flex items-center gap-3 text-[12px] text-[#ccc]">
+      <label className="mb-[23px] flex items-center gap-3 text-[14px] text-[#ccc]">
         <input
           ref={travelling}
           id="travelling"
@@ -215,12 +215,12 @@ export function EnquiryForm({ copy, privacyNote, projects = [] }: EnquiryFormPro
           accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm"
           multiple
           onChange={(event) => onFiles(event.currentTarget.files)}
-          className="mt-[9px] block w-full text-[10px] file:mr-2.5 file:cursor-pointer file:border-0 file:bg-[#333] file:px-2.5 file:py-2 file:text-white"
+          className="mt-[9px] block w-full text-[14px] file:mr-2.5 file:cursor-pointer file:border-0 file:bg-[#333] file:px-2.5 file:py-2 file:text-white"
         />
-        <span className="mt-2.5 block text-[10px] leading-[1.8] text-[#999]">
+        <span className="mt-2.5 block text-[14px] leading-[1.8] text-[#999]">
           Up to {MAX_LEAD_FILES} files: photos up to 5 MB, videos up to 50 MB.
         </span>
-        <span aria-live="polite" className="block text-[10px] leading-[1.8] text-[#999]">
+        <span aria-live="polite" className="block text-[14px] leading-[1.8] text-[#999]">
           {fileNote}
         </span>
       </label>
@@ -237,16 +237,16 @@ export function EnquiryForm({ copy, privacyNote, projects = [] }: EnquiryFormPro
         {copy.submitLabel} ↗&#xFE0E;
       </button>
       {copy.helperText && (
-        <p className="mt-2.5 text-[10px] leading-[1.8] text-[#999]">
+        <p className="mt-2.5 text-[16px] leading-[1.8] text-[#999]">
           <Lines text={copy.helperText} />
         </p>
       )}
       {privacyNote && (
-        <div className="mt-2.5 text-[10px] leading-[1.8] text-[#999] [&_a]:text-text [&_a]:underline">
+        <div className="mt-2.5 text-[14px] leading-[1.8] text-[#999] [&_a]:text-text [&_a]:underline">
           {privacyNote}
         </div>
       )}
-      <p role="status" className="mt-4 text-[12px] text-text empty:hidden">
+      <p role="status" className="mt-4 text-[16px] text-text empty:hidden">
         {status}
       </p>
     </form>

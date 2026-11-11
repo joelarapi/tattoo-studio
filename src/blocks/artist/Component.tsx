@@ -58,16 +58,16 @@ export function ArtistSection({ block, ctx }: BlockProps<'artist'>) {
         <Tag number={ctx.number}>{block.tag}</Tag>
         <StyledHeading as={ctx.headingAs} value={block.heading} className={style.heading} />
         {block.text ? (
-          <Paragraphs text={block.text} className="mt-[23px] text-[13px] md:text-[14px]" />
+          <Paragraphs text={block.text} className="mt-[23px] text-[16px] md:text-[16px]" />
         ) : (
           <RichText
             data={artist?.bio}
-            className="mt-[23px] text-[14px] [&_a]:text-text [&_a]:underline [&_p+p]:mt-[23px]"
+            className="mt-[23px] text-[16px] [&_a]:text-text [&_a]:underline [&_p+p]:mt-[23px]"
           />
         )}
         <Action link={block.button} variant="outline" className="mt-[30px]" />
         {block.note && (
-          <p className="mt-7 border-l border-[#514136] pl-3.5 text-[10px] leading-[1.8] text-[#929292]">
+          <p className="mt-7 border-l border-[#514136] pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
             <Lines text={block.note} />
           </p>
         )}

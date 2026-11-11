@@ -40,7 +40,7 @@ export function PieceGallery({ photos, label }: { photos: Media[]; label?: strin
           }}
           className="block w-full cursor-zoom-in border border-line-strong bg-panel"
         >
-            <CmsImage
+          <CmsImage
             media={media}
             photo={false}
             sizes="(min-width: 681px) 55vw, 90vw"
@@ -49,7 +49,7 @@ export function PieceGallery({ photos, label }: { photos: Media[]; label?: strin
             className="block h-auto max-h-[900px] w-full object-contain"
           />
           {label && (
-            <span className="block p-4 text-center font-label text-[10px] text-[#ddd] uppercase">
+            <span className="block p-4 text-center font-label text-[14px] text-[#ddd] uppercase">
               {label} ↗&#xFE0E;
             </span>
           )}
@@ -66,7 +66,7 @@ export function PieceGallery({ photos, label }: { photos: Media[]; label?: strin
         <button
           type="button"
           onClick={close}
-          className="mb-4 ml-auto block cursor-pointer font-label text-[11px] text-white uppercase"
+          className="mb-4 ml-auto block cursor-pointer font-label text-[14px] text-white uppercase"
         >
           Close ×
         </button>
@@ -79,7 +79,7 @@ export function PieceGallery({ photos, label }: { photos: Media[]; label?: strin
               sizes="85vw"
               className="m-auto block h-auto max-h-[72vh] w-auto max-w-[80vw] md:max-h-[80vh] md:max-w-[85vw]"
             />
-            <p aria-live="polite" className="mt-[15px] text-[10px] text-muted">
+            <p aria-live="polite" className="mt-[15px] text-[16px] text-muted">
               {photo.alt} / {current + 1} of {count}
             </p>
           </>

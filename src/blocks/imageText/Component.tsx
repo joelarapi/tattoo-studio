@@ -38,7 +38,7 @@ export function ImageText({ block, ctx }: BlockProps<'imageText'>) {
         <StyledHeading as={ctx.headingAs} value={block.heading} className="text-h2" />
         <RichText
           data={block.body}
-          className="mt-[23px] text-[14px] leading-[1.9] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_ol]:mt-[18px] [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-[23px] [&_ul]:mt-[18px] [&_ul]:list-disc [&_ul]:pl-5"
+          className="mt-[23px] text-[16px] leading-[1.9] [&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_ol]:mt-[18px] [&_ol]:list-decimal [&_ol]:pl-5 [&_p+p]:mt-[23px] [&_ul]:mt-[18px] [&_ul]:list-disc [&_ul]:pl-5"
         />
         <Action link={block.button} variant="outline" className="mt-[30px]" />
       </div>

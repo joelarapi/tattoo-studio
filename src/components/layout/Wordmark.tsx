@@ -17,15 +17,36 @@ export function Wordmark({
   className?: string
 }) {
   const [first, ...rest] = settings.studioName.trim().split(/\s+/)
+  const logo = typeof settings.logo === 'object' ? settings.logo : null
+  // The supplied square Canva export has artwork at x=131..986, y=436..731.
+  // Frame that artwork without changing the original CMS upload.
+  const paddedLogo =
+    logo?.width === 1080 && logo?.height === 1080 && /ads.*booster/i.test(logo.filename ?? '')
   return (
-    <Link href="/" className={cn('inline-block', className)}>
-      {typeof settings.logo === 'object' && settings.logo ? (
-        <CmsImage
-          media={settings.logo}
-          alt={settings.studioName}
-          photo={false}
-          className="h-11 w-auto"
-        />
+    <Link href="/" className={cn('inline-block max-w-full self-start', className)}>
+      {logo ? (
+        <span
+          className={cn(
+            'block w-[180px] max-w-full lg:w-[220px]',
+            paddedLogo && 'relative aspect-[856/296] overflow-hidden',
+          )}
+        >
+          <CmsImage
+            media={logo}
+            alt={settings.studioName}
+            photo={false}
+            className={paddedLogo ? 'absolute h-auto max-w-none' : 'h-auto w-full'}
+            style={
+              paddedLogo
+                ? {
+                    width: `${(1080 / 856) * 100}%`,
+                    left: `${(-131 / 856) * 100}%`,
+                    top: `${(-436 / 296) * 100}%`,
+                  }
+                : undefined
+            }
+          />
+        </span>
       ) : (
         <span className="block text-[22px] leading-none font-extrabold tracking-[-1.2px] text-text uppercase lg:text-[26px]">
           {first}
