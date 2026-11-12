@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { draftMode } from 'next/headers'
 import type { CollectionSlug, GlobalSlug, Where } from 'payload'
 
+import { normalizeBrandCopy } from './brand'
 import { collectionTag, globalTag } from './cache-tags'
 import { getPayloadClient } from './payload'
 
@@ -41,7 +42,7 @@ function cmsQuery<Args extends unknown[], T>(
     tags,
   })
   return async (...args: Args): Promise<T> =>
-    (await isDraft()) ? load(true, ...args) : cached(...args)
+    normalizeBrandCopy(await ((await isDraft()) ? load(true, ...args) : cached(...args)))
 }
 
 /** Only published posts outside draft mode (the Local API skips access control). */

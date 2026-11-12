@@ -27,7 +27,7 @@ export const PieceTemplate: GlobalConfig = {
         {
           label: 'Text',
           fields: [
-            text('label', 'Small label above the title, e.g. "Tisi / London InkTattoo".'),
+            text('label', 'Small label above the title, e.g. "Tisi / LondonInk Tattoo".'),
             {
               type: 'row',
               fields: [

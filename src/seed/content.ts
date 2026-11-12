@@ -1,12 +1,12 @@
 import { block, doc, h2, link, p } from './lexical'
 
 /*
- * Starting content for London InkTattoo in Fier, adapted from the approved design, all editable in
+ * Starting content for LondonInk Tattoo in Fier, adapted from the approved design, all editable in
  * the CMS. Contact details (phone, email, street, hours) are deliberately left as placeholders or
  * empty; the real ones come from the studio (docs/RESOURCES_NEEDED.md).
  */
 
-export const STUDIO_NAME = 'London InkTattoo'
+export const STUDIO_NAME = 'LondonInk Tattoo'
 
 /** Portfolio categories (the `styles` collection). */
 export const styles = [
@@ -23,7 +23,7 @@ export const artists = [
     yearsOfExperience: 18,
     bio: doc(
       p(
-        'Behind London InkTattoo is Tisi, an artist with 18 years of tattoo experience and an extensive body of work. From large tattoos that become part of a person’s identity to portraits that keep someone close, his work begins with the story the client wants to carry.',
+        'Behind LondonInk Tattoo is Tisi, an artist with 18 years of tattoo experience and an extensive body of work. From large tattoos that become part of a person’s identity to portraits that keep someone close, his work begins with the story the client wants to carry.',
       ),
       p(
         'A large piece asks you to think beyond a single image: how the composition sits on the body, how its elements connect and how the details work together. Portrait tattoos bring a different focus: the expression, character and small features that make a face familiar.',
@@ -378,20 +378,20 @@ type Page = 'home' | 'contact' | 'visiting'
 
 export const faqs: Array<{ question: string; answer: ReturnType<typeof doc>; pages: Page[] }> = [
   {
-    question: 'Where is London InkTattoo?',
+    question: 'Where is LondonInk Tattoo?',
     pages: ['home', 'visiting'],
     answer: doc(
       p(
-        'London InkTattoo is a tattoo studio in Fier, Albania. Tisi is the artist behind the studio, with 18 years of tattoo experience. Confirm the exact address and your appointment time with the studio before visiting.',
+        'LondonInk Tattoo is a tattoo studio in Fier, Albania. Tisi is the artist behind the studio, with 18 years of tattoo experience. Confirm the exact address and your appointment time with the studio before visiting.',
       ),
     ),
   },
   {
-    question: 'Who is the artist behind London InkTattoo?',
+    question: 'Who is the artist behind LondonInk Tattoo?',
     pages: ['home'],
     answer: doc(
       p(
-        'Tisi is the artist behind London InkTattoo, with 18 years of tattoo experience. Visit the ',
+        'Tisi is the artist behind LondonInk Tattoo, with 18 years of tattoo experience. Visit the ',
         link('About page', '/about'),
         ' to get to know the artist, and use the portfolio to begin discussing your own direction.',
       ),
@@ -576,7 +576,7 @@ export const posts: PostSeed[] = [
       ),
       h2('Know where you’re going.'),
       p(
-        'London InkTattoo is in Fier, Albania. Confirm the exact studio address and appointment time directly before travelling. Work out your transport and allow flexibility; journey times depend on your route and conditions.',
+        'LondonInk Tattoo is in Fier, Albania. Confirm the exact studio address and appointment time directly before travelling. Work out your transport and allow flexibility; journey times depend on your route and conditions.',
       ),
       h2('Discuss the rest of your itinerary.'),
       p(
