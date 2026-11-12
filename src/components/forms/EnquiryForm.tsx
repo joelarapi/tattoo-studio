@@ -113,7 +113,7 @@ export function EnquiryForm({ copy, privacyNote, projects = [] }: EnquiryFormPro
       className="rounded-md border border-line bg-panel px-[18px] py-[22px] md:p-[22px] lg:p-[30px]"
     >
       {project && (
-        <p className="mb-[23px] border-l border-[#78523a] pl-[15px] text-[16px]">
+        <p className="mb-[23px] border-l border-accent/65 pl-[15px] text-[16px]">
           About the piece: <span className="text-text">{project.title}</span>
           <input type="hidden" name="project" value={project.slug ?? ''} />
         </p>

@@ -21,12 +21,12 @@ export function NeedleDivider() {
       data-reveal
       className="mx-auto flex h-[15px] max-w-[1400px] items-center px-site md:h-5"
     >
-      <span className="h-px flex-1 bg-linear-to-r from-transparent to-[#5d3b2b]" />
-      <i className="relative mx-3 h-px w-[45px] bg-[#a65531] md:mx-[18px] md:w-[70px]">
+      <span className="h-px flex-1 bg-linear-to-r from-transparent to-accent/40" />
+      <i className="relative mx-3 h-px w-[45px] bg-accent md:mx-[18px] md:w-[70px]">
         <span className="absolute -top-1 left-[17px] size-[7px] rotate-45 border border-accent bg-[#080808] md:left-7" />
         <span className="absolute -top-0.5 -right-[9px] size-0 border-y-2 border-l-[9px] border-y-transparent border-l-accent" />
       </i>
-      <span className="h-px flex-1 bg-linear-to-r from-[#5d3b2b] to-transparent" />
+      <span className="h-px flex-1 bg-linear-to-r from-accent/40 to-transparent" />
     </div>
   )
 }

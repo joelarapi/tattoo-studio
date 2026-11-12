@@ -27,7 +27,7 @@ function Stencil({
       focusable="false"
       viewBox={viewBox}
       fill="none"
-      stroke="#ff6529"
+      stroke="var(--color-accent)"
       strokeWidth="1.4"
       strokeLinecap="round"
       strokeLinejoin="round"
