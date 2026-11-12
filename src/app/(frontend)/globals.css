@@ -157,6 +157,9 @@
   font-size: clamp(1.125rem, 7.6cqi, 3.25rem);
   line-height: 1.08;
   letter-spacing: -0.045em;
+  @media (width < 681px) {
+    font-size: clamp(1.25rem, 9.3cqi, 2.75rem);
+  }
 }
 
 /* Section headings (H2). */
