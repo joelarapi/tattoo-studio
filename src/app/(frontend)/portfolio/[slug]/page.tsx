@@ -87,7 +87,7 @@ export default async function PortfolioPiecePage({ params }: Props) {
         </nav>
         <Tag>{detail.label}</Tag>
         <h1 className="max-w-[1000px] text-[45px] leading-[1.1] tracking-[-2px] md:text-[clamp(45px,6vw,85px)] md:tracking-[-3px]">
-          {item.title}.
+          {item.title}
         </h1>
         <p className="mt-[23px] max-w-[800px] text-[16px] leading-[1.9] md:text-[16px]">
           {item.summary}
