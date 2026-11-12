@@ -24,7 +24,7 @@ export function HomeHero({ block: hero }: BlockProps<'homeHero'>) {
       className="grid-bg grid grid-cols-1 overflow-hidden px-[6%] pt-10 pb-[30px] [--circle-size:400px] md:min-h-[660px] md:grid-cols-[1.08fr_1fr] md:items-center md:gap-[3%] md:px-[5%] md:pt-[45px] md:pb-[50px] lg:min-h-[700px] lg:gap-[4%] lg:px-site lg:pt-[65px] lg:[--circle-size:720px] lg:[--circle-x:70%] lg:[--circle-y:46%]"
     >
       <HeroParallax target={HERO_ID} />
-      <div>
+      <div className="@container">
         <span className="mb-[23px] flex items-center gap-2.5 font-label text-[14px] tracking-[1px] text-text uppercase md:mb-[26px] md:text-[14px] md:tracking-[1.3px]">
           <i className="size-[7px] rounded-full bg-accent shadow-[0_0_20px_#ff510080]" />
           {hero.label}

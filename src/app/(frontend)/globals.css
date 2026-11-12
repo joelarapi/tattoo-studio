@@ -157,17 +157,9 @@
 
 /* The homepage title (H1). */
 @utility text-hero {
-  font-size: clamp(43px, 10.3vw, 64px);
-  line-height: 1.04;
-  letter-spacing: -2.5px;
-  @media (width >= 681px) {
-    font-size: 60px;
-    letter-spacing: -3px;
-  }
-  @media (width >= 1001px) {
-    font-size: clamp(55px, 5.8vw, 92px);
-    letter-spacing: -4px;
-  }
+  font-size: clamp(1.125rem, 7.6cqi, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.045em;
 }
 
 /* Section headings (H2). */
