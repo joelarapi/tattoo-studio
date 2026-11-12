@@ -72,8 +72,8 @@ export function DestinationMotif({
     >
       {motif === 'columns' && (
         <g strokeWidth="4" transform="skewY(-4) translate(0 6)">
-          <path d="M30 28h100" stroke="#ff5100" />
-          <path d="M30 96h100" stroke="#994000" />
+          <path d="M30 28h100" stroke="var(--color-accent)" />
+          <path d="M30 96h100" stroke="var(--color-accent)" opacity="0.6" />
           <path d="M44 36v52M68 36v52M92 36v52M116 36v52" stroke="#f6f5f2" strokeWidth="6" />
         </g>
       )}
@@ -82,7 +82,7 @@ export function DestinationMotif({
           <rect x="68" y="20" width="24" height="16" />
           <rect x="52" y="48" width="24" height="16" />
           <rect x="84" y="48" width="24" height="16" />
-          <rect x="36" y="76" width="24" height="16" stroke="#ff5100" />
+          <rect x="36" y="76" width="24" height="16" stroke="var(--color-accent)" />
           <rect x="68" y="76" width="24" height="16" />
           <rect x="100" y="76" width="24" height="16" />
         </g>
@@ -90,7 +90,7 @@ export function DestinationMotif({
       {motif === 'waves' && (
         <g strokeWidth="3" transform="rotate(-8 80 60)">
           <path d="M30 40c10-8 20-8 30 0s20 8 30 0 20-8 30 0" stroke="#f6f5f2" />
-          <path d="M30 62c10-8 20-8 30 0s20 8 30 0 20-8 30 0" stroke="#ff5100" />
+          <path d="M30 62c10-8 20-8 30 0s20 8 30 0 20-8 30 0" stroke="var(--color-accent)" />
           <path d="M30 84c10-8 20-8 30 0s20 8 30 0 20-8 30 0" stroke="#f6f5f2" opacity="0.6" />
         </g>
       )}

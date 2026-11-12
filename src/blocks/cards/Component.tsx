@@ -33,8 +33,8 @@ function graphic(name: Card['graphic']): ReactNode {
   if (name === 'circles') {
     return (
       <div aria-hidden="true" className={cn(frame, 'gap-2')}>
-        <i className="size-[55px] rounded-full bg-linear-[130deg] from-[#fb9363] to-[#db3e00] shadow-[4px_4px_0_#562710] md:size-[35px] lg:size-12" />
-        <i className="size-[55px] rounded-full bg-linear-90 from-[#ef6c36] from-50% to-[#282828] to-50% shadow-[4px_4px_0_#562710] md:size-[35px] lg:size-12" />
+        <i className="size-[55px] rounded-full bg-linear-[130deg] from-accent-hover to-accent shadow-[4px_4px_0] shadow-accent/35 md:size-[35px] lg:size-12" />
+        <i className="size-[55px] rounded-full bg-linear-90 from-accent from-50% to-[#282828] to-50% shadow-[4px_4px_0] shadow-accent/35 md:size-[35px] lg:size-12" />
         <i className="size-[55px] rounded-full bg-[#292929] shadow-[4px_4px_0_#191919] md:size-[35px] lg:size-12" />
       </div>
     )
@@ -42,7 +42,7 @@ function graphic(name: Card['graphic']): ReactNode {
   if (name === 'bars') {
     return (
       <div aria-hidden="true" className={frame}>
-        <span className="-skew-y-8 bg-linear-90 from-accent via-[#543121] via-65% to-[#333] bg-clip-text text-[100px] font-bold tracking-[-8px] text-transparent">
+        <span className="-skew-y-8 bg-linear-90 from-accent via-accent/40 via-65% to-[#333] bg-clip-text text-[100px] font-bold tracking-[-8px] text-transparent">
           ||||||||
         </span>
       </div>
@@ -50,7 +50,7 @@ function graphic(name: Card['graphic']): ReactNode {
   }
   return (
     <div aria-hidden="true" className={frame}>
-      <Asterisk className="text-[110px] drop-shadow-[4px_3px_0_#773116]" />
+      <Asterisk className="text-[110px] drop-shadow-[4px_3px_0] drop-shadow-accent/45" />
     </div>
   )
 }
@@ -67,7 +67,7 @@ function PanelCards({ cards, columns }: { cards: Card[]; columns: string }) {
           data-reveal
           className="rounded-[5px] border border-[#2b2b2b] bg-[#141414] p-[27px] md:p-[35px]"
         >
-          <span className="font-label text-[14px] text-[#c8784b] uppercase">
+          <span className="font-label text-[14px] text-accent uppercase">
             {String(index + 1).padStart(2, '0')}
             {card.label && ` / ${card.label}`}
           </span>

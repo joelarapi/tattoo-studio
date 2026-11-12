@@ -17,12 +17,9 @@
   --color-muted: #a6a6a6; /* body copy: 8.4:1 on the background */
   --color-soft: #818181; /* the grey part of headings: 5.2:1, large text only */
   --color-faint: #8f8f8f; /* small labels and captions: 6.2:1 */
-  --color-accent: #ff5100; /* SINGLE accent: change it here and everything follows */
-  --color-accent-hover: #d94400;
-  /*
-   * Text drawn ON the accent. White on #FF5100 is only 3.3:1 (fails WCAG AA for the 14px button
-   * labels); black is 6.4:1, and 4.8:1 on the hover colour.
-   */
+  --color-accent: #af7f20;
+  --color-accent-hover: color-mix(in srgb, var(--color-accent) 88%, white);
+  /* Keep button labels readable on both accent backgrounds. */
   --color-on-accent: #000000;
   --color-white: #ffffff;
   --color-black: #000000;

@@ -26,7 +26,7 @@ export function HomeHero({ block: hero }: BlockProps<'homeHero'>) {
       <HeroParallax target={HERO_ID} />
       <div className="@container">
         <span className="mb-[23px] flex items-center gap-2.5 font-label text-[14px] tracking-[1px] text-text uppercase md:mb-[26px] md:text-[14px] md:tracking-[1.3px]">
-          <i className="size-[7px] rounded-full bg-accent shadow-[0_0_20px_#ff510080]" />
+          <i className="size-[7px] rounded-full bg-accent shadow-[0_0_20px] shadow-accent/50" />
           {hero.label}
         </span>
         <StyledHeading as="h1" value={hero.heading} className="text-hero" />

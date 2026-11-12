@@ -14,7 +14,7 @@ const bodyClass =
 function Note({ text }: { text?: string | null }) {
   if (!text) return null
   return (
-    <p className="mt-7 border-l border-[#514136] pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
+    <p className="mt-7 border-l border-accent/40 pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
       <Lines text={text} />
     </p>
   )

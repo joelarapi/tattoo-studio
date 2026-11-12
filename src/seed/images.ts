@@ -62,7 +62,7 @@ function svg(kind: PlaceholderKind, seed: number): string {
     <path d="M${inset} ${inset + tick}V${inset}H${inset + tick}"/>
     <path d="M${width - inset - tick} ${height - inset}H${width - inset}V${height - inset - tick}"/>
   </g>
-  <rect x="${(cx + Math.cos(arcEnd) * r * 0.8 - 5).toFixed(1)}" y="${(cy + Math.sin(arcEnd) * r * 0.8 - 5).toFixed(1)}" width="10" height="10" fill="#FF4800"/>
+  <rect x="${(cx + Math.cos(arcEnd) * r * 0.8 - 5).toFixed(1)}" y="${(cy + Math.sin(arcEnd) * r * 0.8 - 5).toFixed(1)}" width="10" height="10" fill="#af7f20"/>
 </svg>`
 }
 

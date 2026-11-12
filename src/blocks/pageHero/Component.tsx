@@ -112,10 +112,10 @@ function Split({ hero }: { hero: PageHeroBlock }) {
                 {index < stops.length - 1 && (
                   <span
                     aria-hidden="true"
-                    className="absolute top-[57px] left-2 h-full border-l border-dashed border-[#694028]"
+                    className="absolute top-[57px] left-2 h-full border-l border-dashed border-accent/45"
                   />
                 )}
-                <i className="relative z-[1] mt-1.5 size-[17px] shrink-0 rounded-full border border-accent bg-panel shadow-[0_0_0_6px_#ff51000b]" />
+                <i className="relative z-[1] mt-1.5 size-[17px] shrink-0 rounded-full border border-accent bg-panel shadow-[0_0_0_6px] shadow-accent/10" />
                 <div>
                   <span className="font-label text-[14px] tracking-[1px] text-accent uppercase">
                     {String(index + 1).padStart(2, '0')}

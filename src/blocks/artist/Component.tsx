@@ -67,7 +67,7 @@ export function ArtistSection({ block, ctx }: BlockProps<'artist'>) {
         )}
         <Action link={block.button} variant="outline" className="mt-[30px]" />
         {block.note && (
-          <p className="mt-7 border-l border-[#514136] pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
+          <p className="mt-7 border-l border-accent/40 pl-3.5 text-[16px] leading-[1.8] text-[#929292]">
             <Lines text={block.note} />
           </p>
         )}
