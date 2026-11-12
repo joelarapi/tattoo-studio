@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { PageMotion } from '@/components/motion/PageMotion'
+import { StudioStructuredData } from '@/components/seo/StudioStructuredData'
 import { getNavigation, getSiteSettings } from '@/lib/data'
 import { defaultLocale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
@@ -54,6 +55,7 @@ export default async function FrontendLayout({ children }: { children: ReactNode
         <script dangerouslySetInnerHTML={{ __html: jsReadyScript }} />
       </head>
       <body>
+        {!draft.isEnabled && <StudioStructuredData settings={settings} />}
         <a
           href="#main"
           className="sr-only z-[60] rounded-sm bg-white px-4 py-3 text-black focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
