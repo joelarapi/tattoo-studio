@@ -26,14 +26,12 @@ export function PortfolioCard({
   // A piece with only a video uses the video cover.
   const cover = item.images?.[0] ?? item.videoPoster
   return (
-    <Link
-      href={pathForDoc('portfolio-items', item.slug)}
-      data-reveal
-      className={cn('group block min-w-0 self-start', className)}
-    >
-      <div
+    <article data-reveal className={cn('group block min-w-0 self-start', className)}>
+      <Link
+        href={pathForDoc('portfolio-items', item.slug)}
+        aria-label={item.title}
         className={cn(
-          'relative overflow-hidden rounded-md bg-panel-2',
+          'relative block overflow-hidden rounded-md bg-panel-2',
           imageClassName ?? 'h-[440px] md:h-[280px] lg:h-[360px] 2xl:h-[430px]',
         )}
       >
@@ -51,10 +49,10 @@ export function PortfolioCard({
         >
           ↗&#xFE0E;
         </span>
-      </div>
+      </Link>
       <div className="mt-5 flex items-center justify-between gap-4">
         <h3 className="text-[25px] leading-[1.13] tracking-[-1px] md:text-[21px] lg:text-[23px]">
-          {item.title}
+          <Link href={pathForDoc('portfolio-items', item.slug)}>{item.title}</Link>
         </h3>
         <span className="font-label text-[14px] text-faint lg:text-[16px]">
           {pieceNumber(position)}
@@ -67,6 +65,6 @@ export function PortfolioCard({
       {item.summary && (
         <p className="mt-4 text-[16px] leading-[1.85] md:text-[16px]">{item.summary}</p>
       )}
-    </Link>
+    </article>
   )
 }

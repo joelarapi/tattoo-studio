@@ -46,7 +46,7 @@ export function FilmCard({
         )}
       </div>
       <div className="p-4 md:p-5">
-        <h3 className="text-[22px] font-normal tracking-[-1px]">{item.title}</h3>
+        <h3 className="text-[22px] font-normal tracking-[-1px]">{item.title} — Video</h3>
         <Link
           href={pathForDoc('portfolio-items', item.slug)}
           className="mt-3 link-text inline-block"
