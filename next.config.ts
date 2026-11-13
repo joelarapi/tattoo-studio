@@ -10,6 +10,7 @@ const dirname = path.dirname(__filename)
 const publicMediaURL = process.env.S3_PUBLIC_URL ? new URL(process.env.S3_PUBLIC_URL) : null
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
     localPatterns: [

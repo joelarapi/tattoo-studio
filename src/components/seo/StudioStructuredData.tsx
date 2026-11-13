@@ -1,10 +1,10 @@
 import { SCHEMA_DAYS } from '@/lib/format'
-import { getServerURL } from '@/lib/preview'
+import { getCanonicalOrigin } from '@/lib/site-url'
 import type { SiteSetting } from '@/payload-types'
 
 /** One business identity shared by all public pages. */
 export function StudioStructuredData({ settings }: { settings: SiteSetting }) {
-  const url = new URL('/', getServerURL()).href
+  const url = new URL('/', getCanonicalOrigin()).href
   const address = settings.address
   const image = settings.seo?.ogImage
   const imagePath = typeof image === 'object' ? image?.url : undefined

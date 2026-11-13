@@ -10,6 +10,7 @@ import { StudioStructuredData } from '@/components/seo/StudioStructuredData'
 import { getNavigation, getSiteSettings } from '@/lib/data'
 import { defaultLocale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
+import { getCanonicalOrigin } from '@/lib/site-url'
 
 import { inter } from './fonts'
 import './globals.css'
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
   // Defaults for pages without their own metadata (e.g. 404s); pages set their canonical URL.
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+    metadataBase: new URL(getCanonicalOrigin()),
     ...pageMetadata({ settings, path: '/' }),
     alternates: null,
   }
