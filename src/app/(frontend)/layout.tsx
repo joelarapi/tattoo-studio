@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { draftMode } from 'next/headers'
 import type { ReactNode } from 'react'
 
+import { GoogleTagManager } from '@/components/analytics/GoogleTagManager'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
@@ -56,6 +57,11 @@ export default async function FrontendLayout({ children }: { children: ReactNode
         <script dangerouslySetInnerHTML={{ __html: jsReadyScript }} />
       </head>
       <body>
+        {!draft.isEnabled && process.env.VERCEL_ENV === 'production' && (
+          <GoogleTagManager
+            id={settings.tracking?.gtmId || process.env.NEXT_PUBLIC_GTM_ID || 'GTM-WJ9MVBNX'}
+          />
+        )}
         {!draft.isEnabled && <StudioStructuredData settings={settings} />}
         <a
           href="#main"
