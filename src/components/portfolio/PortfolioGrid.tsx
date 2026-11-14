@@ -1,8 +1,16 @@
 'use client'
 
-import { type ReactNode, useState } from 'react'
+import { type ReactNode, useState, useSyncExternalStore } from 'react'
 
 import { cn } from '@/lib/cn'
+
+function subscribeToHash(onChange: () => void) {
+  window.addEventListener('hashchange', onChange)
+  return () => window.removeEventListener('hashchange', onChange)
+}
+
+const readHash = () => window.location.hash.slice(1)
+const emptyHash = () => ''
 
 type Card = { id: number; category?: string | null; node: ReactNode }
 
@@ -22,11 +30,14 @@ export function PortfolioGrid({
   allLabel: string
   countLabel?: string | null
 }) {
-  const [active, setActive] = useState<string | null>(null)
-  const shown = active ? cards.filter((card) => card.category === active) : cards
+  const hash = useSyncExternalStore(subscribeToHash, readHash, emptyHash)
+  const [selection, setSelection] = useState<{ hash: string; slug: string | null }>()
   const used = categories.filter((category) =>
     cards.some((card) => card.category === category.slug),
   )
+
+  const active = selection?.hash === hash ? selection.slug : used.find((category) => category.slug === hash)?.slug ?? null
+  const shown = active ? cards.filter((card) => card.category === active) : cards
 
   const filters = [
     { slug: null, name: allLabel },
@@ -48,7 +59,7 @@ export function PortfolioGrid({
                 key={filter.slug ?? 'all'}
                 type="button"
                 aria-pressed={pressed}
-                onClick={() => setActive(filter.slug)}
+                onClick={() => setSelection({ hash, slug: filter.slug })}
                 className={cn(
                   'cursor-pointer rounded-sm border px-3 py-2.5 font-label text-[14px] uppercase transition-colors md:px-[15px] md:py-[11px] md:text-[14px]',
                   pressed
