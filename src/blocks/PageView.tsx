@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 
+import { Action } from '@/components/ui/Action'
 import { MobileCta } from '@/components/motion/MobileCta'
 import { getSiteSettings } from '@/lib/data'
 import { pageMetadata } from '@/lib/metadata'
@@ -19,6 +20,17 @@ export function PageView({ page }: { page: Page }) {
         numberSections={page.numberSections}
         context={{ updatedAt: page.updatedAt }}
       />
+      {page.slug === 'visiting-albania' && (
+        <nav aria-label="Tattoo travel guides" className="flex flex-wrap gap-6 px-site pb-section">
+          <Action href="/visit/from-italy" variant="plain">Travelling from Italy</Action>
+          <Action href="/visit/from-germany" variant="plain">Travelling from Germany</Action>
+        </nav>
+      )}
+      {page.slug === 'portfolio' && (
+        <div className="px-site pb-section">
+          <Action href="/services/geometric-tattoo" variant="plain">Explore geometric tattoo designs</Action>
+        </div>
+      )}
       {mobileCta?.label && mobileCta.href && (
         <MobileCta label={mobileCta.label} href={mobileCta.href} />
       )}

@@ -29,5 +29,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
     }),
   )
-  return groups.flat()
+  const guides = ['/visit/from-italy', '/visit/from-germany', '/services/geometric-tattoo']
+  return [...groups.flat(), ...guides.map((path) => ({ url: new URL(path, origin).href }))]
 }
