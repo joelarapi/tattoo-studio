@@ -38,6 +38,16 @@ export const Media: CollectionConfig = {
     ],
     afterChange: [afterChange],
     afterDelete: [afterDelete],
+    // Payload builds the admin thumbnail address (`thumbnailURL`) from the stored path,
+    // /api/media/file/…, which isn't served when R2 serves the files publicly
+    // (disablePayloadAccessControl), so admin previews failed with a 500. By now the
+    // thumbnail size's own URL is resolved (R2 or local disk), so the admin uses that.
+    afterRead: [
+      ({ doc }) => {
+        const thumbnail: unknown = doc.sizes?.thumbnail?.url
+        return typeof thumbnail === 'string' ? { ...doc, thumbnailURL: thumbnail } : doc
+      },
+    ],
   },
   fields: [
     {
