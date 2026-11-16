@@ -22,13 +22,19 @@ export function PageView({ page }: { page: Page }) {
       />
       {page.slug === 'visiting-albania' && (
         <nav aria-label="Tattoo travel guides" className="flex flex-wrap gap-6 px-site pb-section">
-          <Action href="/visit/from-italy" variant="plain">Travelling from Italy</Action>
-          <Action href="/visit/from-germany" variant="plain">Travelling from Germany</Action>
+          <Action href="/visiting-albania/from-italy" variant="plain">
+            Travelling from Italy
+          </Action>
+          <Action href="/visit/from-germany" variant="plain">
+            Travelling from Germany
+          </Action>
         </nav>
       )}
       {page.slug === 'portfolio' && (
         <div className="px-site pb-section">
-          <Action href="/services/geometric-tattoo" variant="plain">Explore geometric tattoo designs</Action>
+          <Action href="/services/geometric-tattoo" variant="plain">
+            Explore geometric tattoo designs
+          </Action>
         </div>
       )}
       {mobileCta?.label && mobileCta.href && (
