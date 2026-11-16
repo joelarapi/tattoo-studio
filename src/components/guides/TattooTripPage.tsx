@@ -17,20 +17,11 @@ export type TattooTripGuide = {
   flightCopy: string
   entryCopy: string
   entrySource: string
+  featuredSlugs: string[]
+  portfolioIntro: string
 }
 
 const travelEnquiry = '/contact?travel=1#tattoo-enquiry'
-
-const featuredSlugs = [
-  'jesus-portrait-cross-tattoo',
-  'family-memory-full-sleeve-tattoo',
-  'aztec-inspired-chest-shoulder-tattoo',
-  'archangel-mary-full-sleeve-tattoo',
-  'lion-compass-forearm-tattoo',
-  'woman-portrait-forearm-tattoo',
-  'lion-cub-family-sleeve-tattoo',
-  'joker-playing-cards-sleeve',
-]
 
 export async function TattooTripPage({ guide }: { guide: TattooTripGuide }) {
   const { country } = guide
@@ -40,10 +31,11 @@ export async function TattooTripPage({ guide }: { guide: TattooTripGuide }) {
     getLatestPosts(3),
   ])
   const pieces = [
-    ...featuredSlugs.flatMap((slug) => allPieces.filter((piece) => piece.slug === slug)),
-    ...allPieces.filter((piece) => !featuredSlugs.includes(piece.slug ?? '')),
+    ...guide.featuredSlugs.flatMap((slug) => allPieces.filter((piece) => piece.slug === slug)),
+    ...allPieces.filter((piece) => !guide.featuredSlugs.includes(piece.slug ?? '')),
   ].slice(0, 8)
-  const heroPiece = pieces[0]
+  const heroPiece =
+    allPieces.find((piece) => piece.slug === 'jesus-portrait-cross-tattoo') ?? pieces[0]
   const heroImage = heroPiece?.images?.[0] ?? heroPiece?.videoPoster
   const location =
     [settings.address?.city, settings.address?.country].filter(Boolean).join(', ') || 'Albania'
@@ -150,7 +142,7 @@ export async function TattooTripPage({ guide }: { guide: TattooTripGuide }) {
           layout="stackedUntilWide"
           tag="Explore the portfolio"
           heading={{ text: 'The work.', soft: 'Worth the journey.' }}
-          intro="Real tattoo projects from the studio. Open a piece to see more detail and start a conversation about your idea."
+          intro={guide.portfolioIntro}
           action={
             <Action href="/portfolio" variant="outline">
               View the full portfolio
