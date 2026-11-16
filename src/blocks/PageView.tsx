@@ -28,6 +28,9 @@ export function PageView({ page }: { page: Page }) {
           <Action href="/visit/from-germany" variant="plain">
             Travelling from Germany
           </Action>
+          <Action href="/visit/from-poland" variant="plain">
+            Travelling from Poland
+          </Action>
         </nav>
       )}
       {page.slug === 'portfolio' && (
