@@ -36,7 +36,7 @@ Always use `pnpm exec` / `pnpm dlx` rather than plain `npx`, so commands run on 
 2. Import the GitHub repo in Vercel. The framework (Next.js) and pnpm are detected automatically. Under Settings → Build and Deployment, check that the Node.js version is 24.x.
 3. Add every variable from `.env`. Set `NEXT_PUBLIC_SITE_URL` to the exact production URL (for example `https://<project>.vercel.app`): it's baked in at build time and live preview needs it to match. Production is indexable. Vercel previews always use noindex; `NOINDEX=true` only affects non-production environments.
 4. Functions run in `fra1` (Frankfurt, `vercel.json`), next to the Neon database in `eu-central-1`.
-5. Add the production URL to the R2 bucket's CORS rule (`PUT`, `GET`), next to `http://localhost:3000`.
+5. Add the production URL to the R2 buckets' CORS rules, next to `http://localhost:3000`: the public bucket allows `PUT` and `GET` (admin uploads), the private one `PUT` only (the enquiry form). The private bucket also needs its lifecycle rule (see "The enquiry form").
 6. Preview deployments of other branches use the Preview variables. A branch with its own database (like `design-v1`) needs its own `DATABASE_URI` and `NEXT_PUBLIC_SITE_URL`, scoped to that branch.
 
 Schema changes reach a database through `pnpm dev` or `pnpm seed`, so run one against it before deploying code that changes collections.
@@ -45,12 +45,12 @@ Schema changes reach a database through `pnpm dev` or `pnpm seed`, so run one ag
 
 Every page is a document in **Pages → Pages**, built from sections: the page builder in `src/blocks/`. How and why it was built: `docs/PAGE_BUILDER.md`.
 
-| Route               | Content from (CMS)                                                          |
-| ------------------- | --------------------------------------------------------------------------- |
-| `/`                 | the page `home`                                                             |
+| Route               | Content from (CMS)                                                         |
+| ------------------- | -------------------------------------------------------------------------- |
+| `/`                 | the page `home`                                                            |
 | `/<slug>`           | the page with that slug (`[...slug]`): About, Portfolio, Contact, Privacy… |
-| `/portfolio/[slug]` | the piece, plus Pages → Portfolio piece pages                               |
-| `/journal/[slug]`   | the post, plus Pages → Journal article pages                                |
+| `/portfolio/[slug]` | the piece, plus Pages → Portfolio piece pages                              |
+| `/journal/[slug]`   | the post, plus Pages → Journal article pages                               |
 
 Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`). The `[...slug]` route checks a cached list of page slugs first, so unknown URLs never query the database.
 
@@ -123,18 +123,45 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`). The
   - Keys are an auth collection too, so `req.user` can be a key rather than a CMS user. Access rules check `hasRole()` or `isCmsUser()` (`src/access/`), never just that a user exists or its id.
 - **Schema changes:** development uses Payload's automatic schema push. When a change renames or removes fields, the push asks for confirmation in the terminal. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`).
 
+## The enquiry form
+
+Every "Enquiry form" section uses `EnquiryForm` (`src/components/forms/`). Sending lives in `src/lib/enquiry/`.
+
+1. **Checks in the browser:** the same rules as the server (`fields.ts`), shown next to each field.
+2. **Spam check:** Cloudflare Turnstile (`useTurnstile`). Its script loads when the visitor first uses the form, and the box only shows when Cloudflare wants a click. There's also a hidden honeypot field.
+3. **Reference files** (only when some are attached):
+   - The `getEnquiryUploadLinks` action checks Turnstile and the files (count, type, size).
+   - It returns a signed upload link per file and a signed ticket listing them (`ticket.ts`, signed with `PAYLOAD_SECRET`, valid for 2 hours).
+   - Each link allows one file of that exact type and size, into `client-enquiries/pending/<random>/` in the private bucket. The browser uploads straight to R2, because Vercel caps request bodies at 4.5 MB.
+4. **Saving:** the `sendEnquiry` action re-checks everything and accepts either a Turnstile token or the ticket. It saves the lead with the Local API and answers the visitor straight away.
+5. **After the response** (`after()`):
+   - Each pending file is downloaded and saved as a `lead-attachments` file under `client-enquiries/`. Payload checks what it really is and refuses anything that isn't a photo or video. Files are named after the client and date.
+   - The files are linked to the lead, and the pending copies are deleted.
+   - Two emails go out: the enquiry to `LEADS_NOTIFY_EMAIL` (or the email in Studio details), with "Reply" going to the client; and, if the client gave an email address, a confirmation with the success text from Studio details. The confirmation never repeats what the visitor typed, so the form can't be used to send other people arbitrary text.
+
+Settings:
+
+- **Turnstile:** `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`. Without them the check is skipped in development and the form refuses to send in production. Cloudflare's test keys (in `.env.example`) work locally and are refused on Vercel production.
+- **Email:** `RESEND_API_KEY`, `EMAIL_FROM_ADDRESS` (on the domain verified in Resend), `EMAIL_FROM_NAME`, `LEADS_NOTIFY_EMAIL` (comma-separated). Without a key, emails are printed to the console.
+- **Private bucket:**
+  - CORS rule: `PUT` from the site's origin.
+  - Lifecycle rule: delete objects with the prefix `client-enquiries/pending/` after 1 day. It removes uploads from enquiries that were never sent.
+  - Without `S3_PRIVATE_BUCKET` the upload field is hidden.
+
+The form only works with JavaScript. Without it, a note asks people to contact the studio directly. After a successful enquiry the form pushes `generate_lead` to `dataLayer` (Google Tag Manager).
+
 ## For editors: where things live in the CMS
 
 Log in at `/admin`. The menu on the left has five groups:
 
 - **Content:** journal posts, journal categories, and images and videos.
 - **Studio:** artists, portfolio categories, portfolio pieces and FAQs. To change the order they appear on the site, drag rows in the list. A page's "Questions (FAQ)" section chooses which questions it shows. A portfolio piece has photos (the first is its card image) and can have a short video; give the video a **Video cover**, a still from the clip, which is shown before it plays and on the homepage.
-- **Leads:** tattoo enquiries from the website form (once it's connected), and the photos and videos clients attach.
+- **Leads:** tattoo enquiries from the website form, and the photos and videos clients attach (only admins and editors can open them). Each new enquiry is also emailed to the studio. Set its **Status** as you follow it up.
 - **Settings:** CMS users, AI access keys, studio details and menus. Studio details covers:
   - the name, address, opening hours and social links
   - the black-and-white photo switch
   - the shared call to action
-  - the enquiry form's button and notes
+  - the enquiry form's button and notes, the message shown after sending (also used in the confirmation email to the client) and the message shown when sending fails
   - the "page not found" text
 - **Pages:** every page of the site, built from sections (Privacy and Cookies included), plus two templates: **Portfolio piece pages** and **Journal article pages**.
 

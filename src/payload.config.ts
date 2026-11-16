@@ -24,6 +24,8 @@ import { ArticleTemplate } from './globals/ArticleTemplate'
 import { Navigation } from './globals/Navigation'
 import { PieceTemplate } from './globals/PieceTemplate'
 import { SiteSettings } from './globals/SiteSettings'
+import { LEAD_FILES_PREFIX } from './lib/leads'
+import { s3ClientConfig } from './lib/s3'
 import { bearerToken, matchesSecret } from './lib/secrets'
 import { mcp } from './plugins/mcp'
 import { seo } from './plugins/seo'
@@ -35,14 +37,6 @@ const dirname = path.dirname(filename)
  * Cloudflare R2 (S3-compatible). Each bucket is used only when its env var is set; otherwise
  * uploads go to local disk (/media, /media-private), which is what development uses.
  */
-const s3ClientConfig = {
-  endpoint: process.env.S3_ENDPOINT,
-  region: process.env.S3_REGION || 'auto',
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID || '',
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY || '',
-  },
-}
 const publicMediaURL = process.env.S3_PUBLIC_URL?.replace(/\/$/, '')
 
 export default buildConfig({
@@ -135,12 +129,13 @@ export default buildConfig({
       },
     }),
     // Private bucket: client reference files, only readable through Payload's access control.
+    // The enquiry form uploads into its pending/ folder first (src/lib/enquiry/uploads.ts).
     s3Storage({
       enabled: Boolean(process.env.S3_PRIVATE_BUCKET),
       alwaysInsertFields: true,
       bucket: process.env.S3_PRIVATE_BUCKET || '',
       config: s3ClientConfig,
-      collections: { 'lead-attachments': { prefix: 'leads' } },
+      collections: { 'lead-attachments': { prefix: LEAD_FILES_PREFIX } },
     }),
   ],
 })

@@ -29,7 +29,7 @@ export const siteSettings = (refs: { og: number }): Seed<SiteSetting> => ({
       p('We use your details only to reply to your enquiry. ', link('Privacy policy', '/privacy')),
     ),
     pendingNotice:
-      'Online enquiries aren’t connected yet. For now, please contact the studio by phone or email.',
+      'Sorry, your enquiry couldn’t be sent. Please try again, or contact the studio by phone, WhatsApp or email.',
     successHeading: 'Thank you. Your idea is with us.',
     successMessage: 'We’ll be in touch to talk through the details.',
   },

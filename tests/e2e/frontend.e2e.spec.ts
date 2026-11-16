@@ -83,15 +83,19 @@ test.describe('Frontend', () => {
     await expect(page.getByLabel('Planned dates in Albania')).toBeVisible()
   })
 
-  test('the form shows the not-connected notice instead of sending', async ({ page }) => {
+  // Checks the form's own validation only: a valid enquiry would be saved to the database.
+  test('the form explains a mistake next to the field instead of sending', async ({ page }) => {
     await page.goto(`${base}/contact`)
     await page.getByLabel('First name').fill('Test')
     await page.getByLabel('Surname').fill('Visitor')
-    await page.getByLabel('Phone number, including country code').fill('+355 69 000 0000')
+    const phone = page.getByLabel('Phone number, including country code')
+    await phone.fill('call me')
     await page.getByLabel('Tattoo placement').fill('Forearm')
     await page.getByLabel('Describe your tattoo idea').fill('A small botanical piece.')
     await page.locator('form button[type="submit"]').click()
-    await expect(page.locator('form [role="status"]')).not.toBeEmpty()
+    await expect(phone).toHaveAttribute('aria-invalid', 'true')
+    await expect(page.locator('#phone-error')).toContainText('country code')
+    await expect(phone).toBeFocused()
   })
 
   test.describe('without JavaScript', () => {

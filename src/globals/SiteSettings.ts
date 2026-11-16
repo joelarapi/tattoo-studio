@@ -254,14 +254,17 @@ export const SiteSettings: GlobalConfig = {
                 },
                 paragraphs(
                   'pendingNotice',
-                  'Shown when someone presses the button while sending is not connected yet.',
+                  'Shown when an enquiry can’t be sent, for example when the connection dropped. Tell people another way to reach the studio.',
                   true,
                 ),
                 text(
                   'successHeading',
-                  'Shown after a successful enquiry (once sending is connected).',
+                  'Shown after an enquiry is sent. Also the heading of the confirmation email to the client.',
                 ),
-                paragraphs('successMessage', 'Under the success heading.'),
+                paragraphs(
+                  'successMessage',
+                  'Under the success heading, and in the confirmation email to the client.',
+                ),
               ],
               'Used by every "Enquiry form" section. The field labels are part of the design.',
             ),

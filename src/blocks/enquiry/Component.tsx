@@ -9,6 +9,7 @@ import { StyledHeading } from '@/components/ui/StyledHeading'
 import { Tag } from '@/components/ui/Tag'
 import { Lines, Paragraphs } from '@/components/ui/Text'
 import { getPortfolioItems, getSiteSettings } from '@/lib/data'
+import { referenceUploadsEnabled } from '@/lib/enquiry/config'
 import { openingHoursRows, telHref, whatsappHref } from '@/lib/format'
 import { ENQUIRY_ID } from '@/lib/routes'
 import type { SiteSetting } from '@/payload-types'
@@ -169,6 +170,7 @@ export function Enquiry({ block, data, ctx }: BlockProps<'enquiry', Data>) {
       <EnquiryForm
         copy={form}
         projects={projects}
+        uploads={referenceUploadsEnabled()}
         privacyNote={form.privacyNote ? <RichText data={form.privacyNote} /> : undefined}
       />
     </BlockSection>

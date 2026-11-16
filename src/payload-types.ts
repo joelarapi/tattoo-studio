@@ -2837,15 +2837,15 @@ export interface SiteSetting {
       [k: string]: unknown;
     } | null;
     /**
-     * Shown when someone presses the button while sending is not connected yet.
+     * Shown when an enquiry can’t be sent, for example when the connection dropped. Tell people another way to reach the studio.
      */
     pendingNotice: string;
     /**
-     * Shown after a successful enquiry (once sending is connected).
+     * Shown after an enquiry is sent. Also the heading of the confirmation email to the client.
      */
     successHeading?: string | null;
     /**
-     * Under the success heading.
+     * Under the success heading, and in the confirmation email to the client.
      */
     successMessage?: string | null;
   };
@@ -2941,7 +2941,7 @@ export interface Navigation {
 export interface PieceTemplate {
   id: number;
   /**
-   * Small label above the title, e.g. "Tisi / London InkTattoo".
+   * Small label above the title, e.g. "Tisi / LondonInk Tattoo".
    */
   label?: string | null;
   /**
