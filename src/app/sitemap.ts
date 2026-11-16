@@ -32,6 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const guides = [
     '/visiting-albania/from-italy',
     '/visit/from-germany',
+    '/visit/from-poland',
     '/services/geometric-tattoo',
   ]
   return [...groups.flat(), ...guides.map((path) => ({ url: new URL(path, origin).href }))]
