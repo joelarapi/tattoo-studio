@@ -3,6 +3,14 @@ import { TURNSTILE_ACTION } from './config'
 const VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
 /**
+ * True on a production build without both Turnstile keys: nothing can be sent, and the visitor
+ * gets the "couldn't send" message (which points to the studio's other contact details).
+ */
+export const turnstileMissing = () =>
+  process.env.NODE_ENV === 'production' &&
+  !(process.env.TURNSTILE_SECRET_KEY && process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY)
+
+/**
  * Checks a Cloudflare Turnstile token (each token is accepted once). Without
  * TURNSTILE_SECRET_KEY the check passes in development and fails in production, so a missing key
  * never leaves the live form unprotected.

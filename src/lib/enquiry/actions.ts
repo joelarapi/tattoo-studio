@@ -28,7 +28,7 @@ import {
   validateEnquiry,
 } from './fields'
 import { createTicket, readTicket, type TicketFile } from './ticket'
-import { verifyTurnstile } from './turnstile'
+import { turnstileMissing, verifyTurnstile } from './turnstile'
 import { createUploadLinks, deleteUploads, downloadUpload, isUploaded } from './uploads'
 
 /** Why sending failed, for the form to explain (field problems come back as `errors`). */
@@ -57,7 +57,8 @@ export async function getEnquiryUploadLinks(input: {
   files?: unknown
   website?: unknown
 }): Promise<UploadLinksResult> {
-  if (isBot(input.website) || !referenceUploadsEnabled()) return { ok: false, problem: 'failed' }
+  if (isBot(input.website) || !referenceUploadsEnabled() || turnstileMissing())
+    return { ok: false, problem: 'failed' }
 
   const files: ReferenceFile[] = Array.isArray(input.files)
     ? input.files.map((file: { type?: unknown; size?: unknown }) => ({
@@ -97,6 +98,7 @@ export async function sendEnquiry(input: {
 }): Promise<SendEnquiryResult> {
   // Bots that fill the hidden field are told it worked, and nothing is saved.
   if (isBot(input.website)) return { ok: true }
+  if (turnstileMissing()) return { ok: false, problem: 'failed' }
 
   const values = readEnquiry(
     input.values && typeof input.values === 'object'
