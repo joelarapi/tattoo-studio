@@ -16,14 +16,14 @@ const path = '/visiting-albania/from-italy'
 const travelEnquiry = '/contact?travel=1#tattoo-enquiry'
 
 const featuredSlugs = [
-  'jesus-portrait-cross-tattoo',
-  'family-memory-full-sleeve-tattoo',
-  'aztec-inspired-chest-shoulder-tattoo',
   'archangel-mary-full-sleeve-tattoo',
-  'lion-compass-forearm-tattoo',
-  'woman-portrait-forearm-tattoo',
+  'grim-reaper-full-back-tattoo',
+  'archangel-chest-tattoo',
+  'family-memory-full-sleeve-tattoo',
+  'jesus-portrait-cross-tattoo',
+  'mary-cherub-lettering-tattoo',
+  'angel-ornamental-arm-tattoo',
   'lion-cub-family-sleeve-tattoo',
-  'joker-playing-cards-sleeve',
 ]
 
 export async function generateMetadata() {
@@ -46,7 +46,8 @@ export default async function FromItalyPage() {
     ...featuredSlugs.flatMap((slug) => allPieces.filter((piece) => piece.slug === slug)),
     ...allPieces.filter((piece) => !featuredSlugs.includes(piece.slug ?? '')),
   ].slice(0, 8)
-  const heroPiece = pieces[0]
+  const heroPiece =
+    allPieces.find((piece) => piece.slug === 'jesus-portrait-cross-tattoo') ?? pieces[0]
   const heroImage = heroPiece?.images?.[0] ?? heroPiece?.videoPoster
   const location =
     [settings.address?.city, settings.address?.country].filter(Boolean).join(', ') || 'Albania'
@@ -152,7 +153,7 @@ export default async function FromItalyPage() {
           layout="stackedUntilWide"
           tag="Explore the portfolio"
           heading={{ text: 'The work.', soft: 'Worth the journey.' }}
-          intro="Real tattoo projects from the studio. Open a piece to see more detail and start a conversation about your idea."
+          intro="Explore large compositions alongside angel and religious tattoos from the studio. Open a piece to see more detail and discuss your own direction."
           action={
             <Action href="/portfolio" variant="outline">
               View the full portfolio

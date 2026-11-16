@@ -17,6 +17,18 @@ const guides: Record<Country, TattooTripGuide> = {
     entryCopy:
       'The German Foreign Office currently lists a German passport or national identity card as accepted for entry, subject to validity requirements. If you live in Germany with another nationality, check the rules for your own passport. Review the',
     entrySource: 'https://www.auswaertiges-amt.de/de/reiseundsicherheit/albaniensicherheit-216248',
+    featuredSlugs: [
+      'grim-reaper-full-back-tattoo',
+      'archangel-chest-tattoo',
+      'aztec-inspired-chest-shoulder-tattoo',
+      'eagle-spartan-chest-shoulder-tattoo',
+      'family-memory-full-sleeve-tattoo',
+      'archangel-mary-full-sleeve-tattoo',
+      'lion-cub-family-sleeve-tattoo',
+      'joker-playing-cards-sleeve',
+    ],
+    portfolioIntro:
+      'Explore full-back, chest, shoulder and sleeve projects from the studio. Open a piece to see the composition and discuss the scale of your own idea.',
   },
   poland: {
     country: 'Poland',
@@ -26,6 +38,18 @@ const guides: Record<Country, TattooTripGuide> = {
     entryCopy:
       'Poland’s government lists a valid passport or national ID card for Polish citizens entering Albania, with document validity requirements. If you live in Poland with another nationality, check the rules for your own passport. Review the',
     entrySource: 'https://www.gov.pl/web/albania/praca-i-pobyt',
+    featuredSlugs: [
+      'archangel-mary-full-sleeve-tattoo',
+      'grim-reaper-full-back-tattoo',
+      'archangel-chest-tattoo',
+      'family-memory-full-sleeve-tattoo',
+      'jesus-portrait-cross-tattoo',
+      'mary-cherub-lettering-tattoo',
+      'angel-ornamental-arm-tattoo',
+      'lion-cub-family-sleeve-tattoo',
+    ],
+    portfolioIntro:
+      'Explore large compositions alongside angel and religious tattoos from the studio. Open a piece to see more detail and discuss your own direction.',
   },
 }
 
