@@ -118,6 +118,7 @@ export default async function FromItalyPage() {
       <section className="px-site py-section">
         <SectionHead
           number={1}
+          layout="stackedUntilWide"
           tag="Why travel from Italy"
           heading={{ text: 'Close enough for a trip.', soft: 'Planned around your tattoo.' }}
           intro="Start the design conversation before you travel, then leave enough time for the journey, your session and the trip home."
@@ -148,6 +149,7 @@ export default async function FromItalyPage() {
       <section id="portfolio" className="px-site py-section">
         <SectionHead
           number={2}
+          layout="stackedUntilWide"
           tag="Explore the portfolio"
           heading={{ text: 'The work.', soft: 'Worth the journey.' }}
           intro="Real tattoo projects from the studio. Open a piece to see more detail and start a conversation about your idea."
@@ -181,6 +183,7 @@ export default async function FromItalyPage() {
       <section className="bg-band px-site py-section">
         <SectionHead
           number={3}
+          layout="stackedUntilWide"
           tag="Getting here from Italy"
           heading={{ text: 'By air or by sea.', soft: 'Continue on to the studio.' }}
           intro="Schedules and connections change. Check the operator for your dates before you book around an appointment."
@@ -266,6 +269,7 @@ export default async function FromItalyPage() {
       <section className="bg-band px-site py-section">
         <SectionHead
           number={5}
+          layout="stackedUntilWide"
           tag="Make Albania part of your story"
           heading={{ text: 'A trip to remember.', soft: 'A piece to take home.' }}
           intro="These are examples to discuss with the studio, not fixed packages or promises about what can be completed in one stay."

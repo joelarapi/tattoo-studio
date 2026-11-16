@@ -59,6 +59,7 @@ export function SectionHead({
   action,
   size = 'lg',
   as = 'h2',
+  layout = 'split',
   className,
 }: {
   tag?: string | null
@@ -68,6 +69,7 @@ export function SectionHead({
   action?: ReactNode
   size?: 'lg' | 'md' | 'sm'
   as?: 'h1' | 'h2'
+  layout?: 'split' | 'stackedUntilWide'
   className?: string
 }) {
   const headingClass = { lg: 'text-h2-lg', md: 'text-h2', sm: 'text-h2-sm' }[size]
@@ -75,7 +77,10 @@ export function SectionHead({
     <div
       data-reveal
       className={cn(
-        'mb-[30px] md:mb-10 md:flex md:items-end md:justify-between md:gap-10',
+        'mb-[30px] md:mb-10',
+        layout === 'split'
+          ? 'md:flex md:items-end md:justify-between md:gap-10'
+          : 'md:flex md:flex-col md:items-start md:gap-5 2xl:flex-row 2xl:items-end 2xl:justify-between 2xl:gap-10',
         className,
       )}
     >
@@ -84,7 +89,12 @@ export function SectionHead({
         <StyledHeading as={as} value={heading} className={headingClass} />
       </div>
       {(intro || action) && (
-        <div className="mt-6 md:mt-0 md:shrink-0">
+        <div
+          className={cn(
+            'mt-6 md:mt-0 md:shrink-0',
+            layout === 'stackedUntilWide' && 'max-w-[650px]',
+          )}
+        >
           {intro && (
             <p className="text-[16px]">
               <Lines text={intro} />
