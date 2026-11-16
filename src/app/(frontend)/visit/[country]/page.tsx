@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 
 import { StudioGuide } from '@/components/guides/StudioGuide'
 import { Action } from '@/components/ui/Action'
@@ -7,12 +7,13 @@ import { pageMetadata } from '@/lib/metadata'
 import { ENQUIRY_ID } from '@/lib/routes'
 import { travelGuides } from '@/lib/studio-guides'
 
-const countries = ['italy', 'germany'] as const
+const countries = ['germany'] as const
 type Country = (typeof countries)[number]
 type Props = { params: Promise<{ country: string }> }
 
 async function findGuide(params: Props['params']) {
   const { country } = await params
+  if (country === 'from-italy') permanentRedirect('/visiting-albania/from-italy')
   const key = countries.find((value) => country === `from-${value}`)
   if (!key) notFound()
   return { key, guide: travelGuides[key] }
@@ -37,9 +38,15 @@ export default async function CountryGuide({ params }: Props) {
   return (
     <StudioGuide guide={guide} enquiry={`/contact?travel=1#${ENQUIRY_ID}`}>
       <div className="mt-10 flex flex-wrap gap-6">
-        <Action href="/visiting-albania" variant="plain">Read the Albania visitor guide</Action>
-        <Action href="https://www.tirana-airport.com/en/flights" variant="plain">Check Tirana flights</Action>
-        <Action href="https://www.tirana-airport.com/en/article/15/By-Bus" variant="plain">Check airport buses to Fier</Action>
+        <Action href="/visiting-albania" variant="plain">
+          Read the Albania visitor guide
+        </Action>
+        <Action href="https://www.tirana-airport.com/en/flights" variant="plain">
+          Check Tirana flights
+        </Action>
+        <Action href="https://www.tirana-airport.com/en/article/15/By-Bus" variant="plain">
+          Check airport buses to Fier
+        </Action>
       </div>
     </StudioGuide>
   )
