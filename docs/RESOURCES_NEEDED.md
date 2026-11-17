@@ -68,10 +68,10 @@ Received: 30 pieces with 32 photos and 11 films, now on the site with their titl
 
 ## 11. Accounts (we'll walk you through each when we get there)
 
-- [ ] Domain name, and access to its DNS settings
+- [x] Domain name, and access to its DNS settings (`londoninktattoo.com`, on Cloudflare)
 - [ ] Google: Tag Manager, Analytics, Ads, Search Console, Business Profile
 - [ ] Meta: Business Manager with a Pixel, and a Conversions API token
-- [ ] Cloudflare: an account (for image storage and spam protection on the enquiry form)
-- [ ] An email-sending service (Resend), or the SMTP login for the studio mailbox
+- [x] Cloudflare: an account (for image storage and spam protection on the enquiry form)
+- [x] An email-sending service: Resend, set up on 16 Nov 2026 and sending from `londoninktattoo.com`
 - [ ] Which inbox should receive new enquiries
 - [ ] Hosting: Vercel Pro (about $20/month; the free plan doesn't allow business sites) or a server of your own

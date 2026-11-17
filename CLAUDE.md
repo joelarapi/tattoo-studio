@@ -80,7 +80,12 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
   - Reference files go from the browser straight to the private bucket (Vercel's 4.5 MB limit), into `client-enquiries/pending/`, through signed links fixed to each file's type and exact size. After the response (`after()`) the server re-saves them as `lead-attachments` (Payload checks the real file type) and deletes the pending copies. An R2 lifecycle rule (set by the user in Cloudflare) deletes anything left in pending/ after a day. The user approved `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` for this (16 Nov 2026; already installed with the storage plugin).
   - Emails: the enquiry to `LEADS_NOTIFY_EMAIL` (else Studio details' email), "Reply" to the client; a confirmation to the client with only CMS text (`successHeading`/`successMessage`), never what they typed.
   - Turnstile without keys: skipped in development, refused in production. Cloudflare's test keys are refused on Vercel production.
-  - `pendingNotice` is now the "couldn't send" message. The live text still said "not connected yet" when sending went live: the user was asked to change it.
+  - **Production setup: done** (16–17 Nov 2026). The user sent a real test enquiry with a photo: both emails arrived and `pending/` emptied itself.
+    - Vercel Production has the Turnstile keys (Managed widget for `londoninktattoo.com`; previews have none, so their form shows the "couldn't send" message) and the Resend variables.
+    - Resend is on the user's own account. The domain `londoninktattoo.com` is verified in eu-west-1; Resend added its records in Cloudflare itself. There's no DMARC record yet (optional).
+    - The private bucket's CORS allows only `PUT` from the apex and `localhost:3000`. Its lifecycle rule deletes `client-enquiries/pending/` after 1 day. The site's R2 key can't read bucket settings, so check them with a CORS preflight (`OPTIONS`) instead.
+    - `LEADS_NOTIFY_EMAIL` isn't set, so enquiries go to the email in Studio details → Contact & hours, which the owner can change in the admin.
+  - `pendingNotice` is now the "couldn't send" message. The live text still said "not connected yet" on 17 Nov: the user was asked to change it.
   - Not done yet (rest of Phase 6, with the cookie banner): UTM/click-ID capture (a 30-day cookie needs consent), Meta CAPI, `/thank-you`, landing pages.
   - Travel fields show with CSS `:has(#travelling:checked)`, so they work without JS.
   - `?travel=1` and `?project=<slug>` are read with `useSyncExternalStore`, not `useSearchParams`, which would need a Suspense boundary on prerendered pages.
