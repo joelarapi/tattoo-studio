@@ -138,6 +138,7 @@ Every "Enquiry form" section uses `EnquiryForm` (`src/components/forms/`). Sendi
    - Each pending file is downloaded and saved as a `lead-attachments` file under `client-enquiries/`. Payload checks what it really is and refuses anything that isn't a photo or video. Files are named after the client and date.
    - The files are linked to the lead, and the pending copies are deleted.
    - One email goes out: the enquiry, to `LEADS_NOTIFY_EMAIL` or else the email in Studio details. "Reply" goes to the client if they gave an email address. Clients get no email from the site (the studio's choice), so the form can't be used to send mail to other people.
+   - The reference files are attached to that email while they fit in 25 MB: photos first (five always fit), then videos. Larger videos are only in the admin, and the email says so. If Resend refuses the email with its files, it's sent again without them.
 
 Settings:
 

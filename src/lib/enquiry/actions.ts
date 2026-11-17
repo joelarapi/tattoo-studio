@@ -5,7 +5,7 @@
  * everything: the hidden honeypot field, Turnstile (or the signed upload ticket), every field and
  * every file. Leads are created with the Local API; the public REST API can't create them.
  */
-import { mkdtemp, rm } from 'fs/promises'
+import { mkdtemp, readFile, rm } from 'fs/promises'
 import { headers } from 'next/headers'
 import { after } from 'next/server'
 import os from 'os'
@@ -17,7 +17,7 @@ import { pathForDoc } from '@/lib/routes'
 import { getCanonicalOrigin } from '@/lib/site-url'
 
 import { referenceUploadsEnabled } from './config'
-import { notificationEmail } from './emails'
+import { notificationEmail, pickEmailAttachments } from './emails'
 import {
   checkReferenceFiles,
   type EnquiryValues,
@@ -158,19 +158,24 @@ export async function sendEnquiry(input: {
     })
 
     after(async () => {
+      // The files stay in this folder until the studio's email (which attaches them) has gone.
+      let dir: string | undefined
       try {
-        const { attached, failed } = files.length
-          ? await attachFiles(payload, lead.id, files, fileBaseName(values))
-          : { attached: 0, failed: 0 }
+        if (files.length) dir = await mkdtemp(path.join(os.tmpdir(), 'enquiry-'))
+        const saved = dir
+          ? await attachFiles(payload, lead.id, files, fileBaseName(values), dir)
+          : []
         await notifyStudio(payload, {
           values,
           leadId: lead.id,
           project: piece && { title: piece.title, path: pathForDoc('portfolio-items', piece.slug) },
-          attached,
-          failed,
+          saved,
+          failed: files.length - saved.length,
         })
       } catch (error) {
         payload.logger.error({ err: error, msg: `Enquiry ${lead.id}: finishing it failed` })
+      } finally {
+        if (dir) await rm(dir, { recursive: true, force: true })
       }
     })
     return { ok: true }
@@ -192,19 +197,22 @@ function fileBaseName({ firstName, surname }: EnquiryValues) {
   return `${name || 'enquiry'}-${new Date().toISOString().slice(0, 10)}`
 }
 
+/** A reference file saved to the lead, with its local copy (kept for the studio's email). */
+type SavedFile = { id: number; name: string; path: string; type: string; size: number }
+
 /**
  * Re-saves each pending upload as a private `lead-attachments` file (Payload checks what the file
  * really is and makes a thumbnail), links them to the lead, then removes the pending copies.
+ * The local copies in `dir` are left for the caller.
  */
 async function attachFiles(
   payload: Payload,
   leadId: number,
   files: TicketFile[],
   baseName: string,
+  dir: string,
 ) {
-  const ids: number[] = []
-  let failed = 0
-  const dir = await mkdtemp(path.join(os.tmpdir(), 'enquiry-'))
+  const saved: SavedFile[] = []
   try {
     for (const [index, file] of files.entries()) {
       const name = `${baseName}-${index + 1}.${extensionFor(file.type)}`
@@ -217,37 +225,44 @@ async function attachFiles(
           depth: 0,
           file: { data: Buffer.alloc(0), mimetype: file.type, name, size: file.size, tempFilePath },
         })
-        ids.push(doc.id)
+        saved.push({ id: doc.id, name, path: tempFilePath, type: file.type, size: file.size })
       } catch (error) {
-        failed++
         payload.logger.error({ err: error, msg: `Enquiry ${leadId}: a reference file failed` })
       }
     }
-    if (ids.length)
-      await payload.update({ collection: 'leads', id: leadId, depth: 0, data: { references: ids } })
+    if (saved.length)
+      await payload.update({
+        collection: 'leads',
+        id: leadId,
+        depth: 0,
+        data: { references: saved.map(({ id }) => id) },
+      })
   } catch (error) {
     payload.logger.error({ err: error, msg: `Enquiry ${leadId}: attaching files failed` })
   } finally {
-    await rm(dir, { recursive: true, force: true })
     await deleteUploads(files.map(({ key }) => key)).catch((error: unknown) =>
       payload.logger.error({ err: error, msg: `Enquiry ${leadId}: removing pending files failed` }),
     )
   }
-  return { attached: ids.length, failed }
+  return saved
 }
 
-/** Emails the enquiry to the studio. The client gets no email from the site. */
+/**
+ * Emails the enquiry to the studio, with the reference files that fit attached. If the email with
+ * files is refused, it's sent again without them, so the studio still hears about the enquiry.
+ * The client gets no email from the site.
+ */
 async function notifyStudio(
   payload: Payload,
   details: {
     values: EnquiryValues
     leadId: number
     project?: { title: string; path: string }
-    attached: number
+    saved: SavedFile[]
     failed: number
   },
 ) {
-  const { values, leadId, project, attached, failed } = details
+  const { values, leadId, project, saved, failed } = details
   const siteURL = getCanonicalOrigin()
   const settings = await payload.findGlobal({ slug: 'site-settings', depth: 0 })
 
@@ -256,18 +271,41 @@ async function notifyStudio(
     .map((address) => address.trim())
     .filter(Boolean)
   if (!studio.length) return
-  try {
-    await payload.sendEmail({
+
+  const send = async (files: SavedFile[]) =>
+    payload.sendEmail({
       to: studio,
       replyTo: values.email || undefined,
       ...notificationEmail({
         values,
         project: project && { title: project.title, url: `${siteURL}${project.path}` },
-        attached,
+        attached: saved.length,
+        emailed: files.length,
         failed,
         adminURL: `${siteURL}/admin/collections/leads/${leadId}`,
       }),
+      // Resend reads a string as base64.
+      attachments: await Promise.all(
+        files.map(async (file) => ({
+          filename: file.name,
+          content: (await readFile(file.path)).toString('base64'),
+        })),
+      ),
     })
+
+  const emailed = pickEmailAttachments(saved)
+  try {
+    await send(emailed)
+    return
+  } catch (error) {
+    payload.logger.error({
+      err: error,
+      msg: `Enquiry ${leadId}: the studio email failed${emailed.length ? ' (with files)' : ''}`,
+    })
+  }
+  if (!emailed.length) return
+  try {
+    await send([])
   } catch (error) {
     payload.logger.error({ err: error, msg: `Enquiry ${leadId}: the studio email failed` })
   }

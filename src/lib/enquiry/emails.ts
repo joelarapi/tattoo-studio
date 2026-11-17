@@ -30,11 +30,39 @@ const paragraph = (text: string) =>
 const link = (href: string, text: string) =>
   `<a href="${escapeHtml(href)}" style="color:#111">${escapeHtml(text)}</a>`
 
+/**
+ * Resend refuses emails over 40 MB once encoded, and base64 adds a third, so the files attached to
+ * the studio's email stay under 25 MB. Gmail accepts up to 50 MB.
+ */
+export const EMAIL_FILES_MAX_BYTES = 25 * 1024 * 1024
+
+/**
+ * The reference files to attach to the studio's email: photos first (five always fit), then
+ * videos while there's room. The rest stay in the admin only.
+ */
+export function pickEmailAttachments<T extends { type: string; size: number }>(
+  files: T[],
+  maxBytes = EMAIL_FILES_MAX_BYTES,
+): T[] {
+  const isPhoto = (file: T) => file.type.startsWith('image/')
+  const picked: T[] = []
+  let room = maxBytes
+  for (const file of [...files.filter(isPhoto), ...files.filter((file) => !isPhoto(file))]) {
+    if (file.size > room) continue
+    picked.push(file)
+    room -= file.size
+  }
+  return picked
+}
+
 type Notification = {
   values: EnquiryValues
   /** The piece they came from, if any. */
   project?: { title: string; url: string }
+  /** Files saved to the enquiry. */
   attached: number
+  /** How many of those are attached to this email. */
+  emailed?: number
   failed: number
   adminURL: string
 }
@@ -44,14 +72,17 @@ export function notificationEmail({
   values,
   project,
   attached,
+  emailed = 0,
   failed,
   adminURL,
 }: Notification): Email {
   const name = `${values.firstName} ${values.surname}`
+  const inAdminOnly = attached - emailed
   const files =
     attached || failed
       ? [
-          attached && `${attached} attached (open the enquiry to see them)`,
+          emailed && `${emailed} attached to this email`,
+          inAdminOnly && `${inAdminOnly} ${emailed ? 'more ' : ''}in the admin`,
           failed && `${failed} couldn't be saved`,
         ]
           .filter(Boolean)

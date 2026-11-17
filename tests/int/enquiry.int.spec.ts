@@ -1,7 +1,7 @@
 // The enquiry form's rules, upload ticket and emails. Pure functions: no database needed.
 import { describe, expect, it } from 'vitest'
 
-import { notificationEmail } from '@/lib/enquiry/emails'
+import { notificationEmail, pickEmailAttachments } from '@/lib/enquiry/emails'
 import { checkReferenceFiles, readEnquiry, validateEnquiry } from '@/lib/enquiry/fields'
 import { createTicket, readTicket } from '@/lib/enquiry/ticket'
 
@@ -85,5 +85,33 @@ describe('studio notification email', () => {
     expect(email.html).not.toContain('<img')
     expect(email.html).toContain('&lt;script&gt;')
     expect(email.subject).toBe('New tattoo enquiry: <script> Hoxha')
+  })
+
+  it('attaches photos first, then the videos that still fit', () => {
+    const MB = 1024 * 1024
+    const files = [
+      { name: 'big-video', type: 'video/mp4', size: 30 * MB },
+      { name: 'photo-1', type: 'image/jpeg', size: 5 * MB },
+      { name: 'small-video', type: 'video/mp4', size: 10 * MB },
+      { name: 'photo-2', type: 'image/png', size: 5 * MB },
+    ]
+    expect(pickEmailAttachments(files).map(({ name }) => name)).toEqual([
+      'photo-1',
+      'photo-2',
+      'small-video',
+    ])
+    const fivePhotos = Array.from({ length: 5 }, () => ({ type: 'image/jpeg', size: 5 * MB }))
+    expect(pickEmailAttachments(fivePhotos)).toHaveLength(5)
+  })
+
+  it('says which files are attached and which are only in the admin', () => {
+    const email = notificationEmail({
+      values: readEnquiry(valid),
+      attached: 3,
+      emailed: 2,
+      failed: 0,
+      adminURL: 'https://example.com/admin/collections/leads/1',
+    })
+    expect(email.text).toContain('Reference files: 2 attached to this email, 1 more in the admin')
   })
 })
