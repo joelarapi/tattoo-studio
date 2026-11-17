@@ -2841,11 +2841,11 @@ export interface SiteSetting {
      */
     pendingNotice: string;
     /**
-     * Shown after an enquiry is sent. Also the heading of the confirmation email to the client.
+     * Shown on the page after an enquiry is sent.
      */
     successHeading?: string | null;
     /**
-     * Under the success heading, and in the confirmation email to the client.
+     * Under the success heading.
      */
     successMessage?: string | null;
   };

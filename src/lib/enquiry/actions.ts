@@ -17,7 +17,7 @@ import { pathForDoc } from '@/lib/routes'
 import { getCanonicalOrigin } from '@/lib/site-url'
 
 import { referenceUploadsEnabled } from './config'
-import { confirmationEmail, notificationEmail } from './emails'
+import { notificationEmail } from './emails'
 import {
   checkReferenceFiles,
   type EnquiryValues,
@@ -87,8 +87,8 @@ export async function getEnquiryUploadLinks(input: {
 
 /**
  * Step 2: saves the enquiry. With files, the ticket from step 1 stands in for Turnstile. The
- * visitor gets the answer as soon as the enquiry is saved; the files and emails are handled
- * straight after the response.
+ * visitor gets the answer as soon as the enquiry is saved; the files and the studio's email are
+ * handled straight after the response.
  */
 export async function sendEnquiry(input: {
   values?: unknown
@@ -162,7 +162,7 @@ export async function sendEnquiry(input: {
         const { attached, failed } = files.length
           ? await attachFiles(payload, lead.id, files, fileBaseName(values))
           : { attached: 0, failed: 0 }
-        await sendEmails(payload, {
+        await notifyStudio(payload, {
           values,
           leadId: lead.id,
           project: piece && { title: piece.title, path: pathForDoc('portfolio-items', piece.slug) },
@@ -236,7 +236,8 @@ async function attachFiles(
   return { attached: ids.length, failed }
 }
 
-async function sendEmails(
+/** Emails the enquiry to the studio. The client gets no email from the site. */
+async function notifyStudio(
   payload: Payload,
   details: {
     values: EnquiryValues
@@ -254,33 +255,20 @@ async function sendEmails(
     .split(',')
     .map((address) => address.trim())
     .filter(Boolean)
-  if (studio.length) {
-    try {
-      await payload.sendEmail({
-        to: studio,
-        replyTo: values.email || undefined,
-        ...notificationEmail({
-          values,
-          project: project && { title: project.title, url: `${siteURL}${project.path}` },
-          attached,
-          failed,
-          adminURL: `${siteURL}/admin/collections/leads/${leadId}`,
-        }),
-      })
-    } catch (error) {
-      payload.logger.error({ err: error, msg: `Enquiry ${leadId}: the studio email failed` })
-    }
-  }
-
-  if (values.email) {
-    try {
-      await payload.sendEmail({
-        to: values.email,
-        replyTo: settings.email || undefined,
-        ...confirmationEmail(settings, siteURL),
-      })
-    } catch (error) {
-      payload.logger.error({ err: error, msg: `Enquiry ${leadId}: the confirmation email failed` })
-    }
+  if (!studio.length) return
+  try {
+    await payload.sendEmail({
+      to: studio,
+      replyTo: values.email || undefined,
+      ...notificationEmail({
+        values,
+        project: project && { title: project.title, url: `${siteURL}${project.path}` },
+        attached,
+        failed,
+        adminURL: `${siteURL}/admin/collections/leads/${leadId}`,
+      }),
+    })
+  } catch (error) {
+    payload.logger.error({ err: error, msg: `Enquiry ${leadId}: the studio email failed` })
   }
 }

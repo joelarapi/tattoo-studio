@@ -1,10 +1,9 @@
 /*
- * The two emails an enquiry sends: the details to the studio, and a short confirmation to the
- * client. Everything the visitor typed is escaped. The confirmation only contains the studio's own
- * text from the CMS, so the form can't be used to send someone else arbitrary text.
+ * The email an enquiry sends to the studio. Everything the visitor typed is escaped. Clients get
+ * no email from the site (the studio's choice, 17 Nov 2026), so the form can't be used to send
+ * mail to other people.
  */
-import { telHref, whatsappHref } from '@/lib/format'
-import type { SiteSetting } from '@/payload-types'
+import { whatsappHref } from '@/lib/format'
 
 import type { EnquiryValues } from './fields'
 
@@ -108,51 +107,4 @@ export function notificationEmail({
   )
 
   return { subject: oneLine(`New tattoo enquiry: ${name}`), text, html }
-}
-
-/** "We've got it", for the client: the success text from Studio details and how to reach the studio. */
-export function confirmationEmail(settings: SiteSetting, siteURL: string): Email {
-  const form = settings.enquiryForm
-  const heading = form?.successHeading || 'Thank you for your enquiry.'
-  const message = form?.successMessage || ''
-  const contact: [string, string, string][] = [
-    ['Phone', settings.phone, telHref(settings.phone)],
-    ...(settings.whatsapp
-      ? [
-          ['WhatsApp', settings.whatsapp, whatsappHref(settings.whatsapp)] as [
-            string,
-            string,
-            string,
-          ],
-        ]
-      : []),
-    ['Email', settings.email, `mailto:${settings.email}`],
-  ]
-  const host = new URL(siteURL).host
-  const footer = `You're receiving this because this address was used to send a tattoo enquiry on ${host}.`
-
-  const text = [
-    heading,
-    '',
-    ...(message ? [message, ''] : []),
-    settings.studioName,
-    ...contact.map(([label, value]) => `${label}: ${value}`),
-    '',
-    footer,
-  ].join('\n')
-
-  const html = page(
-    [
-      `<h2 style="font-size:20px;margin:0 0 16px">${escapeHtml(heading)}</h2>`,
-      message ? paragraph(message) : '',
-      `<p style="margin:20px 0 4px"><strong>${escapeHtml(settings.studioName)}</strong></p>`,
-      ...contact.map(
-        ([label, value, href]) =>
-          `<p style="margin:0">${escapeHtml(label)}: ${link(href, value)}</p>`,
-      ),
-      `<p style="margin:24px 0 0;font-size:12px;color:#666">${escapeHtml(footer)}</p>`,
-    ].join(''),
-  )
-
-  return { subject: oneLine(`${settings.studioName}: ${heading}`), text, html }
 }

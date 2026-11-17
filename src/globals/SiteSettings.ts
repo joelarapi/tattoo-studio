@@ -257,14 +257,8 @@ export const SiteSettings: GlobalConfig = {
                   'Shown when an enquiry can’t be sent, for example when the connection dropped. Tell people another way to reach the studio.',
                   true,
                 ),
-                text(
-                  'successHeading',
-                  'Shown after an enquiry is sent. Also the heading of the confirmation email to the client.',
-                ),
-                paragraphs(
-                  'successMessage',
-                  'Under the success heading, and in the confirmation email to the client.',
-                ),
+                text('successHeading', 'Shown on the page after an enquiry is sent.'),
+                paragraphs('successMessage', 'Under the success heading.'),
               ],
               'Used by every "Enquiry form" section. The field labels are part of the design.',
             ),

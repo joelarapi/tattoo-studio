@@ -137,7 +137,7 @@ Every "Enquiry form" section uses `EnquiryForm` (`src/components/forms/`). Sendi
 5. **After the response** (`after()`):
    - Each pending file is downloaded and saved as a `lead-attachments` file under `client-enquiries/`. Payload checks what it really is and refuses anything that isn't a photo or video. Files are named after the client and date.
    - The files are linked to the lead, and the pending copies are deleted.
-   - Two emails go out: the enquiry to `LEADS_NOTIFY_EMAIL` (or the email in Studio details), with "Reply" going to the client; and, if the client gave an email address, a confirmation with the success text from Studio details. The confirmation never repeats what the visitor typed, so the form can't be used to send other people arbitrary text.
+   - One email goes out: the enquiry, to `LEADS_NOTIFY_EMAIL` or else the email in Studio details. "Reply" goes to the client if they gave an email address. Clients get no email from the site (the studio's choice), so the form can't be used to send mail to other people.
 
 Settings:
 
@@ -161,7 +161,7 @@ Log in at `/admin`. The menu on the left has five groups:
   - the name, address, opening hours and social links
   - the black-and-white photo switch
   - the shared call to action
-  - the enquiry form's button and notes, the message shown after sending (also used in the confirmation email to the client) and the message shown when sending fails
+  - the enquiry form's button and notes, the message shown after sending and the message shown when sending fails
   - the "page not found" text
 - **Pages:** every page of the site, built from sections (Privacy and Cookies included), plus two templates: **Portfolio piece pages** and **Journal article pages**.
 
