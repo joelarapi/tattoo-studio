@@ -96,6 +96,12 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **AI assistants (MCP):** `@payloadcms/plugin-mcp`, approved by the user on 9 Nov 2026. Configured in `src/plugins/mcp.ts`; the endpoint is `POST /api/mcp`.
   - **What it exposes:** find, create and update on content collections, and find and update on globals. Media is find and update only. There are no deletes, and leads, lead attachments and users are left out.
   - **Keys:** Settings → AI access keys (`payload-mcp-api-keys`). Each key acts as its owner.
+  - **Markdown tools for posts** (19 Nov 2026, the user's request, to save the assistant tokens): `getPostAsMarkdown`, `createPostFromMarkdown` and `updatePostFromMarkdown` in `src/plugins/mcpPostTools.ts`.
+    - They convert with Payload's Lexical converters, using the post editor's config, and always save drafts.
+    - They refuse to replace a body that has uploads or blocks.
+    - They follow the key's Posts permissions (`withPostMarkdownTools` in `overrideAuth`). The plugin's per-tool checkbox group is filtered out of the keys collection, because each checkbox would be a new database column, and production doesn't push the schema.
+    - `zod` 3.25.76 is a direct dependency for their input schemas, approved by the user on 19 Nov 2026. It's the version the plugin uses.
+    - `pnpm-lock.yaml` keeps `mcp-handler`'s `zod@4.6.7` peer entry, as when the AWS packages were added.
   - **Sending the key:** `Authorization: Bearer <key>`, or `?key=` in the URL for ChatGPT, which offers only OAuth or no authentication. URL keys were the user's choice, knowing the key then sits in the URL.
   - **Keys can reach REST too:** the keys collection is an auth collection with `useAPIKey`, so a key also works against the REST API (`payload-mcp-api-keys API-Key <key>`). There, `req.user` is the key, whose id can match a CMS user's. Access rules must use `hasRole()`/`isCmsUser()` (`src/access`), never just `user` or `user.id`. Tested in `tests/int/access.int.spec.ts`.
 - **Leads export:** none for now (the user's choice). If it's wanted later, `@payloadcms/plugin-import-export` is the option, and it needs approval.

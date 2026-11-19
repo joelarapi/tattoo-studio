@@ -1,5 +1,7 @@
 import { mcpPlugin } from '@payloadcms/plugin-mcp'
 
+import { postMarkdownTools, withPostMarkdownTools } from './mcpPostTools'
+
 /*
  * MCP endpoint (POST /api/mcp) for AI assistants to read and edit content. Each request acts as
  * the CMS user who owns the key, so the usual access rules apply; the key's own checkboxes narrow
@@ -25,7 +27,9 @@ export const mcp = mcpPlugin({
     ),
     styles: content('Portfolio categories, used by the portfolio filter.'),
     artists: content('The studio’s artists.'),
-    posts: content('Journal articles (/journal/<slug>). content is Lexical rich text.'),
+    posts: content(
+      'Journal articles (/journal/<slug>). content is Lexical rich text: to read or write article text, use getPostAsMarkdown, createPostFromMarkdown and updatePostFromMarkdown instead.',
+    ),
     categories: content('Journal categories.'),
     faqs: content('Questions and answers. A page’s FAQ section picks which ones it shows.'),
     // Uploading needs a file, which MCP can't send, so media can only be found and relabelled.
@@ -52,10 +56,17 @@ export const mcp = mcpPlugin({
     },
     navigation: { enabled: { find: true, update: true }, description: 'Header and footer links.' },
   },
-  overrideAuth: (req, getDefaultMcpAccessSettings) =>
-    getDefaultMcpAccessSettings(req.searchParams?.get('key')),
+  overrideAuth: async (req, getDefaultMcpAccessSettings) =>
+    withPostMarkdownTools(await getDefaultMcpAccessSettings(req.searchParams?.get('key'))),
   overrideApiKeyCollection: (collection) => ({
     ...collection,
+    // The plugin adds a checkbox per custom tool. The post tools follow the key's Posts
+    // permissions instead (`withPostMarkdownTools`), so the checkboxes (and their database
+    // columns) are left out.
+    fields: collection.fields.filter(
+      (field) =>
+        !('fields' in field && field.fields.some((f) => 'name' in f && f.name === 'payload-mcp-tool')),
+    ),
     labels: { singular: 'AI access key', plural: 'AI access keys' },
     admin: {
       ...collection.admin,
@@ -65,6 +76,7 @@ export const mcp = mcpPlugin({
     },
   }),
   mcp: {
+    tools: postMarkdownTools,
     serverOptions: {
       serverInfo: { name: 'Website CMS', version: '1.0.0' },
       instructions: [
@@ -72,6 +84,7 @@ export const mcp = mcpPlugin({
         'To change a page, find it by slug, then send its whole `layout` back with your change: add, remove or reorder blocks, or edit their fields. Keep each block’s `blockType`.',
         'Read a document before changing it. Send only the fields you change, but arrays and groups are replaced as a whole, so send them complete.',
         'Save edits with draft: true unless the user asks to publish. Drafts can be checked in the admin panel’s preview; published changes go live at once.',
+        'For journal posts, use getPostAsMarkdown, createPostFromMarkdown and updatePostFromMarkdown: they read and write the article as Markdown and always save drafts.',
         'Never invent studio facts such as prices, address, opening hours or client stories.',
       ].join('\n'),
     },

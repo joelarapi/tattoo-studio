@@ -120,6 +120,11 @@ Any other URL gets the site's 404 page (`src/app/(frontend)/not-found.tsx`). The
   - Keys live in Settings → AI access keys. A key acts as the user who created it, so the usual access rules apply, and each key only gets the capabilities ticked on it.
   - Clients send `Authorization: Bearer <key>`. ChatGPT can't send headers (it offers only OAuth or no authentication), so it connects to `/api/mcp?key=<key>` with "No authentication". Anyone with that URL has the key's access, and the URL shows in request logs: give such keys only what they need.
   - Changes save as drafts only when the assistant passes `draft: true`, which the server's instructions ask it to do; otherwise they go live at once.
+  - **Journal posts as Markdown** (`src/plugins/mcpPostTools.ts`):
+    - `getPostAsMarkdown`, `createPostFromMarkdown` and `updatePostFromMarkdown` read and write an article's body as Markdown; the server converts it to and from the editor's format. The editor's JSON is about three times longer, so this saves the assistant tokens.
+    - Writes are always drafts.
+    - A body with images or call-to-action boxes can be read, but not replaced from Markdown.
+    - A key gets each tool when it may do the same with Posts (find, create, update), so the tools have no checkboxes of their own.
   - Keys are an auth collection too, so `req.user` can be a key rather than a CMS user. Access rules check `hasRole()` or `isCmsUser()` (`src/access/`), never just that a user exists or its id.
 - **Schema changes:** development uses Payload's automatic schema push. When a change renames or removes fields, the push asks for confirmation in the terminal. Before launch, production switches to migrations (`payload migrate:create` / `payload migrate`).
 
@@ -216,5 +221,9 @@ To let ChatGPT read and edit the site's content:
 3. In ChatGPT, add a custom MCP server with the address `https://<the site>/api/mcp?key=<the key>` and **No authentication**.
 
 Treat that address like a password. Ask ChatGPT to save changes as drafts, then check them with the preview and publish them yourself. To cut off access, delete the key.
+
+For an assistant that only writes journal posts, tick just **Posts** (Find, Create, Update), **Categories** (Find), **Media** (Find) and **Artists** (Find). Every capability you tick adds tools the assistant has to read, which costs tokens. Posts written this way arrive as drafts; check them and publish.
+
+Codex (OpenAI's coding assistant) can send the key in a header instead: `codex mcp add <name> --url https://<the site>/api/mcp --bearer-token-env-var <VARIABLE>`, with the key stored in that environment variable.
 
 Everything there now is starting text and placeholder images. Replace it with the real details before launch, especially what Google shows: the address, phone number, opening hours and the portfolio.
