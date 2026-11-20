@@ -21,6 +21,11 @@ import './globals.css'
  * script hasn't booted within 4 s (blocked or failed bundle), remove it so nothing stays hidden.
  */
 const jsReadyScript = `(function(){var d=document.documentElement;d.classList.add('js-ready');setTimeout(function(){if(!d.classList.contains('motion-ready'))d.classList.remove('js-ready')},4000)})()`
+const clarityScript = `(function(c,l,a,r,i,t,y){
+  c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+  t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+  y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window,document,"clarity","script","zeg2wa2ras");`
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
@@ -55,6 +60,7 @@ export default async function FrontendLayout({ children }: { children: ReactNode
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: jsReadyScript }} />
+        <script dangerouslySetInnerHTML={{ __html: clarityScript }} />
       </head>
       <body>
         {!draft.isEnabled && process.env.VERCEL_ENV === 'production' && (
