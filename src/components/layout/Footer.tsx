@@ -83,46 +83,55 @@ export function Footer({
   return (
     // Leave space on phones for the homepage's pinned enquiry button.
     <footer className="px-site pt-[45px] pb-[25px] in-[body:has([data-mobile-cta])]:pb-[100px] md:pt-[55px] md:pb-7 md:in-[body:has([data-mobile-cta])]:pb-7">
-      <div className="grid items-start gap-x-10 gap-y-10 lg:grid-cols-[minmax(220px,1.2fr)_minmax(0,3fr)] lg:gap-x-[65px]">
+      <nav
+        aria-label="Footer"
+        className="grid grid-cols-1 items-start gap-x-10 gap-y-9 md:grid-cols-2 lg:grid-cols-[minmax(220px,1.3fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-x-12"
+      >
         <Wordmark settings={settings} />
 
-        <nav aria-label="Footer" className="grid grid-cols-1 gap-x-9 gap-y-9 sm:grid-cols-3">
-          <div className="sm:col-span-2">
-            <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
-              Pages
-            </h2>
-            <ul className="mt-5 grid grid-cols-2 gap-x-7 gap-y-3">
-              {pageLinks.map((link) => (
-                <li key={pathname(link.href)}>
-                  <Link
-                    href={link.href}
-                    className="text-[14px] transition-colors hover:text-accent"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
-              Travel guides
-            </h2>
-            <ul className="mt-5 flex flex-col gap-3">
-              {travelGuides.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-[14px] transition-colors hover:text-accent"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </nav>
-      </div>
+        <div>
+          <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
+            Pages
+          </h2>
+          <ul className="mt-5 flex flex-col gap-3">
+            {pageLinks.filter((_, index) => index % 2 === 0).map((link) => (
+              <li key={pathname(link.href)}>
+                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="lg:pt-[38px]">
+          <h2 className="sr-only">More pages</h2>
+          <ul className="flex flex-col gap-3">
+            {pageLinks.filter((_, index) => index % 2 === 1).map((link) => (
+              <li key={pathname(link.href)}>
+                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
+            Travel guides
+          </h2>
+          <ul className="mt-5 flex flex-col gap-3">
+            {travelGuides.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
 
       <div className="mt-[45px] flex flex-col gap-5 border-t border-line pt-5 text-[14px] text-faint lg:flex-row lg:items-center lg:justify-between lg:gap-x-8">
         <p>© {year} {settings.studioName}</p>
