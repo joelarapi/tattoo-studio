@@ -57,7 +57,7 @@ const converters: JSXConverters = {
     cta: ({ node }) => {
       const fields = node.fields as unknown as CallToActionBlock
       return (
-        <Notice className="my-10">
+        <Notice className={styles.inlineNotice}>
           <b className="block text-[15px] font-normal text-text">{fields.heading}</b>
           {fields.text && <span className="mt-1 block">{fields.text}</span>}
           <Action link={fields.button} variant="plain" className="mt-3" />
