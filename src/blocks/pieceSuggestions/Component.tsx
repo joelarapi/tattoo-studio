@@ -39,6 +39,8 @@ export function PieceSuggestions({
   data: pieces,
   ctx,
 }: BlockProps<'pieceSuggestions', PortfolioItem[]>) {
+  const isVisitingGallery = block.settings?.anchor === 'visiting-portfolio'
+
   return (
     <BlockSection block={block} className="px-site py-section">
       <div data-reveal className="mb-[35px] md:flex md:items-end md:justify-between md:gap-[30px]">
@@ -60,12 +62,23 @@ export function PieceSuggestions({
             data-reveal
             className="group block"
           >
-            <div className="relative h-[390px] overflow-hidden rounded-[5px] border border-line-strong bg-panel-2 md:h-[340px]">
+            <div
+              className={
+                isVisitingGallery
+                  ? 'relative h-[480px] overflow-hidden rounded-[5px] border border-line-strong bg-[#101010] md:h-[530px] lg:h-[580px]'
+                  : 'relative h-[390px] overflow-hidden rounded-[5px] border border-line-strong bg-panel-2 md:h-[340px]'
+              }
+            >
               <CmsImage
                 media={other.images?.[0] ?? other.videoPoster}
                 fill
-                sizes="(min-width: 681px) 33vw, 90vw"
-                className="object-cover transition-transform duration-400 group-hover:scale-[1.035] motion-reduce:transition-none"
+                photo={!isVisitingGallery}
+                sizes="(min-width: 1001px) 30vw, (min-width: 681px) 33vw, 90vw"
+                className={
+                  isVisitingGallery
+                    ? 'object-contain transition-transform duration-400 group-hover:scale-[1.015] motion-reduce:transition-none'
+                    : 'object-cover transition-transform duration-400 group-hover:scale-[1.035] motion-reduce:transition-none'
+                }
               />
               <span
                 aria-hidden="true"
