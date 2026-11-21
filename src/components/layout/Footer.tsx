@@ -75,7 +75,7 @@ export function Footer({
   const allPageLinks = uniqueLinks([
     ...cmsLinks.filter((link) => pathname(link.href) === '/'),
     ...(footer?.links ?? []),
-    ...cmsLinks.toSorted((a, b) => a.label.localeCompare(b.label)),
+    ...[...cmsLinks].sort((a, b) => a.label.localeCompare(b.label)),
   ])
   const pageLinks = allPageLinks.filter((link) => !legalPaths.has(pathname(link.href)))
   const legalLinks = uniqueLinks([
