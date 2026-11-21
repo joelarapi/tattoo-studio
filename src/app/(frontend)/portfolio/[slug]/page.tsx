@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { PieceGallery } from '@/components/portfolio/PieceGallery'
+import { BreadcrumbStructuredData } from '@/components/seo/BreadcrumbStructuredData'
 import { Action } from '@/components/ui/Action'
 import { Tag } from '@/components/ui/Tag'
 import { Paragraphs } from '@/components/ui/Text'
@@ -65,6 +66,13 @@ export default async function PortfolioPiecePage({ params }: Props) {
 
   return (
     <main id="main">
+      <BreadcrumbStructuredData
+        items={[
+          { name: menuLabel('/', 'Home'), path: '/' },
+          { name: menuLabel(portfolioPath, 'Portfolio'), path: portfolioPath },
+          { name: item.title, path: pathForDoc('portfolio-items', slug) },
+        ]}
+      />
       <div className="px-site pt-[35px] pb-[30px] md:pt-section md:pb-[45px]">
         <nav aria-label="Breadcrumb" className="mb-[35px] md:mb-12">
           <ol className="flex flex-wrap gap-2 font-label text-[14px] leading-[1.7] text-[#999] md:gap-3 md:text-[14px]">
