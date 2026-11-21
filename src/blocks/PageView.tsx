@@ -37,7 +37,7 @@ async function withVisitingPortfolio(page: Page): Promise<Page['layout']> {
   if (page.slug !== 'visiting-albania' || !blocks?.length) return blocks
 
   const planIndex = blocks.findIndex(
-    (block) => block.blockType === 'steps' && block.settings?.anchor === 'plan',
+    (block) => block.blockType === 'cards' && block.settings?.anchor === 'plan',
   )
   const hasCmsGallery = blocks.some(
     (block) =>
