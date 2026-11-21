@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { Action } from '@/components/ui/Action'
 import { MobileCta } from '@/components/motion/MobileCta'
+import { BreadcrumbStructuredData } from '@/components/seo/BreadcrumbStructuredData'
 import { getPortfolioItems, getSiteSettings } from '@/lib/data'
 import { pageMetadata } from '@/lib/metadata'
 import { pathForDoc } from '@/lib/routes'
@@ -81,6 +82,17 @@ export async function PageView({ page }: { page: Page }) {
   const mobileCta = page.mobileCta
   return (
     <main id="main">
+      {(page.slug === 'portfolio' || page.slug === 'journal') && (
+        <BreadcrumbStructuredData
+          items={[
+            { name: 'Home', path: '/' },
+            {
+              name: page.slug === 'journal' ? 'Blog' : 'Portfolio',
+              path: pathForDoc('pages', page.slug),
+            },
+          ]}
+        />
+      )}
       <RenderBlocks
         blocks={layout}
         numberSections={page.numberSections}

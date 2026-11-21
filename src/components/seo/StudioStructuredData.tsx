@@ -1,13 +1,47 @@
+import { getPortfolioItems } from '@/lib/data'
 import { SCHEMA_DAYS } from '@/lib/format'
 import { getCanonicalOrigin } from '@/lib/site-url'
-import type { SiteSetting } from '@/payload-types'
+import type { Media, PortfolioItem, SiteSetting } from '@/payload-types'
+
+const preferredPortfolioSlugs = [
+  'grim-reaper-full-back-tattoo',
+  'archangel-mary-full-sleeve-tattoo',
+  'family-memory-full-sleeve-tattoo',
+]
+
+/** Exclude the original drafting graphics, including placeholder-og-1.jpg. */
+function genuinePhotoUrl(image: Media | number | null | undefined): string | undefined {
+  if (!image || typeof image !== 'object' || !image.url) return undefined
+  if (image.mimeType && !image.mimeType.startsWith('image/')) return undefined
+  if (/placeholder[-_]/i.test([image.filename, image.alt, image.url].join(' '))) return undefined
+  return image.url
+}
+
+/** Use a real CMS photo for the business schema, never a seed placeholder. */
+async function businessPhotoUrl(settings: SiteSetting): Promise<string | undefined> {
+  const selectedShareImage = genuinePhotoUrl(settings.seo?.ogImage)
+  if (selectedShareImage) return selectedShareImage
+
+  const pieces = await getPortfolioItems()
+  const preferred = preferredPortfolioSlugs
+    .map((slug) => pieces.find((item) => item.slug === slug))
+    .filter((item): item is PortfolioItem => Boolean(item))
+
+  for (const piece of [...preferred, ...pieces]) {
+    const photo = [...(piece.images ?? []), piece.videoPoster]
+      .map(genuinePhotoUrl)
+      .find((url): url is string => Boolean(url))
+    if (photo) return photo
+  }
+  // If there is no genuine photo, omit the property instead of advertising a placeholder.
+  return undefined
+}
 
 /** One business identity shared by all public pages. */
-export function StudioStructuredData({ settings }: { settings: SiteSetting }) {
+export async function StudioStructuredData({ settings }: { settings: SiteSetting }) {
   const url = new URL('/', getCanonicalOrigin()).href
   const address = settings.address
-  const image = settings.seo?.ogImage
-  const imagePath = typeof image === 'object' ? image?.url : undefined
+  const imagePath = await businessPhotoUrl(settings)
   const phone = settings.phone?.trim()
   const email = settings.email?.trim()
   const sameAs = settings.socialLinks?.map(({ url }) => url).filter(Boolean)
