@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 
 import { RenderBlocks } from '@/blocks/RenderBlocks'
 import { RichText } from '@/components/RichText'
+import { BreadcrumbStructuredData } from '@/components/seo/BreadcrumbStructuredData'
 import { JsonLd } from '@/components/seo/JsonLd'
 import { Action } from '@/components/ui/Action'
 import { Notice } from '@/components/ui/Blocks'
@@ -93,6 +94,13 @@ export default async function ArticlePage({ params }: Props) {
 
   return (
     <main id="main">
+      <BreadcrumbStructuredData
+        items={[
+          { name: 'Home', path: '/' },
+          { name: 'Blog', path: journalPath },
+          { name: post.title, path: pathForDoc('posts', slug) },
+        ]}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',
