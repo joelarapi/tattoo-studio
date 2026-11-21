@@ -8,7 +8,7 @@ import { Header } from '@/components/layout/Header'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 import { PageMotion } from '@/components/motion/PageMotion'
 import { StudioStructuredData } from '@/components/seo/StudioStructuredData'
-import { getNavigation, getSiteSettings } from '@/lib/data'
+import { getFooterPages, getNavigation, getSiteSettings } from '@/lib/data'
 import { defaultLocale } from '@/lib/i18n'
 import { pageMetadata } from '@/lib/metadata'
 import { getCanonicalOrigin } from '@/lib/site-url'
@@ -43,9 +43,10 @@ export const viewport: Viewport = {
 }
 
 export default async function FrontendLayout({ children }: { children: ReactNode }) {
-  const [navigation, settings, draft] = await Promise.all([
+  const [navigation, settings, footerPages, draft] = await Promise.all([
     getNavigation(),
     getSiteSettings(),
+    getFooterPages(),
     draftMode(),
   ])
 
@@ -77,7 +78,7 @@ export default async function FrontendLayout({ children }: { children: ReactNode
         </a>
         <Header navigation={navigation} settings={settings} />
         {children}
-        <Footer navigation={navigation} settings={settings} />
+        <Footer navigation={navigation} settings={settings} footerPages={footerPages} />
         <PageMotion />
         {draft.isEnabled && <LivePreviewListener />}
       </body>
