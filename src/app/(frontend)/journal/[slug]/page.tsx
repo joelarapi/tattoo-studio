@@ -10,7 +10,6 @@ import { JsonLd } from '@/components/seo/JsonLd'
 import { Action } from '@/components/ui/Action'
 import { Notice } from '@/components/ui/Blocks'
 import { CmsImage } from '@/components/ui/CmsImage'
-import { Tag } from '@/components/ui/Tag'
 import { getArticleTemplate, getPost, getPosts, getSiteSettings } from '@/lib/data'
 import { formatDate } from '@/lib/format'
 import { pageMetadata } from '@/lib/metadata'
@@ -19,6 +18,8 @@ import { getServerURL } from '@/lib/preview'
 import { pathForDoc } from '@/lib/routes'
 import { headingNodeId, tableOfContents } from '@/lib/toc'
 import type { Artist, CallToActionBlock, Media } from '@/payload-types'
+
+import styles from './article.module.css'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -56,7 +57,7 @@ const converters: JSXConverters = {
     cta: ({ node }) => {
       const fields = node.fields as unknown as CallToActionBlock
       return (
-        <Notice className="my-10">
+        <Notice className={styles.inlineNotice}>
           <b className="block text-[15px] font-normal text-text">{fields.heading}</b>
           {fields.text && <span className="mt-1 block">{fields.text}</span>}
           <Action link={fields.button} variant="plain" className="mt-3" />
@@ -65,15 +66,6 @@ const converters: JSXConverters = {
     },
   },
 }
-
-const articleBody = [
-  'text-[16px] leading-[1.9]',
-  '[&_h2]:mt-10 [&_h2]:scroll-mt-5 [&_h2]:text-[31px] [&_h2]:leading-[1.13] [&_h2]:tracking-[-1px] md:[&_h2]:text-[32px]',
-  '[&_h3]:mt-8 [&_h3]:text-h3 [&_h4]:mt-6 [&_h4]:text-[18px]',
-  '[&_p]:mt-[23px] [&_ul]:mt-[23px] [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-[23px] [&_ol]:list-decimal [&_ol]:pl-5',
-  '[&_a]:text-text [&_a]:underline [&_a]:underline-offset-4 [&_blockquote]:mt-[23px] [&_blockquote]:border-l [&_blockquote]:border-accent [&_blockquote]:pl-5 [&_blockquote]:text-text',
-  '[&_img]:mt-[23px] [&_img]:h-auto [&_img]:w-full [&_img]:rounded-[5px]',
-].join(' ')
 
 export default async function ArticlePage({ params }: Props) {
   const { slug } = await params
@@ -93,7 +85,7 @@ export default async function ArticlePage({ params }: Props) {
   const journalPath = pathForDoc('pages', 'journal')
 
   return (
-    <main id="main">
+    <main id="main" className={styles.page}>
       <BreadcrumbStructuredData
         items={[
           { name: 'Home', path: '/' },
@@ -118,28 +110,45 @@ export default async function ArticlePage({ params }: Props) {
         }}
       />
 
-      <section className="grid-bg overflow-hidden px-[6%] pt-[45px] pb-[60px] md:px-[12%] md:pt-[65px] md:pb-20">
-        <Link href={journalPath} className="mb-[45px] block label text-[#999] hover:text-text">
-          ← {labels.backLabel}
-        </Link>
-        <Tag>{[category, date].filter(Boolean).join(' / ')}</Tag>
-        <h1 className="max-w-[1000px] text-[49px] leading-[1.06] tracking-[-2px] md:text-[clamp(46px,6vw,86px)] md:tracking-[-3px]">
-          {post.title}
-        </h1>
-        {post.excerpt && (
-          <p className="mt-[23px] max-w-[700px] text-[16px] md:text-[18px]">{post.excerpt}</p>
-        )}
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <Link href={journalPath} className={styles.backLink}>
+            ← {labels.backLabel}
+          </Link>
+          <span className={styles.meta}>{[category, date].filter(Boolean).join(' / ')}</span>
+          <h1 className={styles.headline}>{post.title}</h1>
+          {post.excerpt && <p className={styles.intro}>{post.excerpt}</p>}
+        </div>
       </section>
 
-      <div className="grid grid-cols-1 gap-[30px] px-site py-section md:grid-cols-[1fr_3fr] md:gap-[8%]">
-        <aside className="border-b border-line-strong pb-[25px] md:border-0 md:pb-0">
+      <div className={styles.mainLayout}>
+        <article className={styles.article}>
+          {cover && (
+            <CmsImage
+              media={cover}
+              sizes="(min-width: 1001px) 65vw, 100vw"
+              loading="eager"
+              fetchPriority="high"
+              className={styles.cover}
+            />
+          )}
+          <RichText data={post.content} converters={converters} className={styles.content} />
+          <Action href={journalPath} variant="accent" className={styles.backButton}>
+            {labels.backButtonLabel}
+          </Action>
+        </article>
+
+        <aside className={styles.sidebar}>
           {contents.length > 0 && (
-            <nav aria-label={labels.tocLabel ?? 'Contents'} className="md:sticky md:top-8">
-              {labels.tocLabel && <span className="tag">{labels.tocLabel}</span>}
-              <ol className="flex flex-col gap-2.5 text-[14px]">
-                {contents.map((item) => (
-                  <li key={item.id}>
-                    <a href={`#${item.id}`} className="hover:text-text">
+            <nav aria-label={labels.tocLabel ?? 'Contents'} className={styles.outline}>
+              <h2 className={styles.outlineTitle}>{labels.tocLabel ?? 'In this guide'}</h2>
+              <ol className={styles.outlineList}>
+                {contents.map((item, index) => (
+                  <li key={item.id} className={styles.outlineItem}>
+                    <span aria-hidden="true" className={styles.outlineNumber}>
+                      {index + 1}
+                    </span>
+                    <a href={`#${item.id}`} className={styles.outlineLink}>
                       {item.text}
                     </a>
                   </li>
@@ -147,24 +156,20 @@ export default async function ArticlePage({ params }: Props) {
               </ol>
             </nav>
           )}
-          {author && <p className="mt-6 text-[16px]">{author.name}</p>}
-        </aside>
 
-        <article>
-          {cover && (
-            <CmsImage
-              media={cover}
-              sizes="(min-width: 681px) 65vw, 100vw"
-              loading="eager"
-              fetchPriority="high"
-              className="max-h-[480px] w-full rounded-[5px] object-cover"
-            />
-          )}
-          <RichText data={post.content} converters={converters} className={articleBody} />
-          <Action href={journalPath} variant="outline" className="mt-10">
-            {labels.backButtonLabel}
-          </Action>
-        </article>
+          <div className={styles.ctaCard}>
+            <h2 className={styles.ctaHeading}>Planning a tattoo in Albania?</h2>
+            <p className={styles.ctaText}>
+              Explore how to plan your studio visit before you travel.
+            </p>
+            <Link href="/visiting-albania" className={styles.goldButton}>
+              Plan your visit
+              <span aria-hidden="true" className={styles.buttonIcon}>↗</span>
+            </Link>
+          </div>
+
+          {author && <p className={styles.author}>{author.name}</p>}
+        </aside>
       </div>
 
       <RenderBlocks blocks={labels.after} titleFromFirst={false} />
