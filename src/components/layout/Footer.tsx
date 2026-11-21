@@ -9,17 +9,11 @@ import { Wordmark } from './Wordmark'
 type FooterLink = { label: string; href: string }
 type FooterPage = { slug: string; title: string }
 
-// These pages have their own Next.js routes rather than entries in the Pages collection.
-// Keep this list aligned with the standalone routes in src/app/(frontend)/ and sitemap.ts.
-// The footer reads published CMS pages separately, so new top-level pages need no manual entry.
+// These guides are standalone Next.js routes rather than Pages collection entries.
 const travelGuides: FooterLink[] = [
   { label: 'From Italy', href: '/visiting-albania/from-italy' },
   { label: 'From Germany', href: '/visit/from-germany' },
   { label: 'From Poland', href: '/visit/from-poland' },
-]
-
-const serviceGuides: FooterLink[] = [
-  { label: 'Geometric tattoos', href: '/services/geometric-tattoo' },
 ]
 
 const legalPaths = new Set(['/privacy', '/privacy-policy', '/cookies', '/terms', '/terms-of-service'])
@@ -53,7 +47,10 @@ function uniqueLinks(links: FooterLink[]): FooterLink[] {
   })
 }
 
-/** Wordmark, site pages, standalone guides, social profiles and the legal line. */
+/**
+ * One four-column desktop row: logo, two columns of pages, travel guides.
+ * A single divider separates navigation from social and legal information.
+ */
 export function Footer({
   navigation,
   settings,
@@ -65,10 +62,9 @@ export function Footer({
 }) {
   const footer = navigation.footer
   const year = new Date().getFullYear()
-  const location = [settings.address?.city, settings.address?.country].filter(Boolean).join(', ')
 
-  // Keep editor-curated link labels/order, then add any other published CMS pages.
-  // Individual portfolio and journal entries never appear in this list.
+  // Preserve editor-curated links; automatically add any other published CMS pages.
+  // Portfolio pieces and journal articles are intentionally excluded.
   const cmsLinks = footerPages.map((page) => ({
     label: pageLabels[page.slug] ?? page.title,
     href: pathForDoc('pages', page.slug),
@@ -85,65 +81,55 @@ export function Footer({
   ])
 
   return (
-    // On phones, leave room under the footer for the homepage's pinned enquiry button.
-    <footer className="grid grid-cols-2 gap-[30px] px-site pt-[45px] pb-[25px] in-[body:has([data-mobile-cta])]:pb-[100px] md:grid-cols-3 md:pt-[55px] md:pb-7 md:in-[body:has([data-mobile-cta])]:pb-7">
-      <Wordmark settings={settings} />
-      <div>
-        {location && <span className="label-sm text-text md:text-[14px]">{location}</span>}
-        {settings.brandParagraph && (
-          <p className="mt-[5px] text-[16px]">{settings.brandParagraph}</p>
-        )}
+    // Leave space on phones for the homepage's pinned enquiry button.
+    <footer className="px-site pt-[45px] pb-[25px] in-[body:has([data-mobile-cta])]:pb-[100px] md:pt-[55px] md:pb-7 md:in-[body:has([data-mobile-cta])]:pb-7">
+      <div className="grid items-start gap-x-10 gap-y-10 lg:grid-cols-[minmax(220px,1.2fr)_minmax(0,3fr)] lg:gap-x-[65px]">
+        <Wordmark settings={settings} />
+
+        <nav aria-label="Footer" className="grid grid-cols-1 gap-x-9 gap-y-9 sm:grid-cols-3">
+          <div className="sm:col-span-2">
+            <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
+              Pages
+            </h2>
+            <ul className="mt-5 grid grid-cols-2 gap-x-7 gap-y-3">
+              {pageLinks.map((link) => (
+                <li key={pathname(link.href)}>
+                  <Link
+                    href={link.href}
+                    className="text-[14px] transition-colors hover:text-accent"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">
+              Travel guides
+            </h2>
+            <ul className="mt-5 flex flex-col gap-3">
+              {travelGuides.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-[14px] transition-colors hover:text-accent"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
       </div>
 
-      <nav aria-label="Footer" className="col-span-full grid grid-cols-1 gap-x-10 gap-y-8 border-t border-line pt-8 md:grid-cols-[2fr_1fr_1fr]">
-        <div>
-          <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">Pages</h2>
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3 md:grid-cols-2">
-            {pageLinks.map((link) => (
-              <li key={pathname(link.href)}>
-                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">Tattoo services</h2>
-          <ul className="mt-4 flex flex-col gap-3">
-            {serviceGuides.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h2 className="font-label text-[12px] tracking-[0.12em] text-faint uppercase">Travel guides</h2>
-          <ul className="mt-4 flex flex-col gap-3">
-            {travelGuides.map((link) => (
-              <li key={link.href}>
-                <Link href={link.href} className="text-[14px] transition-colors hover:text-accent">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-
-      <SocialLinks
-        studioName={settings.studioName}
-        links={settings.socialLinks}
-        className="col-span-full"
-      />
-
-      <div className="col-span-full mt-3 flex flex-col gap-3 border-t border-line pt-5 text-[14px] text-faint md:flex-row md:items-center md:justify-between">
-        <p>
-          {(footer?.legalLine || `© {year} ${settings.studioName}`).replace('{year}', String(year))}
-        </p>
+      <div className="mt-[45px] flex flex-col gap-5 border-t border-line pt-5 text-[14px] text-faint lg:flex-row lg:items-center lg:justify-between lg:gap-x-8">
+        <p>© {year} {settings.studioName}</p>
+        <SocialLinks
+          studioName={settings.studioName}
+          links={settings.socialLinks}
+        />
         {legalLinks.length > 0 && (
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {legalLinks.map((link) => (
