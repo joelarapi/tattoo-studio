@@ -98,6 +98,26 @@ export const getPageSlugs = cmsQuery('page-slugs', { collections: ['pages'] }, a
   return docs.map((doc) => doc.slug).filter((slug): slug is string => Boolean(slug))
 })
 
+/** Published CMS pages for the footer; excludes portfolio pieces and journal articles. */
+export const getFooterPages = cmsQuery(
+  'footer-pages',
+  { collections: ['pages'] },
+  async () => {
+    const payload = await getPayloadClient()
+    const { docs } = await payload.find({
+      collection: 'pages',
+      where: { _status: { equals: 'published' } },
+      select: { slug: true, title: true },
+      depth: 0,
+      limit: 500,
+      pagination: false,
+    })
+    return docs
+      .filter((doc) => Boolean(doc.slug))
+      .map((doc) => ({ slug: doc.slug!, title: doc.title }))
+  },
+)
+
 /** Text and sections shared by every portfolio piece's page. */
 export const getPieceTemplate = cmsQuery(
   'piece-template',
