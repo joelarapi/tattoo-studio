@@ -72,7 +72,11 @@ export function Footer({
     label: pageLabels[page.slug] ?? page.title,
     href: pathForDoc('pages', page.slug),
   }))
-  const allPageLinks = uniqueLinks([...(footer?.links ?? []), ...cmsLinks])
+  const allPageLinks = uniqueLinks([
+    ...cmsLinks.filter((link) => pathname(link.href) === '/'),
+    ...(footer?.links ?? []),
+    ...cmsLinks.toSorted((a, b) => a.label.localeCompare(b.label)),
+  ])
   const pageLinks = allPageLinks.filter((link) => !legalPaths.has(pathname(link.href)))
   const legalLinks = uniqueLinks([
     ...(footer?.legalLinks ?? []),
