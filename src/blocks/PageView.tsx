@@ -14,10 +14,13 @@ type PageBlock = NonNullable<Page['layout']>[number]
 
 // These are existing portfolio entries, not separate images or copies of CMS content.
 // A matching CMS "More portfolio pieces" block takes precedence over this fallback.
-const visitingPortfolioSlugs = [
-  'grim-reaper-full-back-tattoo',
-  'family-memory-full-sleeve-tattoo',
-  'lion-cub-family-sleeve-tattoo',
+const visitingPortfolioPicks = [
+  { slug: 'grim-reaper-full-back-tattoo', title: /grim reaper.*back/i },
+  { slug: 'family-memory-full-sleeve-tattoo', title: /family.*full sleeve/i },
+  { slug: 'lion-cub-family-sleeve-tattoo', title: /lion.*cub.*sleeve/i },
+  { slug: 'archangel-mary-full-sleeve-tattoo', title: /archangel.*mary.*sleeve/i },
+  { slug: 'lion-compass-forearm-tattoo', title: /lion.*compass.*forearm/i },
+  { slug: 'winged-warrior-arm-tattoo', title: /winged.*(angel|warrior).*sleeve/i },
 ]
 
 function hasPortfolioImage(item: PortfolioItem): boolean {
@@ -46,13 +49,16 @@ async function withVisitingPortfolio(page: Page): Promise<Page['layout']> {
   if (planIndex === -1 || hasCmsGallery) return blocks
 
   const items = (await getPortfolioItems()).filter(hasPortfolioImage)
-  const selected = visitingPortfolioSlugs
-    .map((slug) => items.find((item) => item.slug === slug))
+  // Match current CMS titles first, since editors may improve a piece's SEO slug.
+  // Fall back to the original portfolio slug, but never substitute an unrelated tattoo.
+  const selected = visitingPortfolioPicks
+    .map(({ slug, title }) =>
+      items.find((item) => title.test(item.title)) ?? items.find((item) => item.slug === slug),
+    )
     .filter((item): item is PortfolioItem => Boolean(item))
-  const fallback = items.filter(
-    (item) => /arm|forearm|sleeve|back/i.test(item.placement ?? '') && !selected.some((s) => s.id === item.id),
+  const pieces = selected.filter(
+    (item, index) => selected.findIndex((other) => other.id === item.id) === index,
   )
-  const pieces = [...selected, ...fallback].slice(0, 3)
   if (!pieces.length) return blocks
 
   const gallery: Extract<PageBlock, { blockType: 'pieceSuggestions' }> = {
