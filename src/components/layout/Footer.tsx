@@ -11,6 +11,7 @@ type FooterPage = { slug: string; title: string }
 
 // These pages have their own Next.js routes rather than entries in the Pages collection.
 // Keep this list aligned with the standalone routes in src/app/(frontend)/ and sitemap.ts.
+// The footer reads published CMS pages separately, so new top-level pages need no manual entry.
 const travelGuides: FooterLink[] = [
   { label: 'From Italy', href: '/visiting-albania/from-italy' },
   { label: 'From Germany', href: '/visit/from-germany' },
