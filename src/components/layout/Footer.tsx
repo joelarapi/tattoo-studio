@@ -5,6 +5,18 @@ import type { Navigation, SiteSetting } from '@/payload-types'
 
 import { Wordmark } from './Wordmark'
 
+// Standalone landing pages that may not yet be included in the CMS-managed footer menu.
+const additionalPages = [
+  { label: 'Tattoo Trip from Italy', href: '/visiting-albania/from-italy' },
+  { label: 'Tattoo Trip from Germany', href: '/visit/from-germany' },
+  { label: 'Tattoo Trip from Poland', href: '/visit/from-poland' },
+  { label: 'Geometric Tattoos', href: '/services/geometric-tattoo' },
+]
+
+function pathOnly(href: string): string {
+  return href.split(/[?#]/)[0].replace(/\/$/, '') || '/'
+}
+
 /** Wordmark, city and tagline, the page links, social profiles and the legal line. */
 export function Footer({
   navigation,
@@ -14,6 +26,19 @@ export function Footer({
   settings: SiteSetting
 }) {
   const footer = navigation.footer
+  const configuredLinks = footer?.links ?? []
+  const configuredPaths = new Set(configuredLinks.map((link) => pathOnly(link.href)))
+  const missingPages = additionalPages.filter((link) => !configuredPaths.has(link.href))
+  // Keep Contact at the end of the list when it is configured in the CMS.
+  const contactIndex = configuredLinks.findIndex((link) => pathOnly(link.href) === '/contact')
+  const links =
+    contactIndex === -1
+      ? [...configuredLinks, ...missingPages]
+      : [
+          ...configuredLinks.slice(0, contactIndex),
+          ...missingPages,
+          ...configuredLinks.slice(contactIndex),
+        ]
   const year = new Date().getFullYear()
   const location = [settings.address?.city, settings.address?.country].filter(Boolean).join(', ')
 
@@ -28,10 +53,10 @@ export function Footer({
         )}
       </div>
 
-      {!!footer?.links?.length && (
+      {links.length > 0 && (
         <ul className="col-span-2 flex flex-wrap gap-[22px] font-label text-[14px] md:col-span-1 md:flex-col md:gap-[9px] md:text-[14px]">
-          {footer.links.map((link) => (
-            <li key={link.id}>
+          {links.map((link) => (
+            <li key={link.href}>
               <Link href={link.href} className="transition-colors hover:text-accent">
                 {link.label}
               </Link>
