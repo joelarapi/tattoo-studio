@@ -43,14 +43,50 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   })
 }
 
-// Headings get ids for the "In this guide" links; the CTA block becomes a boxed note.
+// Preserve CMS copy and rich-text marks; add layout only where the content has structure.
+const textOfNode = (value: unknown): string => {
+  if (!value || typeof value !== 'object') return ''
+  const node = value as { text?: string; children?: unknown[] }
+  if (typeof node.text === 'string') return node.text
+  return (node.children ?? []).map(textOfNode).join('')
+}
+
 const converters: JSXConverters = {
   heading: ({ node, nodesToJSX }) => {
     const Heading = node.tag
+    const first = node.children[0]
+
+    // Style an existing leading section number without changing its words or anchor.
+    if (node.tag === 'h2' && first && 'text' in first && typeof first.text === 'string') {
+      const number = first.text.match(/^(\d{1,2}[.)])\s+/)
+      if (number) {
+        const remaining = [
+          { ...first, text: first.text.slice(number[0].length) },
+          ...node.children.slice(1),
+        ]
+        return (
+          <Heading id={headingNodeId(node)}>
+            <span className={styles.sectionNumber}>{number[1]}</span>{' '}
+            {nodesToJSX({ nodes: remaining })}
+          </Heading>
+        )
+      }
+    }
+
     return (
       <Heading id={node.tag === 'h2' ? headingNodeId(node) : undefined}>
         {nodesToJSX({ nodes: node.children })}
       </Heading>
+    )
+  },
+  paragraph: ({ node, nodesToJSX }) => {
+    const words = textOfNode(node).trim()
+    // Only short notes that already start "Best for" become compact category pills.
+    const isQuickTip = /^best for\b/i.test(words) && words.length <= 115
+    return (
+      <p className={isQuickTip ? styles.quickTip : undefined}>
+        {nodesToJSX({ nodes: node.children })}
+      </p>
     )
   },
   blocks: {

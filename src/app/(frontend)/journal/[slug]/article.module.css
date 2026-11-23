@@ -132,6 +132,29 @@
   margin-top: 14px;
 }
 
+/* A short overview under a major heading is a lead, not just another paragraph. */
+.content :global(h2 + p) {
+  color: var(--journal-heading);
+  font-size: clamp(18px, 1.5vw, 20px);
+  font-weight: 500;
+  line-height: 1.7;
+}
+
+/* Authored "Best for…" lines become subtle scan-friendly pills. */
+.content :global(p).quickTip {
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 22px;
+  padding: 6px 15px;
+  border: 1px solid color-mix(in srgb, var(--journal-gold) 34%, transparent);
+  border-radius: 999px;
+  color: var(--journal-secondary);
+  background: var(--journal-bg);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
 .content :global(h2),
 .content :global(h3),
 .content :global(h4) {
@@ -140,6 +163,11 @@
   font-weight: 600;
   line-height: 1.24;
   text-wrap: balance;
+}
+
+.sectionNumber {
+  color: var(--journal-highlight);
+  font-variant-numeric: tabular-nums;
 }
 
 .content :global(h2) {
@@ -214,6 +242,13 @@
 
 .content :global(li > p:first-child) { margin-top: 0; }
 .content :global(li > p + p) { margin-top: 6px; color: var(--journal-secondary); }
+
+/* Lists with a separate title paragraph get the hierarchy shown in the guide. */
+.content :global(li > p:first-child:has(+ p)) {
+  color: var(--journal-heading);
+  font-weight: 600;
+  line-height: 1.5;
+}
 
 /* Nested lists stay grouped with their parent. */
 .content :global(li li) {
@@ -445,6 +480,7 @@
   .content :global(h2) { margin-top: 46px; padding-top: 27px; }
   .content :global(h3) { margin-top: 30px; }
   .content :global(li) { padding-block: 12px 15px; }
+  .content :global(p).quickTip { font-size: 13px; }
   .content :global(blockquote) { padding: 18px 20px; }
   .ctaCard { padding: 21px; }
 }
