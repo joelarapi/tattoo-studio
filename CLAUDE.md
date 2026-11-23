@@ -115,6 +115,11 @@ Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.c
 - **Domain:** `londoninktattoo.com`, bought by the owner on Cloudflare. Its DNS records point at Vercel and are "DNS only". The apex is the main address and `www` redirects to it (13 Nov 2026); `NEXT_PUBLIC_SITE_URL` is `https://londoninktattoo.com`. The old `.vercel.app` address still works. Both R2 buckets' CORS rules must list the domain.
 - **Storage schema:** both `s3Storage` plugins use `alwaysInsertFields: true`, so `prefix`/`_objectKey` columns exist with or without R2. Production never pushes the schema, so without this, turning on R2 would break every media query. `pnpm media:to-r2` (`scripts/media-to-r2.ts`) re-uploads local files into R2. Local `.env` has the `S3_*` vars, so the seed uploads straight to R2.
 - **Orderable lists:** styles, portfolio, artists and FAQs use `orderable: true` (sorted by `_order`). The seed creates them one at a time, because `_order` follows creation order.
+- **Image optimization usage** (23 Nov 2026): Vercel Hobby includes 5,000 transformations a month, and Vercel warned at 75% on 20 Nov.
+  - **What counts:** every cache miss or expiry of a (source URL, width, quality, format) variant. The site has about 80 images, each with ~10 srcset widths, in AVIF and WebP.
+  - **Done:** R2 sends `max-age=0`, so Next 16's 4-hour default re-billed every variant. `minimumCacheTTL` is now 31 days (`next.config.ts`). This is safe because a replaced file gets a new `_objectKey` folder, so its URL changes.
+  - **Planned after the monthly reset:** WebP only, and fewer `deviceSizes`/`imageSizes`. Both change cache keys, so doing them near the limit would make new variants fail with 402 (alt text instead of the photo).
+  - **For launch:** a custom R2 domain instead of `r2.dev`, which is rate-limited and not meant for production. It changes every source URL, so it also belongs after a reset.
 - **next/image in Next 16:** `priority` is deprecated. Use `loading="eager"` + `fetchPriority="high"` (or `preload`), on one image per page at most.
 - **Favicon:** none yet (the 404 in the console). It comes with the logo in Phase 7.
 

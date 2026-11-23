@@ -12,6 +12,10 @@ const publicMediaURL = process.env.S3_PUBLIC_URL ? new URL(process.env.S3_PUBLIC
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
+    // Vercel bills a transformation each time a resized image expires and is made again. R2 sends
+    // `max-age=0`, so Next's 4-hour default applied. Media URLs never change content (a new upload
+    // gets a new `_objectKey` folder), so resized images can be kept for 31 days.
+    minimumCacheTTL: 2678400,
     formats: ['image/avif', 'image/webp'],
     localPatterns: [
       {
