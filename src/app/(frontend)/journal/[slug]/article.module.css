@@ -73,12 +73,14 @@
 
 .mainLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(265px, 305px);
+  grid-template-columns: minmax(0, 1fr) minmax(265px, 290px);
   align-items: start;
-  gap: clamp(40px, 5vw, 95px);
+  gap: clamp(32px, 4vw, 72px);
+  /* Share the hero's content edges; avoid double-guttering the article. */
+  width: calc(100% - 2 * var(--site-x));
   max-width: 1350px;
   margin-inline: auto;
-  padding: 35px var(--site-x) 90px;
+  padding-block: 35px 90px;
 }
 
 .article {
