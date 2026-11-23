@@ -3,12 +3,12 @@
   --journal-bg: #070605;
   --journal-panel: #0D0B08;
   --journal-heading: #F4EFE6;
-  --journal-text: #D6D0C6;
+  --journal-text: #E9E5DE;
   --journal-secondary: #B9B3A9;
   --journal-muted: #8E8A83;
-  --journal-gold: #B8893A;
-  --journal-highlight: #D1A75A;
-  --journal-line: rgba(255, 255, 255, 0.08);
+  --journal-gold: var(--color-accent, #AF7F20);
+  --journal-highlight: color-mix(in srgb, var(--journal-gold) 72%, white);
+  --journal-line: rgba(244, 239, 230, 0.12);
   min-height: 100vh;
   background: var(--journal-bg);
   color: var(--journal-text);
@@ -66,7 +66,7 @@
 .intro {
   max-width: 850px;
   margin-top: 24px;
-  color: var(--journal-secondary);
+  color: var(--journal-text);
   font-size: clamp(17px, 1.4vw, 19px);
   line-height: 1.8;
 }
@@ -97,9 +97,9 @@
 
 .content {
   color: var(--journal-text);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 400;
-  line-height: 1.87;
+  line-height: 1.8;
   overflow-wrap: break-word;
 }
 
@@ -111,8 +111,23 @@
   line-height: inherit;
 }
 
+/* Make the opening thought easier to scan without changing the CMS content. */
+.content > :global(p:first-child) {
+  margin-top: 0;
+  color: var(--journal-heading);
+  font-size: clamp(19px, 1.8vw, 22px);
+  font-weight: 500;
+  line-height: 1.65;
+}
+
 .content :global(p) {
-  margin-top: 22px;
+  margin-top: 20px;
+}
+
+.content :global(h2 + p),
+.content :global(h3 + p),
+.content :global(h4 + p) {
+  margin-top: 14px;
 }
 
 .content :global(h2),
@@ -126,21 +141,40 @@
 }
 
 .content :global(h2) {
-  margin-top: 52px;
+  position: relative;
+  margin-top: 68px;
+  padding-top: 34px;
+  border-top: 1px solid var(--journal-line);
   font-size: clamp(29px, 2.8vw, 38px);
   letter-spacing: -0.025em;
   scroll-margin-top: 28px;
 }
 
+/* Introduce each new section without inserting or rewriting the headline. */
+.content :global(h2::before) {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 52px;
+  height: 2px;
+  background: var(--journal-gold);
+  content: '';
+}
+
 .content :global(h3) {
   margin-top: 38px;
+  padding-left: 17px;
+  border-left: 2px solid var(--journal-gold);
   font-size: clamp(23px, 2.2vw, 28px);
   letter-spacing: -0.02em;
 }
 
 .content :global(h4) {
-  margin-top: 28px;
-  font-size: 20px;
+  margin-top: 32px;
+  color: var(--journal-highlight);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.075em;
 }
 
 .content :global(h2 strong),
@@ -157,14 +191,33 @@
 
 .content :global(ul),
 .content :global(ol) {
-  margin-top: 24px;
-  padding-left: 23px;
+  margin-block: 23px 36px;
+  padding-left: 25px;
 }
 
 .content :global(ul) { list-style: disc; }
 .content :global(ol) { list-style: decimal; }
-.content :global(li) { margin-top: 10px; padding-left: 3px; }
-.content :global(li::marker) { color: var(--journal-gold); }
+
+/* Dividers between points make long guides easier to scan. */
+.content :global(li) {
+  margin-top: 0;
+  padding: 14px 0 17px 6px;
+  border-bottom: 1px solid var(--journal-line);
+}
+
+.content :global(li::marker) {
+  color: var(--journal-highlight);
+  font-weight: 600;
+}
+
+.content :global(li > p:first-child) { margin-top: 0; }
+.content :global(li > p + p) { margin-top: 6px; color: var(--journal-secondary); }
+
+/* Nested lists stay grouped with their parent. */
+.content :global(li li) {
+  padding-block: 6px;
+  border-bottom: 0;
+}
 
 .content :global(a) {
   color: var(--journal-highlight);
@@ -175,10 +228,11 @@
 .content :global(a:hover) { color: var(--journal-heading); }
 
 .content :global(blockquote) {
-  margin-top: 28px;
-  padding: 14px 0 14px 23px;
-  border-left: 2px solid var(--journal-gold);
-  color: var(--journal-secondary);
+  margin-block: 32px;
+  padding: 24px 28px;
+  border: 1px solid var(--journal-line);
+  border-left: 3px solid var(--journal-gold);
+  color: var(--journal-text);
   background: var(--journal-panel);
 }
 
@@ -211,14 +265,18 @@
 }
 
 .inlineNotice {
-  margin-block: 32px;
-  border-color: var(--journal-line);
-  background: var(--journal-panel);
-  color: var(--journal-secondary);
+  margin-block: 38px;
+  padding: 25px;
+  border-color: color-mix(in srgb, var(--journal-gold) 38%, transparent);
+  background: linear-gradient(110deg, var(--journal-panel) 50%, #2A1E0D 100%);
+  color: var(--journal-text);
 }
 
 .inlineNotice :global(b) {
   color: var(--journal-heading);
+  font-size: 19px;
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .content :global(hr) {
@@ -294,8 +352,8 @@
 .ctaCard {
   margin-top: 25px;
   padding: 24px 22px;
-  border: 1px solid var(--journal-line);
-  background: var(--journal-panel);
+  border: 1px solid color-mix(in srgb, var(--journal-gold) 28%, transparent);
+  background: linear-gradient(130deg, var(--journal-panel), #22190E);
 }
 
 .ctaHeading {
@@ -321,7 +379,7 @@
   max-width: 100%;
   padding: 10px 11px 10px 19px;
   border-radius: 999px;
-  background: linear-gradient(110deg, #C99A48, #A9782A);
+  background: linear-gradient(110deg, var(--journal-highlight), var(--journal-gold));
   color: #171109;
   font-size: 12px;
   font-weight: 700;
@@ -355,7 +413,7 @@
 .backButton {
   margin-top: 42px;
   border-radius: 999px;
-  background: linear-gradient(110deg, #C99A48, #A9782A);
+  background: linear-gradient(110deg, var(--journal-highlight), var(--journal-gold));
   color: #171109;
   font-weight: 700;
   transition: filter 0.2s ease;
@@ -381,6 +439,10 @@
   .hero { padding-top: 40px; padding-bottom: 38px; }
   .mainLayout { padding-top: 25px; padding-bottom: 60px; }
   .headline { font-size: clamp(35px, 10vw, 48px); }
-  .content { font-size: 16.5px; line-height: 1.85; }
+  .content { font-size: 17px; line-height: 1.8; }
+  .content :global(h2) { margin-top: 46px; padding-top: 27px; }
+  .content :global(h3) { margin-top: 30px; }
+  .content :global(li) { padding-block: 12px 15px; }
+  .content :global(blockquote) { padding: 18px 20px; }
   .ctaCard { padding: 21px; }
 }
